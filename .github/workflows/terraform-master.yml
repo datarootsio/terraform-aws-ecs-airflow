@@ -1,0 +1,36 @@
+name: 'publish'
+on:
+  push:
+    branches:
+      - main
+jobs:
+  publish:
+    name: 'Publish'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@master
+      - name: Find Tag
+        id: get_latest_tag
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: 'HEAD~'
+      - name: 'Get next version'
+        id: next_tag
+        uses: "WyriHaximus/github-action-next-semvers@master"
+        with:
+          version: ${{ steps.get_latest_tag.outputs.tag }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "${{ steps.next_tag.outputs.v_patch }}"
+          release_name: "${{ steps.next_tag.outputs.v_patch }}"
+          body: |
+            Automatic release for ${{ steps.next_tag.outputs.v_patch }}
+          draft: false
+          prerelease: false
