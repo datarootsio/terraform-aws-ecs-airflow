@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/aws/aws-sdk-go/service/iam"
 	"testing"
 	"time"
 
@@ -26,9 +27,15 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 
 	terraformOptions.Vars["airflow_image_name"] = "puckel/docker-airflow"
 	terraformOptions.Vars["airflow_image_tag"] = "1.10.9"
+	terraformOptions.Vars["airflow_navbar_color"] = "#e27d60"
+
 	terraformOptions.Vars["ecs_cluster_name"] = "dtr-airflow-test"
+	terraformOptions.Vars["ecs_cpu"] = 256
+	terraformOptions.Vars["ecs_memory"] = 512
+
 	terraformOptions.Vars["vpc_id"] = "vpc-d8170bbe"
 	terraformOptions.Vars["subnet_id"] = "subnet-81b338db"
+
 	terraformOptions.Vars["rds_instance_class"] = "db.t2.micro"
 
 	return terraformOptions, nil
@@ -46,5 +53,16 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	_, err = terraform.InitAndApplyE(t, options)
 	assert.NoError(t, err)
 
+	iamClient := aws.NewIamClient(t, region)
+
+	// check if roles exists
+	rolesToCheck := []string{"airflow-task-execution-role", "airflow-task-role"}
+	for _, roleName := range rolesToCheck {
+		roleInput := &iam.GetRoleInput{RoleName: &roleName}
+		_, err := iamClient.GetRole(roleInput)
+		assert.Equal(t, err, nil)
+	}
+
+	// check if ecs cluster exists
 	aws.GetEcsCluster(t, region, "dtr-airflow-test")
 }
