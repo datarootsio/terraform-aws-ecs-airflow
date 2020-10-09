@@ -16,9 +16,9 @@ variable "airflow_log_region" {
 }
 
 variable "airflow_log_retention" {
-  type        = number
+  type        = string
   description = "The number of days you want to keep the log of airflow container"
-  default     = 7
+  default     = "7"
 }
 
 variable "airflow_navbar_color" {

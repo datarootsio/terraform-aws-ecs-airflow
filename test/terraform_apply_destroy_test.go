@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"testing"
 	"time"
@@ -28,7 +29,7 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 	terraformOptions.Vars["airflow_image_name"] = "puckel/docker-airflow"
 	terraformOptions.Vars["airflow_image_tag"] = "1.10.9"
 	terraformOptions.Vars["airflow_log_region"] = "eu-west-1"
-	terraformOptions.Vars["airflow_log_retention"] = 7
+	terraformOptions.Vars["airflow_log_retention"] = "7"
 	terraformOptions.Vars["airflow_navbar_color"] = "#e27d60"
 
 	terraformOptions.Vars["ecs_cluster_name"] = "dtr-airflow-test"
@@ -67,4 +68,12 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 
 	// check if ecs cluster exists
 	aws.GetEcsCluster(t, region, "dtr-airflow-test")
+	airflowEcsService := aws.GetEcsService(t, region, "dtr-airflow-test", "airflow")
+
+	for i := 0; i < 10; i++ {
+		fmt.Println("*airflowEcsService.Status")
+		fmt.Println(*airflowEcsService.Status)
+		time.Sleep(10 * time.Second)
+	}
+
 }
