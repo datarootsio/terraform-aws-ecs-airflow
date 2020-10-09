@@ -10,9 +10,27 @@ variable "airflow_image_tag" {
   default     = "1.10.9"
 }
 
+variable "airflow_navbar_color" {
+  type        = string
+  description = "The color of the airflow navbar; good way to distinguish your dev/stag/prod airflow"
+  default     = "#007A87"
+}
+
 variable "ecs_cluster_name" {
   type        = string
   description = "The name of the ecs cluster, this name will also be the log group"
+}
+
+variable "ecs_cpu" {
+  type        = number
+  description = "The allocated cpu for your airflow instance"
+  default     = 256
+}
+
+variable "ecs_memory" {
+  type        = number
+  description = "The allocated memory for your airflow instance"
+  default     = 512
 }
 
 variable "vpc_id" {
