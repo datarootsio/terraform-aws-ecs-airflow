@@ -49,3 +49,49 @@ resource "aws_ecs_task_definition" "airflow" {
   ]
   TASK_DEFINITION
 }
+
+resource "aws_ecs_service" "airflow" {
+  name            = "airflow"
+  cluster         = aws_ecs_cluster.airflow.id
+  task_definition = aws_ecs_task_definition.airflow.id
+  desired_count   = 1
+
+  network_configuration {
+    subnets          = [var.subnet_id]
+    security_groups  = [aws_security_group.airflow.id]
+    assign_public_ip = true
+  }
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 100
+  }
+}
+
+// BASIC SG's TO TEST IF YOU ARE ABLE TO CONNECT
+resource "aws_security_group" "airflow" {
+  vpc_id      = var.vpc_id
+  name        = "airflow"
+  description = "airflow"
+  tags = {
+    Name = "airflow"
+  }
+}
+
+resource "aws_security_group_rule" "ingress_from_lb" {
+  security_group_id = aws_security_group.airflow.id
+  type              = "ingress"
+  protocol          = "TCP"
+  from_port         = 8080
+  to_port           = 8080
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "https_in" {
+  security_group_id = aws_security_group.airflow.id
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+}

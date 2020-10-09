@@ -30,3 +30,5 @@ override.tf.json
 # example: *tfplan*
 .idea
 .vscode
+
+*.tfvars

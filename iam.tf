@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "task_execution_permissions" {
     effect = "Allow"
 
     resources = [
-      aws_cloudwatch_log_group.airflow.arn,
+      "*",
     ]
 
     actions = [
