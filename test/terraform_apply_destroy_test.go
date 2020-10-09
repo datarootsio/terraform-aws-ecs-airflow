@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
@@ -25,6 +26,7 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 
 	terraformOptions.Vars["airflow_image_name"] = "puckel/docker-airflow"
 	terraformOptions.Vars["airflow_image_tag"] = "1.10.9"
+	terraformOptions.Vars["ecs_cluster_name"] = "dtr-airflow-test"
 	terraformOptions.Vars["vpc_id"] = "vpc-d8170bbe"
 	terraformOptions.Vars["subnet_id"] = "subnet-81b338db"
 	terraformOptions.Vars["rds_instance_class"] = "db.t2.micro"
@@ -33,6 +35,8 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 }
 
 func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
+	region := "eu-west-1"
+
 	t.Parallel()
 
 	options, err := getDefaultTerraformOptions(t)
@@ -41,4 +45,6 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	defer terraform.Destroy(t, options)
 	_, err = terraform.InitAndApplyE(t, options)
 	assert.NoError(t, err)
+
+	aws.GetEcsCluster(t, region, "dtr-airflow-test")
 }

@@ -10,6 +10,11 @@ variable "airflow_image_tag" {
   default     = "1.10.9"
 }
 
+variable "ecs_cluster_name" {
+  type        = string
+  description = "The name of the ecs cluster, this name will also be the log group"
+}
+
 variable "vpc_id" {
   type        = string
   description = "The id of the vpc where you will run ecs/rds"
