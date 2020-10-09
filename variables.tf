@@ -10,6 +10,17 @@ variable "airflow_image_tag" {
   default     = "1.10.9"
 }
 
+variable "airflow_log_region" {
+  type        = string
+  description = "The region you want your airflow logs in"
+}
+
+variable "airflow_log_retention" {
+  type        = number
+  description = "The number of days you want to keep the log of airflow container"
+  default     = 7
+}
+
 variable "airflow_navbar_color" {
   type        = string
   description = "The color of the airflow navbar; good way to distinguish your dev/stag/prod airflow"

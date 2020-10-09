@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_log_group" "airflow" {
   name              = var.ecs_cluster_name
-  retention_in_days = "7"
+  retention_in_days = var.airflow_log_retention
 }
 
 resource "aws_ecs_cluster" "airflow" {
@@ -28,12 +28,13 @@ resource "aws_ecs_task_definition" "airflow" {
         "memory": ${var.ecs_memory},
         "name": "airflow",
         "environment": [
-            {"name": "AIRFLOW__WEBSERVER__NAVBAR_COLOR", "value": "${var.airflow_navbar_color}"},
+            {"name": "AIRFLOW__WEBSERVER__NAVBAR_COLOR", "value": "${var.airflow_navbar_color}"}
+        ],
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
             "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
-            "awslogs-region": "eu-west-1",
+            "awslogs-region": "${var.airflow_log_region}",
             "awslogs-stream-prefix": "container"
           }
         },
