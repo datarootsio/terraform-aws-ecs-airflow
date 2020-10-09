@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
@@ -24,8 +23,6 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 		Logger:             logger.TestingT,
 	}
 
-	terraformOptions.Vars["name"] = "cicd-aws"
-
 	return terraformOptions, nil
 }
 
@@ -35,13 +32,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	options, err := getDefaultTerraformOptions(t)
 	assert.NoError(t, err)
 
-	options.Vars["extra_tag"] = "my_super_tag"
-
 	defer terraform.Destroy(t, options)
 	_, err = terraform.InitAndApplyE(t, options)
 	assert.NoError(t, err)
-
-	aws.AssertS3BucketExists(t, "eu-west-1", "cicd-aws-this-is-a-blueprint")
-	bucketName := aws.FindS3BucketWithTag(t, "eu-west-1", "ExtraTag", "my_super_tag")
-	assert.Equal(t, bucketName, "cicd-aws-this-is-a-blueprint")
 }
