@@ -23,6 +23,12 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 		Logger:             logger.TestingT,
 	}
 
+	terraformOptions.Vars["airflow_image_name"] = "puckel/docker-airflow"
+	terraformOptions.Vars["airflow_image_tag"] = "1.10.9"
+	terraformOptions.Vars["vpc_id"] = "vpc-d8170bbe"
+	terraformOptions.Vars["subnet_id"] = "subnet-81b338db"
+	terraformOptions.Vars["rds_instance_class"] = "db.t2.micro"
+
 	return terraformOptions, nil
 }
 
