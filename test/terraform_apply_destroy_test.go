@@ -50,6 +50,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	clusterName := "dtr-airflow-test"
 	serviceName := "airflow"
 	desiredStatusRunning := "RUNNING"
+	retrySleepTime := time.Duration(10) * time.Second
 	ecsGetTaskArnMaxRetries := 10
 	ecsGetTaskStatusMaxRetries := 10
 
@@ -79,7 +80,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 
 	// check if the service is ACTIVE
 	airflowEcsService := aws.GetEcsService(t, region, clusterName, serviceName)
-	assert.Equal(t, *airflowEcsService.Status, "ACTIVE")
+	assert.Equal(t, "ACTIVE", *airflowEcsService.Status)
 	// check if there is 1 deployment namely the airflow one
 	assert.Equal(t, 1, len(airflowEcsService.Deployments))
 
@@ -98,7 +99,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 			taskArns = runningTasks.TaskArns
 			break
 		}
-		time.Sleep(10 * time.Second)
+		time.Sleep(retrySleepTime)
 	}
 	assert.Equal(t, 1, len(taskArns))
 
@@ -117,7 +118,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 			if taskStatus == "RUNNING" || taskStatus == "STOPPED"{
 				break
 			}
-			time.Sleep(10 * time.Second)
+			time.Sleep(retrySleepTime)
 		}
 		assert.Equal(t, "RUNNING", taskStatus)
 	}
