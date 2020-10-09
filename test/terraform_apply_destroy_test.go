@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"testing"
@@ -95,7 +94,6 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	var taskArns []*string
 	for i := 0; i < ecsGetTaskArnMaxRetries; i++ {
 		runningTasks, _ := ecsClient.ListTasks(listRunningTasksInput)
-		fmt.Println(runningTasks.String())
 		if len(runningTasks.TaskArns) == 1 {
 			taskArns = runningTasks.TaskArns
 			break
