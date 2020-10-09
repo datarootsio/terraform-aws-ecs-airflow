@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"testing"
 	"time"
@@ -45,7 +46,15 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 }
 
 func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
+	// 'GLOBAL' test vars
 	region := "eu-west-1"
+	clusterName := "dtr-airflow-test"
+	serviceName := "airflow"
+	desiredStatusRunning := "RUNNING"
+	ecsGetTaskArnMaxRetries := 10
+	ecsGetTaskStatusMaxRetries := 10
+
+	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
 	t.Parallel()
 
@@ -63,17 +72,55 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	for _, roleName := range rolesToCheck {
 		roleInput := &iam.GetRoleInput{RoleName: &roleName}
 		_, err := iamClient.GetRole(roleInput)
-		assert.Equal(t, err, nil)
+		assert.Equal(t, nil, err)
 	}
 
 	// check if ecs cluster exists
-	aws.GetEcsCluster(t, region, "dtr-airflow-test")
-	airflowEcsService := aws.GetEcsService(t, region, "dtr-airflow-test", "airflow")
+	aws.GetEcsCluster(t, region, clusterName)
 
-	for i := 0; i < 10; i++ {
-		fmt.Println("*airflowEcsService.Status")
-		fmt.Println(*airflowEcsService.Status)
-		time.Sleep(10 * time.Second)
+	// check if the service is ACTIVE
+	airflowEcsService := aws.GetEcsService(t, region, clusterName, serviceName)
+	assert.Equal(t, *airflowEcsService.Status, "ACTIVE")
+	// check if there is 1 deployment namely the airflow one
+	assert.Equal(t, 1, len(airflowEcsService.Deployments))
+
+	ecsClient := aws.NewEcsClient(t, region)
+	listRunningTasksInput := &ecs.ListTasksInput{
+		Cluster:       &clusterName,
+		ServiceName:   &serviceName,
+		DesiredStatus: &desiredStatusRunning,
 	}
 
+	// Wait until the airflow task is in a RUNNING state
+	var taskArns []*string
+	for i := 0; i < ecsGetTaskArnMaxRetries; i++ {
+		runningTasks, _ := ecsClient.ListTasks(listRunningTasksInput)
+		fmt.Println(runningTasks.String())
+		if len(runningTasks.TaskArns) == 1 {
+			taskArns = runningTasks.TaskArns
+			break
+		}
+		time.Sleep(10 * time.Second)
+	}
+	assert.Equal(t, 1, len(taskArns))
+
+	if len(taskArns) == 1{
+		describeTasksInput := &ecs.DescribeTasksInput{
+			Cluster: &clusterName,
+			Tasks:   taskArns,
+		}
+
+		var taskStatus string
+		for i := 0; i < ecsGetTaskStatusMaxRetries; i++ {
+			describeTasks, _ := ecsClient.DescribeTasks(describeTasksInput)
+			airflowTask := describeTasks.Tasks[0]
+
+			taskStatus = *airflowTask.LastStatus
+			if taskStatus == "RUNNING" || taskStatus == "STOPPED"{
+				break
+			}
+			time.Sleep(10 * time.Second)
+		}
+		assert.Equal(t, "RUNNING", taskStatus)
+	}
 }
