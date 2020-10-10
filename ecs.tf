@@ -50,14 +50,18 @@ resource "aws_ecs_task_definition" "airflow" {
   TASK_DEFINITION
 }
 
+// Without depends on I get this error:
+// Error: InvalidParameterException: The target group with targetGroupArn arn:aws:elasticloadbalancing:eu-west-1:428226611932:targetgroup/airflow/77a259290ea30e76 does not have an associated load balancer. "airflow"
 resource "aws_ecs_service" "airflow" {
+  depends_on = [aws_lb.airflow]
+
   name            = "airflow"
   cluster         = aws_ecs_cluster.airflow.id
   task_definition = aws_ecs_task_definition.airflow.id
   desired_count   = 1
 
   network_configuration {
-    subnets          = [var.subnet_id]
+    subnets          = [var.public_subnet_id]
     security_groups  = [aws_security_group.airflow.id]
     assign_public_ip = true
   }
@@ -66,32 +70,32 @@ resource "aws_ecs_service" "airflow" {
     capacity_provider = "FARGATE_SPOT"
     weight            = 100
   }
-}
 
-// BASIC SG's TO TEST IF YOU ARE ABLE TO CONNECT
-resource "aws_security_group" "airflow" {
-  vpc_id      = var.vpc_id
-  name        = "airflow"
-  description = "airflow"
-  tags = {
-    Name = "airflow"
+  load_balancer {
+    container_name   = "airflow"
+    container_port   = 8080
+    target_group_arn = aws_lb_target_group.airflow.arn
   }
+
 }
 
-resource "aws_security_group_rule" "ingress_from_lb" {
-  security_group_id = aws_security_group.airflow.id
-  type              = "ingress"
-  protocol          = "TCP"
-  from_port         = 8080
-  to_port           = 8080
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+resource "aws_lb_target_group" "airflow" {
+  name        = "airflow"
+  vpc_id      = var.vpc_id
+  protocol    = "HTTP"
+  port        = 8080
+  target_type = "ip"
 
-resource "aws_security_group_rule" "https_in" {
-  security_group_id = aws_security_group.airflow.id
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
+  health_check {
+    port                = 8080
+    protocol            = "HTTP"
+    interval            = 30
+    unhealthy_threshold = 3
+    matcher             = "200,302"
+
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }

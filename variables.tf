@@ -35,13 +35,13 @@ variable "ecs_cluster_name" {
 variable "ecs_cpu" {
   type        = number
   description = "The allocated cpu for your airflow instance"
-  default     = 256
+  default     = 1024
 }
 
 variable "ecs_memory" {
   type        = number
   description = "The allocated memory for your airflow instance"
-  default     = 512
+  default     = 2048
 }
 
 variable "vpc_id" {
@@ -49,9 +49,14 @@ variable "vpc_id" {
   description = "The id of the vpc where you will run ecs/rds"
 }
 
-variable "subnet_id" {
+variable "public_subnet_id" {
   type        = string
-  description = "The id of the subnet where you will run ecs/rds"
+  description = "The id of a public subnet for the alb/rds/ecs task to be in"
+}
+
+variable "backup_public_subnet_id" {
+  type        = string
+  description = "The id of a public backup subnet for the alb to be in"
 }
 
 variable "rds_instance_class" {
