@@ -3,9 +3,6 @@ resource "aws_security_group" "alb" {
   vpc_id      = var.vpc_id
   name        = "alb"
   description = "Security group for the alb attached to the airflow ecs task"
-  tags = {
-    Name = "airflow"
-  }
 
   egress {
     description = "Allow all traffic out"
@@ -13,6 +10,10 @@ resource "aws_security_group" "alb" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    name = "airflow"
   }
 }
 
@@ -31,9 +32,6 @@ resource "aws_security_group" "airflow" {
   vpc_id      = var.vpc_id
   name        = "airflow"
   description = "Security group to connect to the airflow instance"
-  tags = {
-    Name = "airflow"
-  }
 
   egress {
     description = "Allow all traffic out"
@@ -41,6 +39,10 @@ resource "aws_security_group" "airflow" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    name = "airflow"
   }
 }
 
@@ -62,6 +64,10 @@ resource "aws_lb" "airflow" {
   subnets            = [var.public_subnet_id, var.backup_public_subnet_id]
 
   enable_deletion_protection = false
+
+  tags = {
+    name = "airflow"
+  }
 }
 
 

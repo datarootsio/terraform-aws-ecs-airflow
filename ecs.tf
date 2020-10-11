@@ -1,6 +1,10 @@
 resource "aws_cloudwatch_log_group" "airflow" {
   name              = var.ecs_cluster_name
   retention_in_days = var.airflow_log_retention
+
+  tags = {
+    name = "airflow"
+  }
 }
 
 resource "aws_ecs_cluster" "airflow" {
@@ -9,6 +13,10 @@ resource "aws_ecs_cluster" "airflow" {
 
   default_capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"
+  }
+
+  tags = {
+    name = "airflow"
   }
 }
 
@@ -28,6 +36,13 @@ resource "aws_ecs_task_definition" "airflow" {
         "memory": ${var.ecs_memory},
         "name": "airflow",
         "environment": [
+            {"name": "LOAD_EX", "value": "n"},
+            {"name": "EXECUTOR", "value": "Local"},
+            {"name": "POSTGRES_HOST", "value": "${aws_db_instance.airflow.address}"},
+            {"name": "POSTGRES_PORT", "value": "${aws_db_instance.airflow.port}"},
+            {"name": "POSTGRES_USER", "value": "${var.rds_username}"},
+            {"name": "POSTGRES_PASSWORD", "value": "${var.rds_password}"},
+            {"name": "POSTGRES_DB", "value": "${aws_db_instance.airflow.name}"},
             {"name": "AIRFLOW__WEBSERVER__NAVBAR_COLOR", "value": "${var.airflow_navbar_color}"}
         ],
         "logConfiguration": {
@@ -48,12 +63,16 @@ resource "aws_ecs_task_definition" "airflow" {
     }
   ]
   TASK_DEFINITION
+
+  tags = {
+    name = "airflow"
+  }
 }
 
-// Without depends on I get this error:
+// Without depends_on I get this error:
 // Error: InvalidParameterException: The target group with targetGroupArn arn:aws:elasticloadbalancing:eu-west-1:428226611932:targetgroup/airflow/77a259290ea30e76 does not have an associated load balancer. "airflow"
 resource "aws_ecs_service" "airflow" {
-  depends_on = [aws_lb.airflow]
+  depends_on = [aws_lb.airflow, aws_db_instance.airflow]
 
   name            = "airflow"
   cluster         = aws_ecs_cluster.airflow.id
@@ -76,7 +95,6 @@ resource "aws_ecs_service" "airflow" {
     container_port   = 8080
     target_group_arn = aws_lb_target_group.airflow.arn
   }
-
 }
 
 resource "aws_lb_target_group" "airflow" {
@@ -97,5 +115,9 @@ resource "aws_lb_target_group" "airflow" {
 
   lifecycle {
     create_before_destroy = true
+  }
+
+  tags = {
+    name = "airflow"
   }
 }

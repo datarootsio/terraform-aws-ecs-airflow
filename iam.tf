@@ -44,12 +44,20 @@ data "aws_iam_policy_document" "task_execution_permissions" {
 resource "aws_iam_role" "execution" {
   name               = "airflow-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.task_assume.json
+
+  tags = {
+    name = "airflow"
+  }
 }
 
 # role for the airflow instance itself
 resource "aws_iam_role" "task" {
   name               = "airflow-task-role"
   assume_role_policy = data.aws_iam_policy_document.task_assume.json
+
+  tags = {
+    name = "airflow"
+  }
 }
 
 resource "aws_iam_role_policy" "task_execution" {

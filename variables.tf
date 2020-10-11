@@ -1,3 +1,4 @@
+// Airflow variables
 variable "airflow_image_name" {
   type        = string
   description = "The name of the airflow image"
@@ -27,6 +28,7 @@ variable "airflow_navbar_color" {
   default     = "#007A87"
 }
 
+// ECS variables
 variable "ecs_cluster_name" {
   type        = string
   description = "The name of the ecs cluster, this name will also be the log group"
@@ -44,6 +46,7 @@ variable "ecs_memory" {
   default     = 2048
 }
 
+// Networking variables
 variable "vpc_id" {
   type        = string
   description = "The id of the vpc where you will run ecs/rds"
@@ -59,9 +62,30 @@ variable "backup_public_subnet_id" {
   description = "The id of a public backup subnet for the alb to be in"
 }
 
+// RDS variables
+variable "rds_username" {
+  type        = string
+  description = "Username of rds"
+}
+
+variable "rds_password" {
+  type        = string
+  description = "Password of rds"
+}
+
 variable "rds_instance_class" {
   type        = string
   description = "The class of instance you want to give to your rds db"
   default     = "db.t2.micro"
+}
+
+variable "rds_availability_zone" {
+  type        = string
+  description = "Availability zone for the rds instance"
+}
+
+variable "rds_deletion_protection" {
+  type        = bool
+  description = "Deletion protection for the rds instance"
 }
 

@@ -45,7 +45,12 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 	terraformOptions.Vars["public_subnet_id"] = "subnet-01fa6330ad05a409f"
 	terraformOptions.Vars["backup_public_subnet_id"] = "subnet-051fd974e6b4f0db9"
 
+	// Get password and username from env vars
+	terraformOptions.Vars["rds_username"] = "dataroots"
+	terraformOptions.Vars["rds_password"] = "dataroots"
 	terraformOptions.Vars["rds_instance_class"] = "db.t2.micro"
+	terraformOptions.Vars["rds_availability_zone"] = "eu-west-1a"
+	terraformOptions.Vars["rds_deletion_protection"] = false
 
 	return terraformOptions, nil
 }
@@ -140,7 +145,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 		assert.Equal(t, "RUNNING", taskStatus)
 
 		// TODO: Figure out why even when it is running it returns a 503
-		// Solution for now is to wait for a minute
+		// Solution for now is to wait for half a minute
 		time.Sleep(time.Duration(30) * time.Second)
 
 		airflowAlbDns := terraform.Output(t, options, "airflow_alb_dns")
