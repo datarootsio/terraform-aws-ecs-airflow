@@ -38,7 +38,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "cpu" : ${var.ecs_cpu},
         "memory": ${var.ecs_memory},
         "name": "airflow-seed",
-        "command": "aws s3 cp s3://${local.s3_bucket_name}/${aws_s3_bucket_object.airflow-seed.key} /usr/local/airflow/dags/airflow-seed.py"
+        "command": "aws s3 cp s3://${local.s3_bucket_name}/${aws_s3_bucket_object.airflow-seed.key} /usr/local/airflow/dags/airflow-seed.py",
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
