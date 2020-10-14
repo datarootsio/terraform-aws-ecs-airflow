@@ -78,96 +78,93 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	_, err = terraform.InitAndApplyE(t, options)
 	assert.NoError(t, err)
 
-	if err != nil {
+	iamClient := aws.NewIamClient(t, region)
 
-		iamClient := aws.NewIamClient(t, region)
+	// check if roles exists
+	rolesToCheck := []string{"airflow-task-execution-role", "airflow-task-role"}
+	for _, roleName := range rolesToCheck {
+		roleInput := &iam.GetRoleInput{RoleName: &roleName}
+		_, err := iamClient.GetRole(roleInput)
+		assert.NoError(t, err)
+	}
 
-		// check if roles exists
-		rolesToCheck := []string{"airflow-task-execution-role", "airflow-task-role"}
-		for _, roleName := range rolesToCheck {
-			roleInput := &iam.GetRoleInput{RoleName: &roleName}
-			_, err := iamClient.GetRole(roleInput)
-			assert.NoError(t, err)
+	// check if ecs cluster exists
+	_, err = aws.GetEcsClusterE(t, region, clusterName)
+	assert.NoError(t, err)
+
+	// check if the service is ACTIVE
+	airflowEcsService, err := aws.GetEcsServiceE(t, region, clusterName, serviceName)
+	assert.NoError(t, err)
+	assert.Equal(t, "ACTIVE", *airflowEcsService.Status)
+	// check if there is 1 deployment namely the airflow one
+	assert.Equal(t, 1, len(airflowEcsService.Deployments))
+
+	ecsClient := aws.NewEcsClient(t, region)
+
+	// Get all the arns of the task that are running.
+	// There should only be one task running, the airflow task
+	listRunningTasksInput := &ecs.ListTasksInput{
+		Cluster:       &clusterName,
+		ServiceName:   &serviceName,
+		DesiredStatus: &desiredStatusRunning,
+	}
+
+	var taskArns []*string
+	for i := 0; i < ecsGetTaskArnMaxRetries; i++ {
+		runningTasks, _ := ecsClient.ListTasks(listRunningTasksInput)
+		if len(runningTasks.TaskArns) == 1 {
+			taskArns = runningTasks.TaskArns
+			break
+		}
+		time.Sleep(retrySleepTime)
+	}
+	// Check that there is only one task running
+	assert.Equal(t, 1, len(taskArns))
+
+	// If there is no task running you can't do the following tests so skip them
+	if len(taskArns) == 1 {
+		describeTasksInput := &ecs.DescribeTasksInput{
+			Cluster: &clusterName,
+			Tasks:   taskArns,
 		}
 
-		// check if ecs cluster exists
-		_, err = aws.GetEcsClusterE(t, region, clusterName)
-		assert.NoError(t, err)
+		// Wait until the airflow task is in a RUNNING state or STOPPED state
+		// RUNNING => the container startup went well
+		// STOPPED => the container crashed while starting up
+		var taskStatus string
+		for i := 0; i < ecsGetTaskStatusMaxRetries; i++ {
+			describeTasks, _ := ecsClient.DescribeTasks(describeTasksInput)
+			airflowTask := describeTasks.Tasks[0]
 
-		// check if the service is ACTIVE
-		airflowEcsService, err := aws.GetEcsServiceE(t, region, clusterName, serviceName)
-		assert.NoError(t, err)
-		assert.Equal(t, "ACTIVE", *airflowEcsService.Status)
-		// check if there is 1 deployment namely the airflow one
-		assert.Equal(t, 1, len(airflowEcsService.Deployments))
-
-		ecsClient := aws.NewEcsClient(t, region)
-
-		// Get all the arns of the task that are running.
-		// There should only be one task running, the airflow task
-		listRunningTasksInput := &ecs.ListTasksInput{
-			Cluster:       &clusterName,
-			ServiceName:   &serviceName,
-			DesiredStatus: &desiredStatusRunning,
-		}
-
-		var taskArns []*string
-		for i := 0; i < ecsGetTaskArnMaxRetries; i++ {
-			runningTasks, _ := ecsClient.ListTasks(listRunningTasksInput)
-			if len(runningTasks.TaskArns) == 1 {
-				taskArns = runningTasks.TaskArns
+			taskStatus = *airflowTask.LastStatus
+			if taskStatus == "RUNNING" || taskStatus == "STOPPED" {
 				break
 			}
 			time.Sleep(retrySleepTime)
 		}
-		// Check that there is only one task running
-		assert.Equal(t, 1, len(taskArns))
+		assert.Equal(t, "RUNNING", taskStatus)
 
-		// If there is no task running you can't do the following tests so skip them
-		if len(taskArns) == 1 {
-			describeTasksInput := &ecs.DescribeTasksInput{
-				Cluster: &clusterName,
-				Tasks:   taskArns,
-			}
+		// TODO: Figure out why even when it is running it returns a 503
+		// Solution for now is to wait for half a minute
+		time.Sleep(time.Duration(30) * time.Second)
 
-			// Wait until the airflow task is in a RUNNING state or STOPPED state
-			// RUNNING => the container startup went well
-			// STOPPED => the container crashed while starting up
-			var taskStatus string
-			for i := 0; i < ecsGetTaskStatusMaxRetries; i++ {
-				describeTasks, _ := ecsClient.DescribeTasks(describeTasksInput)
-				airflowTask := describeTasks.Tasks[0]
+		airflowAlbDns := terraform.Output(t, options, "airflow_alb_dns")
+		airflowUrl := fmt.Sprintf("http://%s", airflowAlbDns)
+		// Request the HTML page.
+		res, err := http.Get(airflowUrl)
+		assert.NoError(t, err)
 
-				taskStatus = *airflowTask.LastStatus
-				if taskStatus == "RUNNING" || taskStatus == "STOPPED" {
-					break
-				}
-				time.Sleep(retrySleepTime)
-			}
-			assert.Equal(t, "RUNNING", taskStatus)
+		// Check the status code
+		assert.Equal(t, 200, res.StatusCode)
 
-			// TODO: Figure out why even when it is running it returns a 503
-			// Solution for now is to wait for half a minute
-			time.Sleep(time.Duration(30) * time.Second)
+		// Get the actual HTML code
+		defer res.Body.Close()
+		doc, err := goquery.NewDocumentFromReader(res.Body)
+		assert.NoError(t, err)
 
-			airflowAlbDns := terraform.Output(t, options, "airflow_alb_dns")
-			airflowUrl := fmt.Sprintf("http://%s", airflowAlbDns)
-			// Request the HTML page.
-			res, err := http.Get(airflowUrl)
-			assert.NoError(t, err)
-
-			// Check the status code
-			assert.Equal(t, 200, res.StatusCode)
-
-			// Get the actual HTML code
-			defer res.Body.Close()
-			doc, err := goquery.NewDocumentFromReader(res.Body)
-			assert.NoError(t, err)
-
-			// Check if the navbar has the correct color
-			navbarStyle, exists := doc.Find(".navbar.navbar-inverse.navbar-fixed-top").First().Attr("style")
-			assert.Equal(t, true, exists)
-			assert.Equal(t, true, strings.Contains(navbarStyle, "background-color: #e27d60"))
-		}
+		// Check if the navbar has the correct color
+		navbarStyle, exists := doc.Find(".navbar.navbar-inverse.navbar-fixed-top").First().Attr("style")
+		assert.Equal(t, true, exists)
+		assert.Equal(t, true, strings.Contains(navbarStyle, "background-color: #e27d60"))
 	}
 }
