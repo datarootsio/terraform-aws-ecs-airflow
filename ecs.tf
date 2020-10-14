@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "airflow" {
             "awslogs-stream-prefix": "container"
           }
         },
-        "essential": true,
+        "essential": false,
         "mountPoints": [
           {
             "sourceVolume": "airflow-seed",
