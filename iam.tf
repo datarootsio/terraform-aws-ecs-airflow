@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "task_permissions" {
     resources = [
       "arn:aws:s3:::*"
     ]
-    
+
     actions = ["s3:ListBucket", "s3:ListAllMyBuckets"]
   }
 
