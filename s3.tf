@@ -15,10 +15,6 @@ resource "aws_s3_bucket" "airflow_seed" {
     }
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
-
   tags = {
     name = "airflow"
   }
