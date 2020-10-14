@@ -28,13 +28,44 @@ resource "aws_ecs_task_definition" "airflow" {
   network_mode             = "awsvpc"
   task_role_arn            = aws_iam_role.task.arn
   execution_role_arn       = aws_iam_role.execution.arn
-  container_definitions    = <<TASK_DEFINITION
+  volume {
+    name = "airflow-seed"
+  }
+  container_definitions = <<TASK_DEFINITION
   [
+ {
+        "image": "amazon/aws-cli",
+        "cpu" : ${var.ecs_cpu},
+        "memory": ${var.ecs_memory},
+        "name": "airflow-seed",
+        "command": "aws s3 cp s3://${local.s3_bucket_name}/${aws_s3_bucket_object.airflow-seed.key} /usr/local/airflow/dags/airflow-seed.py"
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
+            "awslogs-region": "${var.airflow_log_region}",
+            "awslogs-stream-prefix": "container"
+          }
+        },
+        "essential": true,
+        "mountPoints": [
+          {
+            "sourceVolume": "airflow-seed",
+            "containerPath": "/usr/local/airflow/dags"
+          }
+        ]
+    },
     {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "cpu" : ${var.ecs_cpu},
         "memory": ${var.ecs_memory},
         "name": "airflow",
+        "dependsOn": [
+            {
+                "containerName": "airflow-seed",
+                "condition": "COMPLETE"
+            }
+        ],
         "environment": [
             {"name": "LOAD_EX", "value": "n"},
             {"name": "EXECUTOR", "value": "Local"},
@@ -54,6 +85,12 @@ resource "aws_ecs_task_definition" "airflow" {
           }
         },
         "essential": true,
+        "mountPoints": [
+          {
+            "sourceVolume": "airflow-seed",
+            "containerPath": "/usr/local/airflow/dags"
+          }
+        ],
         "portMappings": [
             {
                 "containerPort": 8080,

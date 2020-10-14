@@ -23,6 +23,22 @@ data "aws_iam_policy_document" "task_permissions" {
       "logs:PutLogEvents",
     ]
   }
+
+  statement {
+    effect = "Allow"
+
+    resources = [
+      "arn:aws:s3:::*"
+    ]
+    actions = ["s3:ListBucket", "s3:ListAllMyBuckets"]
+  }
+
+  statement {
+    effect    = "Allow"
+    resources = ["arn:aws:s3:::${local.s3_bucket_name}", "arn:aws:s3:::${local.s3_bucket_name}/*"]
+    actions   = ["s3:ListBucket", "s3:GetObject"]
+  }
+
 }
 
 data "aws_iam_policy_document" "task_execution_permissions" {

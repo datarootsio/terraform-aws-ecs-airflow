@@ -89,3 +89,15 @@ variable "rds_deletion_protection" {
   description = "Deletion protection for the rds instance"
 }
 
+// S3 Bucket
+
+variable "s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The S3 bucket name where the DAG seed will be stored"
+}
+
+locals {
+  s3_bucket_name = var.s3_bucket_name != "" ? var.s3_bucket_name : aws_s3_bucket.airflow_seed[0].id
+}
+
