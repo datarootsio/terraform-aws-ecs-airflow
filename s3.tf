@@ -20,7 +20,7 @@ resource "aws_s3_bucket" "airflow_seed" {
   }
 
   tags = {
-    Name = "airflow"
+    name = "airflow"
   }
 }
 
