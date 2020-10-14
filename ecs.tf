@@ -35,8 +35,6 @@ resource "aws_ecs_task_definition" "airflow" {
   [
  {
         "image": "amazon/aws-cli",
-        "cpu" : ${var.ecs_cpu},
-        "memory": ${var.ecs_memory},
         "name": "airflow-seed",
         "command": ["aws s3 cp s3://${local.s3_bucket_name}/${aws_s3_bucket_object.airflow-seed.key} /usr/local/airflow/dags/airflow-seed.py"],
         "logConfiguration": {
@@ -57,8 +55,6 @@ resource "aws_ecs_task_definition" "airflow" {
     },
     {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
-        "cpu" : ${var.ecs_cpu},
-        "memory": ${var.ecs_memory},
         "name": "airflow",
         "dependsOn": [
             {
