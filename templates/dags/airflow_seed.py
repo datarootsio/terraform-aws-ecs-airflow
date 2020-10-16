@@ -1,4 +1,3 @@
-"""
 import datetime
 from datetime import timedelta
 
@@ -29,6 +28,11 @@ with DAG(
     default_args=args,
     schedule_interval=None
 ) as dag:
+    list_dags_before = BashOperator(
+        task_id="list_dags_before_delete",
+        bash_command="ls ${AIRFLOW_HOME}/dags",
+    )
+
     def get_dag_id(dag_file_path):
         with open(dag_file_path, "r") as file:
             all_python_code = file.read()
@@ -46,9 +50,9 @@ with DAG(
 
     def sync_s3_dags_to_local_dags(**context):
         bucket_name = "${BUCKET_NAME}"
-        remote_directory_name = "airflow/dags/"
+        remote_directory_name = "dags"
 
-        folder_local = "/usr/local/airflow/dags"
+        folder_local = "${AIRFLOW_HOME}/dags"
 
         s3_resource = boto3.resource("s3")
         bucket = s3_resource.Bucket(bucket_name)
@@ -57,10 +61,9 @@ with DAG(
         # get files from s3
         for object in bucket.objects.filter(Prefix=remote_directory_name):
             file_name = object.key.split("/")[-1]
-            if "_wf.py" in file_name:
-                dag_files_in_s3.append(file_name)
-                print(f"Adding file: {folder_local}/{file_name}")
-                bucket.download_file(object.key, f"{folder_local}/{file_name}")
+            dag_files_in_s3.append(file_name)
+            print(f"Adding file: {folder_local}/{file_name}")
+            bucket.download_file(object.key, f"{folder_local}/{file_name}")
 
         # remove all the files and dags not in s3
         files_in_dag_folder = [f for f in listdir(folder_local) if isfile(join(folder_local, f))]
@@ -80,20 +83,14 @@ with DAG(
         provide_context=True,
     )
 
-    list_dags_before_delete = BashOperator(
-        task_id="list_dags_before_delete",
-        bash_command="ls /usr/local/airflow/dags",
-    )
-
     refresh_dag_bag = BashOperator(
         task_id="refresh_dag_bag",
         bash_command="python -c 'from airflow.models import DagBag; d = DagBag();'",
     )
 
-    list_dags_after_delete = BashOperator(
+    list_dags_after = BashOperator(
         task_id="list_dags_after_delete",
-        bash_command="ls /usr/local/airflow/dags",
+        bash_command="ls ${AIRFLOW_HOME}/dags",
     )
 
-    sync_dags >> list_dags_before_delete >> refresh_dag_bag >> list_dags_after_delete
-"""
+    list_dags_before >> sync_dags >> refresh_dag_bag >> list_dags_after
