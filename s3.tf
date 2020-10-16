@@ -28,8 +28,32 @@ resource "aws_s3_bucket_public_access_block" "airflow" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_object" "airflow_seed" {
+resource "aws_s3_bucket_object" "airflow_seed_dag" {
   bucket  = local.s3_bucket_name
   key     = "dags/airflow_seed.py"
   content = templatefile("${path.module}/templates/dags/airflow_seed.py", { BUCKET_NAME = local.s3_bucket_name })
+}
+
+resource "aws_s3_bucket_object" "airflow_example_dag" {
+  bucket  = local.s3_bucket_name
+  key     = "dags/example_dag.py"
+  content = templatefile("${path.module}/templates/dags/example_dag.py", {})
+}
+
+resource "aws_s3_bucket_object" "airflow_scheduler_entrypoint" {
+  bucket  = local.s3_bucket_name
+  key     = "startup/entrypoint_scheduler.sh"
+  content = templatefile("${path.module}/templates/startup/entrypoint_scheduler.sh", { AIRFLOW_HOME = local.airflow_container_home })
+}
+
+resource "aws_s3_bucket_object" "airflow_webserver_entrypoint" {
+  bucket  = local.s3_bucket_name
+  key     = "startup/entrypoint_webserver.sh"
+  content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", { AIRFLOW_HOME = local.airflow_container_home })
+}
+
+resource "aws_s3_bucket_object" "airflow_requirements" {
+  bucket  = local.s3_bucket_name
+  key     = "startup/requirements.txt"
+  content = templatefile("${path.module}/templates/startup/requirements.txt", {})
 }
