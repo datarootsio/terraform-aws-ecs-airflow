@@ -1,3 +1,21 @@
+variable "resource_prefix" {
+  type = string
+  description = "A prefix for the create resources, example your company name"
+  default = "dataroots"
+}
+
+variable "resource_suffix" {
+  type = string
+  description = "A suffix for the created resources, example the environment for airflow to run in"
+  default = "dev"
+}
+
+variable "extra_tags" {
+  description = "Extra tags that you would like to add to all created resources"
+  type        = map(string)
+  default     = {}
+}
+
 // Airflow variables
 variable "airflow_image_name" {
   type        = string
@@ -90,14 +108,8 @@ variable "rds_deletion_protection" {
 }
 
 // S3 Bucket
-
 variable "s3_bucket_name" {
   type        = string
   default     = ""
   description = "The S3 bucket name where the DAG seed will be stored"
 }
-
-locals {
-  s3_bucket_name = var.s3_bucket_name != "" ? var.s3_bucket_name : aws_s3_bucket.airflow_seed[0].id
-}
-

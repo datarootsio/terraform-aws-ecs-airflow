@@ -2,9 +2,7 @@ resource "aws_cloudwatch_log_group" "airflow" {
   name              = var.ecs_cluster_name
   retention_in_days = var.airflow_log_retention
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
 }
 
 resource "aws_ecs_cluster" "airflow" {
@@ -15,9 +13,7 @@ resource "aws_ecs_cluster" "airflow" {
     capacity_provider = "FARGATE_SPOT"
   }
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
 }
 
 resource "aws_ecs_task_definition" "airflow" {
@@ -102,9 +98,7 @@ resource "aws_ecs_task_definition" "airflow" {
   ]
   TASK_DEFINITION
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
 }
 
 // Without depends_on I get this error:
@@ -155,7 +149,5 @@ resource "aws_lb_target_group" "airflow" {
     create_before_destroy = true
   }
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
 }

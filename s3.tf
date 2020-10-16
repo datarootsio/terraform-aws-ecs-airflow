@@ -15,9 +15,7 @@ resource "aws_s3_bucket" "airflow_seed" {
     }
   }
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
 }
 
 resource "aws_s3_bucket_public_access_block" "airflow_seed" {

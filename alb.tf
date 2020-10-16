@@ -12,9 +12,7 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
 }
 
 resource "aws_security_group_rule" "alb_outside_http" {
@@ -41,9 +39,8 @@ resource "aws_security_group" "airflow" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
+
 }
 
 resource "aws_security_group_rule" "airflow_connection" {
@@ -65,9 +62,7 @@ resource "aws_lb" "airflow" {
 
   enable_deletion_protection = false
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
 }
 
 

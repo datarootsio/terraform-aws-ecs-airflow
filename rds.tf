@@ -16,18 +16,14 @@ resource "aws_db_instance" "airflow" {
   vpc_security_group_ids    = [aws_security_group.airflow.id]
   db_subnet_group_name      = aws_db_subnet_group.airflow.name
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
 }
 
 resource "aws_db_subnet_group" "airflow" {
   name       = "airflow"
   subnet_ids = [var.public_subnet_id, var.backup_public_subnet_id]
 
-  tags = {
-    name = "airflow"
-  }
+  tags = local.common_tags
 }
 
 
