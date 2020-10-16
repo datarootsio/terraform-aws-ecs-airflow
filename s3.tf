@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "airflow_seed" {
   count  = var.s3_bucket_name == "" ? 1 : 0
-  bucket = "airflow-seed"
+  bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   acl    = "private"
 
   versioning {
@@ -34,6 +34,6 @@ data "template_file" "airflow-seed" {
 
 resource "aws_s3_bucket_object" "airflow-seed" {
   bucket  = local.s3_bucket_name
-  key     = "airflow-seed.py"
-  content = templatefile("${path.module}/templates/airflow-seed.py", { BUCKET_NAME = local.s3_bucket_name })
+  key     = "dags/airflow-seed.py"
+  content = templatefile("${path.module}/templates/dags/airflow-seed.py", { BUCKET_NAME = local.s3_bucket_name })
 }
