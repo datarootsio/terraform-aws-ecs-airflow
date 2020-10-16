@@ -8,6 +8,6 @@ locals {
   }
   common_tags = merge(local.own_tags, var.extra_tags)
 
-  s3_bucket_name         = var.s3_bucket_name != "" ? var.s3_bucket_name : aws_s3_bucket.airflow_seed[0].id
+  s3_bucket_name         = var.s3_bucket_name != "" ? var.s3_bucket_name : aws_s3_bucket.airflow[0].id
   airflow_container_name = "${var.resource_prefix}-airflow-${var.resource_suffix}"
 }

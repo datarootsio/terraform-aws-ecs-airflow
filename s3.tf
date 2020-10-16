@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "airflow_seed" {
+resource "aws_s3_bucket" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
   bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   acl    = "private"
@@ -18,9 +18,9 @@ resource "aws_s3_bucket" "airflow_seed" {
   tags = local.common_tags
 }
 
-resource "aws_s3_bucket_public_access_block" "airflow_seed" {
+resource "aws_s3_bucket_public_access_block" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
-  bucket = aws_s3_bucket.airflow_seed[0].id
+  bucket = aws_s3_bucket.airflow[0].id
 
   block_public_acls       = true
   block_public_policy     = true
