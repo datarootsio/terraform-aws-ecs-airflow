@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "airflow" {
   }
   container_definitions = <<TASK_DEFINITION
   [
- {
+    {
         "image": "amazon/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
@@ -62,6 +62,13 @@ resource "aws_ecs_task_definition" "airflow" {
                 "containerName": "${local.airflow_sidecar_container_name}",
                 "condition": "COMPLETE"
             }
+        ],
+        "command": [
+            "/bin/sh -c \"chmod +x ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key}\""
+        ],
+        "entryPoint": [
+            "sh",
+            "-c"
         ],
         "environment": [
             {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"},
@@ -97,6 +104,13 @@ resource "aws_ecs_task_definition" "airflow" {
                 "containerName": "${local.airflow_sidecar_container_name}",
                 "condition": "COMPLETE"
             }
+        ],
+        "command": [
+            "/bin/sh -c \"chmod +x ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key}\""
+        ],
+        "entryPoint": [
+            "sh",
+            "-c"
         ],
         "environment": [
             {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"},
