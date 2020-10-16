@@ -59,6 +59,10 @@ variable "ecs_memory" {
   default     = 2048
 }
 
+// TODO: Add param to create SSL cert based on dns
+// TODO: Add param to give SSL arn
+// TODO: If no dns or ssl, put it public
+// TODO: Add ip allowlist
 // Networking variables
 variable "vpc_id" {
   type        = string
@@ -75,6 +79,7 @@ variable "backup_public_subnet_id" {
   description = "The id of a public backup subnet for the alb to be in"
 }
 
+// TODO: Add more rds params and option to give own cluster uri
 // RDS variables
 variable "rds_username" {
   type        = string

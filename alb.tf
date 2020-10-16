@@ -65,7 +65,7 @@ resource "aws_lb" "airflow" {
   tags = local.common_tags
 }
 
-
+// TODO: option to listen on 443 with SSL Cert
 resource "aws_lb_listener" "airflow" {
   load_balancer_arn = aws_lb.airflow.arn
   port              = "80"
