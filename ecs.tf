@@ -17,39 +17,42 @@ resource "aws_ecs_cluster" "airflow" {
 }
 
 resource "aws_ecs_task_definition" "airflow" {
-  family                   = "airflow"
+  family                   = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.ecs_cpu
   memory                   = var.ecs_memory
   network_mode             = "awsvpc"
   task_role_arn            = aws_iam_role.task.arn
   execution_role_arn       = aws_iam_role.execution.arn
+
   volume {
-    name = "airflow"
+    name = local.airflow_volume_name
   }
+
   container_definitions = <<TASK_DEFINITION
   [
     {
-        "image": "amazon/aws-cli",
+        "image": "mikesir87/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
-          "s3",
-          "cp",
-          "s3://${local.s3_bucket_name}/${local.s3_key}",
-          "${local.airflow_container_home}"
+            "/bin/sh -c \"aws s3 cp s3://${local.s3_bucket_name}/${local.s3_key} ${local.airflow_container_home} --recursive && chmod +x ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${local.airflow_container_home}\""
+        ],
+        "entryPoint": [
+            "sh",
+            "-c"
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
             "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
             "awslogs-region": "${var.airflow_log_region}",
-            "awslogs-stream-prefix": "${local.airflow_sidecar_container_name}"
+            "awslogs-stream-prefix": "airflow"
           }
         },
         "essential": false,
         "mountPoints": [
           {
-            "sourceVolume": "airflow",
+            "sourceVolume": "${local.airflow_volume_name}",
             "containerPath": "${local.airflow_container_home}"
           }
         ]
@@ -64,7 +67,7 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "/bin/sh -c \"chmod +x ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key}\""
+            "/bin/sh -c \"${local.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key}\""
         ],
         "entryPoint": [
             "sh",
@@ -79,21 +82,15 @@ resource "aws_ecs_task_definition" "airflow" {
           "options": {
             "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
             "awslogs-region": "${var.airflow_log_region}",
-            "awslogs-stream-prefix": "${local.airflow_scheduler_container_name}"
+            "awslogs-stream-prefix": "airflow"
           }
         },
         "essential": true,
         "mountPoints": [
           {
-            "sourceVolume": "airflow",
+            "sourceVolume": "${local.airflow_volume_name}",
             "containerPath": "${local.airflow_container_home}"
           }
-        ],
-        "portMappings": [
-            {
-                "containerPort": 8080,
-                "hostPort": 8080
-            }
         ]
     },
     {
@@ -106,7 +103,7 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "/bin/sh -c \"chmod +x ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key}\""
+            "/bin/sh -c \"${local.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key}\""
         ],
         "entryPoint": [
             "sh",
@@ -121,14 +118,14 @@ resource "aws_ecs_task_definition" "airflow" {
           "options": {
             "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
             "awslogs-region": "${var.airflow_log_region}",
-            "awslogs-stream-prefix": "${local.airflow_webserver_container_name}"
+            "awslogs-stream-prefix": "airflow"
           }
         },
         "essential": true,
         "mountPoints": [
           {
-            "sourceVolume": "airflow",
-            "containerPath": "/opt/airflow"
+            "sourceVolume": "${local.airflow_volume_name}",
+            "containerPath": "${local.airflow_container_home}"
           }
         ],
         "portMappings": [

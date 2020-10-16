@@ -1,5 +1,5 @@
 resource "aws_db_instance" "airflow" {
-  name                      = "${var.resource_prefix}-airflow-${var.resource_suffix}"
+  name                      = local.rds_name
   allocated_storage         = 20
   storage_type              = "standard"
   engine                    = "postgres"
