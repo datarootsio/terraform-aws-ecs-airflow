@@ -142,7 +142,10 @@ resource "aws_ecs_task_definition" "airflow" {
 }
 
 // Without depends_on I get this error:
-// Error: InvalidParameterException: The target group with targetGroupArn arn:aws:elasticloadbalancing:eu-west-1:428226611932:targetgroup/airflow/77a259290ea30e76 does not have an associated load balancer. "airflow"
+// Error:
+//  InvalidParameterException: The target group with targetGroupArn
+//  arn:aws:elasticloadbalancing:eu-west-1:428226611932:targetgroup/airflow/77a259290ea30e76
+//  does not have an associated load balancer. "airflow"
 resource "aws_ecs_service" "airflow" {
   depends_on = [aws_lb.airflow, aws_db_instance.airflow]
 
