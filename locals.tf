@@ -1,10 +1,10 @@
 locals {
   module_name = "terraform-aws-ecs-airflow"
-  
+
   own_tags = {
     Name      = "airflow"
     CreatedBy = "Terrafrom"
-    Module = local.module_name
+    Module    = local.module_name
   }
   common_tags = merge(local.own_tags, var.extra_tags)
 

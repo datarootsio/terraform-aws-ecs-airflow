@@ -1,3 +1,4 @@
+"""
 import datetime
 from datetime import timedelta
 
@@ -95,3 +96,4 @@ with DAG(
     )
 
     sync_dags >> list_dags_before_delete >> refresh_dag_bag >> list_dags_after_delete
+"""
