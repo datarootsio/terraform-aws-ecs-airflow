@@ -1,7 +1,7 @@
 // SG only meant for the alb to connect to the outside world
 resource "aws_security_group" "alb" {
   vpc_id      = var.vpc_id
-  name        = "alb"
+  name        = "${var.resource_prefix}-alb-${var.resource_suffix}"
   description = "Security group for the alb attached to the airflow ecs task"
 
   egress {
@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "alb_outside_http" {
 // the airflow ecs task. For example rds and the alb
 resource "aws_security_group" "airflow" {
   vpc_id      = var.vpc_id
-  name        = "airflow"
+  name        = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   description = "Security group to connect to the airflow instance"
 
   egress {
@@ -54,7 +54,7 @@ resource "aws_security_group_rule" "airflow_connection" {
 
 // ALB
 resource "aws_lb" "airflow" {
-  name               = "airflow"
+  name               = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id, aws_security_group.airflow.id]

@@ -1,13 +1,13 @@
 variable "resource_prefix" {
-  type = string
+  type        = string
   description = "A prefix for the create resources, example your company name"
-  default = "dataroots"
+  default     = "dataroots"
 }
 
 variable "resource_suffix" {
-  type = string
+  type        = string
   description = "A suffix for the created resources, example the environment for airflow to run in"
-  default = "dev"
+  default     = "dev"
 }
 
 variable "extra_tags" {
@@ -47,11 +47,6 @@ variable "airflow_navbar_color" {
 }
 
 // ECS variables
-variable "ecs_cluster_name" {
-  type        = string
-  description = "The name of the ecs cluster, this name will also be the log group"
-}
-
 variable "ecs_cpu" {
   type        = number
   description = "The allocated cpu for your airflow instance"

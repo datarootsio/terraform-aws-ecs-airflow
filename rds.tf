@@ -1,5 +1,5 @@
 resource "aws_db_instance" "airflow" {
-  name                      = "airflow"
+  name                      = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   allocated_storage         = 20
   storage_type              = "standard"
   engine                    = "postgres"
@@ -20,7 +20,7 @@ resource "aws_db_instance" "airflow" {
 }
 
 resource "aws_db_subnet_group" "airflow" {
-  name       = "airflow"
+  name       = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   subnet_ids = [var.public_subnet_id, var.backup_public_subnet_id]
 
   tags = local.common_tags

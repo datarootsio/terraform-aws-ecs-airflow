@@ -1,12 +1,12 @@
 resource "aws_cloudwatch_log_group" "airflow" {
-  name              = var.ecs_cluster_name
+  name              = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   retention_in_days = var.airflow_log_retention
 
   tags = local.common_tags
 }
 
 resource "aws_ecs_cluster" "airflow" {
-  name               = var.ecs_cluster_name
+  name               = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   capacity_providers = ["FARGATE_SPOT", "FARGATE"]
 
   default_capacity_provider_strategy {
@@ -56,7 +56,7 @@ resource "aws_ecs_task_definition" "airflow" {
     },
     {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
-        "name": "airflow",
+        "name": "${local.airflow_container_name}",
         "dependsOn": [
             {
                 "containerName": "airflow-seed",
@@ -106,7 +106,7 @@ resource "aws_ecs_task_definition" "airflow" {
 resource "aws_ecs_service" "airflow" {
   depends_on = [aws_lb.airflow, aws_db_instance.airflow]
 
-  name            = "airflow"
+  name            = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   cluster         = aws_ecs_cluster.airflow.id
   task_definition = aws_ecs_task_definition.airflow.id
   desired_count   = 1
@@ -123,14 +123,14 @@ resource "aws_ecs_service" "airflow" {
   }
 
   load_balancer {
-    container_name   = "airflow"
+    container_name   = local.airflow_container_name
     container_port   = 8080
     target_group_arn = aws_lb_target_group.airflow.arn
   }
 }
 
 resource "aws_lb_target_group" "airflow" {
-  name        = "airflow"
+  name        = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   vpc_id      = var.vpc_id
   protocol    = "HTTP"
   port        = 8080

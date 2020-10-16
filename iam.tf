@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "task_execution_permissions" {
 
 # role for ecs to create the instance
 resource "aws_iam_role" "execution" {
-  name               = "airflow-task-execution-role"
+  name               = "${var.resource_prefix}-airflow-task-execution-role-${var.resource_suffix}"
   assume_role_policy = data.aws_iam_policy_document.task_assume.json
 
   tags = local.common_tags
@@ -67,20 +67,20 @@ resource "aws_iam_role" "execution" {
 
 # role for the airflow instance itself
 resource "aws_iam_role" "task" {
-  name               = "airflow-task-role"
+  name               = "${var.resource_prefix}-airflow-task-role-${var.resource_suffix}"
   assume_role_policy = data.aws_iam_policy_document.task_assume.json
 
   tags = local.common_tags
 }
 
 resource "aws_iam_role_policy" "task_execution" {
-  name   = "airflow-task-execution"
+  name   = "${var.resource_prefix}-airflow-task-execution-${var.resource_suffix}"
   role   = aws_iam_role.execution.id
   policy = data.aws_iam_policy_document.task_execution_permissions.json
 }
 
 resource "aws_iam_role_policy" "log_agent" {
-  name   = "airflow-log-permissions"
+  name   = "${var.resource_prefix}-airflow-log-permissions-${var.resource_suffix}"
   role   = aws_iam_role.task.id
   policy = data.aws_iam_policy_document.task_permissions.json
 }
