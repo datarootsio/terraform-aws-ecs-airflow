@@ -30,8 +30,8 @@ resource "aws_ecs_task_definition" "airflow" {
   }
 
   container_definitions = <<TASK_DEFINITION
-  [
-    {
+    [
+      {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
@@ -56,8 +56,8 @@ resource "aws_ecs_task_definition" "airflow" {
             "containerPath": "${local.airflow_container_home}"
           }
         ]
-    },
-    {
+      },
+      {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_scheduler_container_name}",
         "dependsOn": [
@@ -92,8 +92,8 @@ resource "aws_ecs_task_definition" "airflow" {
             "containerPath": "${local.airflow_container_home}"
           }
         ]
-    },
-    {
+      },
+      {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_webserver_container_name}",
         "dependsOn": [
@@ -134,8 +134,8 @@ resource "aws_ecs_task_definition" "airflow" {
                 "hostPort": 8080
             }
         ]
-    }
-  ]
+      }
+    ]
   TASK_DEFINITION
 
   tags = local.common_tags
