@@ -28,12 +28,8 @@ resource "aws_s3_bucket_public_access_block" "airflow" {
   restrict_public_buckets = true
 }
 
-data "template_file" "airflow-seed" {
-  template = ""
-}
-
-resource "aws_s3_bucket_object" "airflow-seed" {
+resource "aws_s3_bucket_object" "airflow_seed" {
   bucket  = local.s3_bucket_name
-  key     = "dags/airflow-seed.py"
-  content = templatefile("${path.module}/templates/dags/airflow-seed.py", { BUCKET_NAME = local.s3_bucket_name })
+  key     = "dags/airflow_seed.py"
+  content = templatefile("${path.module}/templates/dags/airflow_seed.py", { BUCKET_NAME = local.s3_bucket_name })
 }

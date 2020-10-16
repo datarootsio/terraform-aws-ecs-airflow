@@ -25,52 +25,46 @@ resource "aws_ecs_task_definition" "airflow" {
   task_role_arn            = aws_iam_role.task.arn
   execution_role_arn       = aws_iam_role.execution.arn
   volume {
-    name = "airflow-seed"
+    name = "airflow"
   }
   container_definitions = <<TASK_DEFINITION
   [
  {
         "image": "amazon/aws-cli",
-        "name": "airflow-seed",
+        "name": "${local.airflow_sidecar_container_name}",
         "command": [
           "s3",
           "cp",
-          "s3://${local.s3_bucket_name}/${aws_s3_bucket_object.airflow-seed.key}",
-          "/usr/local/airflow/dags/airflow-seed.py"
+          "s3://${local.s3_bucket_name}/${local.s3_key}",
+          "${local.airflow_container_home}"
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
             "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
             "awslogs-region": "${var.airflow_log_region}",
-            "awslogs-stream-prefix": "container"
+            "awslogs-stream-prefix": "${local.airflow_sidecar_container_name}"
           }
         },
         "essential": false,
         "mountPoints": [
           {
-            "sourceVolume": "airflow-seed",
-            "containerPath": "/usr/local/airflow/dags"
+            "sourceVolume": "airflow",
+            "containerPath": "${local.airflow_container_home}"
           }
         ]
     },
     {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
-        "name": "${local.airflow_container_name}",
+        "name": "${local.airflow_scheduler_container_name}",
         "dependsOn": [
             {
-                "containerName": "airflow-seed",
+                "containerName": "${local.airflow_sidecar_container_name}",
                 "condition": "COMPLETE"
             }
         ],
         "environment": [
-            {"name": "LOAD_EX", "value": "n"},
-            {"name": "EXECUTOR", "value": "Local"},
-            {"name": "POSTGRES_HOST", "value": "${aws_db_instance.airflow.address}"},
-            {"name": "POSTGRES_PORT", "value": "${aws_db_instance.airflow.port}"},
-            {"name": "POSTGRES_USER", "value": "${var.rds_username}"},
-            {"name": "POSTGRES_PASSWORD", "value": "${var.rds_password}"},
-            {"name": "POSTGRES_DB", "value": "${aws_db_instance.airflow.name}"},
+            {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"},
             {"name": "AIRFLOW__WEBSERVER__NAVBAR_COLOR", "value": "${var.airflow_navbar_color}"}
         ],
         "logConfiguration": {
@@ -78,14 +72,49 @@ resource "aws_ecs_task_definition" "airflow" {
           "options": {
             "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
             "awslogs-region": "${var.airflow_log_region}",
-            "awslogs-stream-prefix": "container"
+            "awslogs-stream-prefix": "${local.airflow_scheduler_container_name}"
           }
         },
         "essential": true,
         "mountPoints": [
           {
-            "sourceVolume": "airflow-seed",
-            "containerPath": "/usr/local/airflow/dags"
+            "sourceVolume": "airflow",
+            "containerPath": "${local.airflow_container_home}"
+          }
+        ],
+        "portMappings": [
+            {
+                "containerPort": 8080,
+                "hostPort": 8080
+            }
+        ]
+    },
+    {
+        "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
+        "name": "${local.airflow_webserver_container_name}",
+        "dependsOn": [
+            {
+                "containerName": "${local.airflow_sidecar_container_name}",
+                "condition": "COMPLETE"
+            }
+        ],
+        "environment": [
+            {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"},
+            {"name": "AIRFLOW__WEBSERVER__NAVBAR_COLOR", "value": "${var.airflow_navbar_color}"}
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
+            "awslogs-region": "${var.airflow_log_region}",
+            "awslogs-stream-prefix": "${local.airflow_webserver_container_name}"
+          }
+        },
+        "essential": true,
+        "mountPoints": [
+          {
+            "sourceVolume": "airflow",
+            "containerPath": "/opt/airflow"
           }
         ],
         "portMappings": [
@@ -123,7 +152,7 @@ resource "aws_ecs_service" "airflow" {
   }
 
   load_balancer {
-    container_name   = local.airflow_container_name
+    container_name   = local.airflow_webserver_container_name
     container_port   = 8080
     target_group_arn = aws_lb_target_group.airflow.arn
   }
