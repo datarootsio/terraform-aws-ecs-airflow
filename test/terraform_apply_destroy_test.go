@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	"testing"
 	"time"
@@ -9,11 +10,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/aws/aws-sdk-go/service/iam"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/terraform"
-	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
+	testStructure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,8 +33,7 @@ func GetContainerWithName(containerName string, containers []*ecs.Container) *ec
 }
 
 func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
-
-	tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, "..", ".")
+	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "..", ".")
 
 	terraformOptions := &terraform.Options{
 		TerraformDir:       tempTestFolder,
@@ -87,6 +86,8 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	retrySleepTime := time.Duration(10) * time.Second
 	ecsGetTaskArnMaxRetries := 10
 	ecsGetTaskStatusMaxRetries := 15
+	httpStatusCodeMaxRetries := 18
+	amountOfConsecutiveToBeHealthy := 6
 
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
@@ -162,9 +163,11 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 				Tasks:   taskArns,
 			}
 
-			// Wait until the airflow task is in a RUNNING state or STOPPED state
-			// RUNNING => the container startup went well
-			// STOPPED => the container crashed while starting up
+			// Wait until the 3 containers are in there desired state
+			// - Sidecar container must be STOPPED to be healthy
+			//   (only runs once and then stops it's an "init container")
+			// - Webserver container must be RUNNING to be healthy
+			// - Scheduler container must be RUNNING to be healthy
 			fmt.Println("Getting container statuses")
 			var webserverContainer ecs.Container
 			var schedulerContainer ecs.Container
@@ -187,35 +190,54 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 				}
 				time.Sleep(retrySleepTime)
 			}
-
 			assert.Equal(t, "RUNNING", *webserverContainer.LastStatus)
 			assert.Equal(t, "RUNNING", *schedulerContainer.LastStatus)
 			assert.Equal(t, "STOPPED", *sidecarContainer.LastStatus)
 
-			// TODO: Figure out why even when it is running it returns a 503
-			// Solution for now is to wait for half a minute
-			fmt.Println("Wait for a minute for the webserver to be available")
-			time.Sleep(time.Duration(60) * time.Second)
-
+			// We do consecutive checks because sometime it could be that
+			// the webserver is available for a short amount of time and crashes
+			// a couple of seconds later
+			fmt.Println("Doing HTTP request/checking health")
 			airflowAlbDns := terraform.Output(t, options, "airflow_alb_dns")
 			airflowUrl := fmt.Sprintf("http://%s", airflowAlbDns)
 
-			fmt.Println("Requesting the HTML page.")
-			res, err := http.Get(airflowUrl)
-			assert.NoError(t, err)
+			var amountOfConsecutiveHealthyChecks int
+			var res *http.Response
+			for i := 0; i < httpStatusCodeMaxRetries; i++ {
+				fmt.Printf("Doing HTTP request to airflow webservice, try... %d\n", i)
+				res, err = http.Get(airflowUrl)
+				if res != nil && err == nil {
+					if res.StatusCode == 200 {
+						amountOfConsecutiveHealthyChecks++
+						fmt.Println("Webservice is healthy")
+					} else {
+						amountOfConsecutiveHealthyChecks = 0
+						fmt.Println("Webservice is NOT healthy")
+					}
 
-			fmt.Println("Checking the status code")
-			assert.Equal(t, 200, res.StatusCode)
+					if amountOfConsecutiveHealthyChecks == amountOfConsecutiveToBeHealthy {
+						break
+					}
+				}
+				time.Sleep(retrySleepTime)
+			}
 
-			fmt.Println("Getting the actual HTML code")
-			defer res.Body.Close()
-			doc, err := goquery.NewDocumentFromReader(res.Body)
-			assert.NoError(t, err)
+			if res != nil {
+				assert.Equal(t, 200, res.StatusCode)
+				assert.Equal(t, amountOfConsecutiveToBeHealthy, amountOfConsecutiveHealthyChecks)
 
-			fmt.Println("Checking if the navbar has the correct color")
-			navbarStyle, exists := doc.Find(".navbar.navbar-inverse.navbar-fixed-top").First().Attr("style")
-			assert.Equal(t, true, exists)
-			assert.Contains(t, navbarStyle, "background-color: #e27d60")
+				if res.StatusCode == 200 {
+					fmt.Println("Getting the actual HTML code")
+					defer res.Body.Close()
+					doc, err := goquery.NewDocumentFromReader(res.Body)
+					assert.NoError(t, err)
+
+					fmt.Println("Checking if the navbar has the correct color")
+					navbarStyle, exists := doc.Find(".navbar.navbar-inverse.navbar-fixed-top").First().Attr("style")
+					assert.Equal(t, true, exists)
+					assert.Contains(t, navbarStyle, "background-color: #e27d60")
+				}
+			}
 		}
 	}
 }
