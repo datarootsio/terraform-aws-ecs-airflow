@@ -94,6 +94,28 @@ variable "backup_public_subnet_id" {
   }
 }
 
+variable "private_subnet_id" {
+  type        = string
+  description = "The id of a private subnet for the rds/ecs-task to be in (only if the the vpc contains a nat gateway)"
+  default = ""
+
+  validation {
+    condition     = can(regex("^subnet-", var.private_subnet_id))
+    error_message = "The private_subnet_id value must be a valid subnet id, starting with \"subnet-\"."
+  }
+}
+
+variable "backup_private_subnet_id" {
+  type        = string
+  description = "The id of a private backup subnet for the rds/ecs-task to be in (only if the the vpc contains a nat gateway)"
+  default = ""
+
+  validation {
+    condition     = can(regex("^subnet-", var.backup_private_subnet_id))
+    error_message = "The backup_private_subnet_id value must be a valid subnet id, starting with \"subnet-\"."
+  }
+}
+
 // TODO: Add more rds params and option to give own cluster uri
 // RDS variables
 variable "rds_username" {

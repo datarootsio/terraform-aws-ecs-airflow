@@ -63,6 +63,8 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 	terraformOptions.Vars["vpc_id"] = "vpc-0eafa6867cb3bdaa3"
 	terraformOptions.Vars["public_subnet_id"] = "subnet-08da686d46e99872d"
 	terraformOptions.Vars["backup_public_subnet_id"] = "subnet-0e5bb83f963f8df0f"
+	terraformOptions.Vars["private_subnet_id"] = "subnet-03c2a3885cfc8a740"
+	terraformOptions.Vars["backup_private_subnet_id"] = "subnet-09c0ce0aff676904a"
 
 	// Get password and username from env vars
 	terraformOptions.Vars["rds_username"] = "dataroots"

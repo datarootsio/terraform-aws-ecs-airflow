@@ -20,4 +20,7 @@ locals {
   airflow_volume_name              = "airflow"
 
   airflow_container_home = "/opt/airflow"
+
+  rds_ecs_subnet_id = var.private_subnet_id != "" ? var.private_subnet_id : var.public_subnet_id
+  rds_ecs_backup_subnet_id = var.backup_private_subnet_id != "" ? var.backup_private_subnet_id : var.backup_public_subnet_id
 }

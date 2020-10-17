@@ -155,10 +155,12 @@ resource "aws_ecs_service" "airflow" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = [var.public_subnet_id]
+    subnets          = [local.rds_ecs_subnet_id, local.rds_ecs_backup_subnet_id]
     security_groups  = [aws_security_group.airflow.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
+
+
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"
