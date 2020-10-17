@@ -67,16 +67,31 @@ variable "ecs_memory" {
 variable "vpc_id" {
   type        = string
   description = "The id of the vpc where you will run ecs/rds"
+
+  validation {
+    condition     = can(regex("^vpc-", var.vpc_id))
+    error_message = "The vpc_id value must be a valid VPC id, starting with \"vpc-\"."
+  }
 }
 
 variable "public_subnet_id" {
   type        = string
   description = "The id of a public subnet for the alb/rds/ecs task to be in"
+
+  validation {
+    condition     = can(regex("^subnet-", var.public_subnet_id))
+    error_message = "The public_subnet_id value must be a valid subnet id, starting with \"subnet-\"."
+  }
 }
 
 variable "backup_public_subnet_id" {
   type        = string
   description = "The id of a public backup subnet for the alb to be in"
+
+  validation {
+    condition     = can(regex("^subnet-", var.backup_public_subnet_id))
+    error_message = "The backup_public_subnet_id value must be a valid subnet id, starting with \"subnet-\"."
+  }
 }
 
 // TODO: Add more rds params and option to give own cluster uri
