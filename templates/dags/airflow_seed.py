@@ -1,4 +1,5 @@
 import datetime
+from typing import Dict
 from datetime import timedelta
 
 from airflow import DAG
@@ -15,29 +16,40 @@ from os import listdir
 import os
 from os.path import isfile, join
 
-# the name of this file
+# The name of this file
 seed_dag_file_name = os.path.basename(__file__)
 
+# The bucket name and key the of where dags are stored in S3
+s3_bucket_name_dags = "${BUCKET_NAME}"
+s3_key_dags = "dags"
+# Path to the local folder on the container
+# where the dags are stored
+folder_local = "${AIRFLOW_HOME}/dags"
+
 args = {
-    "start_date": datetime.datetime(2020, 7, 7),
+    "start_date": datetime.datetime(2020, 10, 16),
 }
 
-# prefix with "_" to make it the frist dag
 with DAG(
     dag_id="_sync_dags_in_s3_to_local_airflow_dags_folder",
     default_args=args,
     schedule_interval=None
 ) as dag:
     list_dags_before = BashOperator(
-        task_id="list_dags_before_delete",
+        task_id="list_dags_before",
         bash_command="ls ${AIRFLOW_HOME}/dags",
     )
 
-    def get_dag_id(dag_file_path):
+    def get_dag_id(dag_file_path: str) -> str:
+        """Gets the dag id in a file."""
         with open(dag_file_path, "r") as file:
             all_python_code = file.read()
 
-        dag_id_search = re.search('dag_id="(.*)",.*', all_python_code, re.IGNORECASE)
+        dag_id_search = re.search(
+            'dag_id="(.*)",.*',
+            all_python_code,
+            re.IGNORECASE
+        )
 
         dag_id = None
         if dag_id_search:
@@ -48,24 +60,21 @@ with DAG(
 
         return dag_id
 
-    def sync_s3_dags_to_local_dags(**context):
-        bucket_name = "${BUCKET_NAME}"
-        remote_directory_name = "dags"
-
-        folder_local = "${AIRFLOW_HOME}/dags"
-
+    def sync_s3_dags_to_local_dags(**context: Dict) -> None:
+        """Syncs an S3 bucket with a local folder in the airflow container."""
         s3_resource = boto3.resource("s3")
-        bucket = s3_resource.Bucket(bucket_name)
+        bucket = s3_resource.Bucket(s3_bucket_name_dags)
 
         dag_files_in_s3 = [seed_dag_file_name]
-        # get files from s3
-        for object in bucket.objects.filter(Prefix=remote_directory_name):
+        # get files from s3 and download them to the local folder
+        for object in bucket.objects.filter(Prefix=s3_key_dags):
             file_name = object.key.split("/")[-1]
             dag_files_in_s3.append(file_name)
             print(f"Adding file: {folder_local}/{file_name}")
             bucket.download_file(object.key, f"{folder_local}/{file_name}")
 
-        # remove all the files and dags not in s3
+        # remove all the files and dags not in s3 from the local folder
+        # also delete the dag
         files_in_dag_folder = [f for f in listdir(folder_local) if isfile(join(folder_local, f))]
 
         for file_name in files_in_dag_folder:
@@ -89,7 +98,7 @@ with DAG(
     )
 
     list_dags_after = BashOperator(
-        task_id="list_dags_after_delete",
+        task_id="list_dags_after",
         bash_command="ls ${AIRFLOW_HOME}/dags",
     )
 
