@@ -2,10 +2,11 @@ package test
 
 import (
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
 
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/aws/aws-sdk-go/service/iam"
@@ -59,9 +60,9 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 	terraformOptions.Vars["ecs_cpu"] = 1024
 	terraformOptions.Vars["ecs_memory"] = 2048
 
-	terraformOptions.Vars["vpc_id"] = "vpc-007b7377a35da621a"
-	terraformOptions.Vars["public_subnet_id"] = "subnet-01fa6330ad05a409f"
-	terraformOptions.Vars["backup_public_subnet_id"] = "subnet-051fd974e6b4f0db9"
+	terraformOptions.Vars["vpc_id"] = "vpc-0eafa6867cb3bdaa3"
+	terraformOptions.Vars["public_subnet_id"] = "subnet-08da686d46e99872d"
+	terraformOptions.Vars["backup_public_subnet_id"] = "subnet-0e5bb83f963f8df0f"
 
 	// Get password and username from env vars
 	terraformOptions.Vars["rds_username"] = "dataroots"
@@ -198,14 +199,14 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 			// the webserver is available for a short amount of time and crashes
 			// a couple of seconds later
 			fmt.Println("Doing HTTP request/checking health")
-			airflowAlbDns := terraform.Output(t, options, "airflow_alb_dns")
-			airflowUrl := fmt.Sprintf("http://%s", airflowAlbDns)
+			airflowAlbDNS := terraform.Output(t, options, "airflow_alb_dns")
+			airflowURL := fmt.Sprintf("http://%s", airflowAlbDNS)
 
 			var amountOfConsecutiveHealthyChecks int
 			var res *http.Response
 			for i := 0; i < httpStatusCodeMaxRetries; i++ {
 				fmt.Printf("Doing HTTP request to airflow webservice, try... %d\n", i)
-				res, err = http.Get(airflowUrl)
+				res, err = http.Get(airflowURL)
 				if res != nil && err == nil {
 					if res.StatusCode == 200 {
 						amountOfConsecutiveHealthyChecks++
