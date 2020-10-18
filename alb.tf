@@ -21,7 +21,7 @@ resource "aws_security_group_rule" "alb_outside_http" {
   protocol          = "TCP"
   from_port         = 80
   to_port           = 80
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = var.ip_allow_list
 }
 
 // Give this SG to all the instances that want to connect to

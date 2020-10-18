@@ -62,8 +62,13 @@ variable "ecs_memory" {
 // TODO: Add param to create SSL cert based on dns
 // TODO: Add param to give SSL arn
 // TODO: If no dns or ssl, put it public
-// TODO: Add ip allowlist
 // Networking variables
+variable "ip_allow_list" {
+  type        = list(string)
+  description = "A list of ip ranges that are allowed to access the airflow webserver, default: full access"
+  default     = ["0.0.0.0/0"]
+}
+
 variable "vpc_id" {
   type        = string
   description = "The id of the vpc where you will run ecs/rds"
@@ -97,7 +102,7 @@ variable "backup_public_subnet_id" {
 variable "private_subnet_id" {
   type        = string
   description = "The id of a private subnet for the rds/ecs-task to be in (only if the the vpc contains a nat gateway)"
-  default = ""
+  default     = ""
 
   validation {
     condition     = can(regex("^subnet-", var.private_subnet_id))
@@ -108,7 +113,7 @@ variable "private_subnet_id" {
 variable "backup_private_subnet_id" {
   type        = string
   description = "The id of a private backup subnet for the rds/ecs-task to be in (only if the the vpc contains a nat gateway)"
-  default = ""
+  default     = ""
 
   validation {
     condition     = can(regex("^subnet-", var.backup_private_subnet_id))
@@ -116,8 +121,14 @@ variable "backup_private_subnet_id" {
   }
 }
 
-// TODO: Add more rds params and option to give own cluster uri
-// RDS variables
+// Database variables
+variable "postgres_uri" {
+  type        = string
+  description = "The postgres uri of your postgres db, if none provided a postgres db in rds is made"
+  default     = ""
+}
+
+// TODO: Add more rds params
 variable "rds_username" {
   type        = string
   description = "Username of rds"

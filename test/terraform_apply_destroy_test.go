@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
@@ -17,6 +18,12 @@ import (
 	testStructure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
 )
+
+func getPublicIp() string {
+	res, _ := http.Get("https://api.ipify.org")
+	ip, _ := ioutil.ReadAll(res.Body)
+	return string(ip)
+}
 
 func AddPreAndSuffix(resourceName string) string {
 	resourcePrefix := "dataroots"
@@ -60,6 +67,9 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 	terraformOptions.Vars["ecs_cpu"] = 1024
 	terraformOptions.Vars["ecs_memory"] = 2048
 
+	terraformOptions.Vars["ip_allow_list"] = []string{
+		fmt.Sprintf("%s/32", getPublicIp()),
+	}
 	terraformOptions.Vars["vpc_id"] = "vpc-0eafa6867cb3bdaa3"
 	terraformOptions.Vars["public_subnet_id"] = "subnet-08da686d46e99872d"
 	terraformOptions.Vars["backup_public_subnet_id"] = "subnet-0e5bb83f963f8df0f"
@@ -67,6 +77,7 @@ func getDefaultTerraformOptions(t *testing.T) (*terraform.Options, error) {
 	terraformOptions.Vars["backup_private_subnet_id"] = "subnet-09c0ce0aff676904a"
 
 	// Get password and username from env vars
+	terraformOptions.Vars["postgres_uri"] = ""
 	terraformOptions.Vars["rds_username"] = "dataroots"
 	terraformOptions.Vars["rds_password"] = "dataroots"
 	terraformOptions.Vars["rds_instance_class"] = "db.t2.micro"
@@ -90,7 +101,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	ecsGetTaskArnMaxRetries := 10
 	ecsGetTaskStatusMaxRetries := 15
 	httpStatusCodeMaxRetries := 18
-	amountOfConsecutiveToBeHealthy := 6
+	amountOfConsecutiveGetsToBeHealthy := 6
 
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
@@ -218,7 +229,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 						fmt.Println("Webservice is NOT healthy")
 					}
 
-					if amountOfConsecutiveHealthyChecks == amountOfConsecutiveToBeHealthy {
+					if amountOfConsecutiveHealthyChecks == amountOfConsecutiveGetsToBeHealthy {
 						break
 					}
 				}
@@ -227,7 +238,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 
 			if res != nil {
 				assert.Equal(t, 200, res.StatusCode)
-				assert.Equal(t, amountOfConsecutiveToBeHealthy, amountOfConsecutiveHealthyChecks)
+				assert.Equal(t, amountOfConsecutiveGetsToBeHealthy, amountOfConsecutiveHealthyChecks)
 
 				if res.StatusCode == 200 {
 					fmt.Println("Getting the actual HTML code")
