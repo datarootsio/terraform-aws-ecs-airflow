@@ -19,8 +19,8 @@ resource "aws_security_group_rule" "alb_outside_http" {
   security_group_id = aws_security_group.alb.id
   type              = "ingress"
   protocol          = "TCP"
-  from_port         = 80
-  to_port           = 80
+  from_port         = var.use_https ? 443 : 80
+  to_port           = var.use_https ? 443 : 80
   cidr_blocks       = var.ip_allow_list
 }
 
@@ -68,12 +68,12 @@ resource "aws_lb" "airflow" {
 // TODO: option to listen on 443 with SSL Cert
 resource "aws_lb_listener" "airflow" {
   load_balancer_arn = aws_lb.airflow.arn
-  port              = "80"
-  protocol          = "HTTP"
+  port              = var.use_https ? "443" : "80"
+  protocol          = var.use_https ? "HTTPS" : "HTTP"
+  certificate_arn   = var.use_https ? local.certificate_arn : ""
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.airflow.arn
   }
 }
-

@@ -185,9 +185,8 @@ resource "aws_lb_target_group" "airflow" {
     port                = 8080
     protocol            = "HTTP"
     interval            = 30
-    unhealthy_threshold = 3
-    matcher             = "200,302"
-
+    unhealthy_threshold = 5
+    matcher             = "200-399"
   }
 
   lifecycle {
