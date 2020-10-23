@@ -22,6 +22,12 @@ module "airflow" {
 
     use_https = false
 
+    airflow_executor = "Local"
+    airflow_py_requirements_path = "./requirements.txt"
+    airflow_variables = {
+      AIRFLOW__WEBSERVER__NAVBAR_COLOR : "#e27d60"
+    }
+
     rds_username            = "dataroots"
     rds_password            = "dataroots"
     rds_availability_zone   = "eu-west-1a"

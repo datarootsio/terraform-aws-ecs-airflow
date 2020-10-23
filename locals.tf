@@ -13,13 +13,14 @@ locals {
   day                 = formatdate("D", local.timestamp)
 
   rds_name             = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-  created_postgres_uri = "${var.rds_username}:${var.rds_password}@${aws_db_instance.airflow.address}:${aws_db_instance.airflow.port}/${aws_db_instance.airflow.name}"
+  created_postgres_uri = var.airflow_executor == "Sequential" ? "" : "${var.rds_username}:${var.rds_password}@${aws_db_instance.airflow[0].address}:${aws_db_instance.airflow[0].port}/${aws_db_instance.airflow[0].name}"
   postgres_uri         = var.postgres_uri != "" ? var.postgres_uri : local.created_postgres_uri
   db_uri               = var.airflow_executor == "Local" ? local.postgres_uri : "sqlite:////opt/airflow/airflow.db"
 
   s3_bucket_name = var.s3_bucket_name != "" ? var.s3_bucket_name : aws_s3_bucket.airflow[0].id
   s3_key         = ""
 
+  airflow_py_requirements_path     = var.airflow_py_requirements_path != "" ? var.airflow_py_requirements_path : "${path.module}/templates/startup/requirements.txt"
   airflow_log_region               = var.airflow_log_region != "" ? var.airflow_log_region : var.region
   airflow_webserver_container_name = "${var.resource_prefix}-airflow-webserver-${var.resource_suffix}"
   airflow_scheduler_container_name = "${var.resource_prefix}-airflow-scheduler-${var.resource_suffix}"

@@ -20,6 +20,8 @@ module "airflow" {
     vpc_id             = "vpc-123456"
     public_subnet_ids  = ["subnet-456789", "subnet-098765"]
 
+    airflow_executor = "Sequential"
+
     use_https = false
 
     rds_username            = "dataroots"

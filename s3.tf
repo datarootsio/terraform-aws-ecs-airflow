@@ -63,5 +63,5 @@ resource "aws_s3_bucket_object" "airflow_webserver_entrypoint" {
 resource "aws_s3_bucket_object" "airflow_requirements" {
   bucket  = local.s3_bucket_name
   key     = "startup/requirements.txt"
-  content = templatefile("${path.module}/templates/startup/requirements.txt", {})
+  content = templatefile(local.airflow_py_requirements_path, {})
 }

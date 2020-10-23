@@ -49,7 +49,7 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 	retrySleepTime := time.Duration(10) * time.Second
 	ecsGetTaskArnMaxRetries := 10
 	ecsGetTaskStatusMaxRetries := 15
-	httpStatusCodeMaxRetries := 18
+	httpStatusCodeMaxRetries := 30
 	amountOfConsecutiveGetsToBeHealthy := 6
 	desiredStatusRunning := "RUNNING"
 	clusterName := AddPreAndSuffix("airflow", resourcePrefix, resourceSuffix)
@@ -231,6 +231,10 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 	terraformOptions.Vars["airflow_log_region"] = "eu-west-1"
 	terraformOptions.Vars["airflow_log_retention"] = "7"
 	terraformOptions.Vars["airflow_example_dag"] = true
+	terraformOptions.Vars["airflow_variables"] = map[string]interface{}{
+		"AIRFLOW__WEBSERVER__NAVBAR_COLOR": "#e27d60",
+	}
+	terraformOptions.Vars["airflow_executor"] = "Local"
 
 	terraformOptions.Vars["ecs_cpu"] = 1024
 	terraformOptions.Vars["ecs_memory"] = 2048
