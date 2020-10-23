@@ -55,6 +55,8 @@ module "airflow" {
 
 [Press here to see more examples](https://github.com/datarootsio/terraform-aws-ecs-airflow/tree/main/examples)
 
+Note: After that Terraform is done deploying everything, it can take up to a minute for Airflow to be available through HTTP(S)
+
 ## Adding DAGs
 
 To add dags, upload them to the created S3 bucket in the subdir "dags/". After you uploaded them run the seed dag. This will sync the s3 bucket with the local dags folder of the ECS container. 

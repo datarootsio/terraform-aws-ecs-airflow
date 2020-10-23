@@ -160,7 +160,7 @@ variable "route53_zone_name" {
 // Database variables
 variable "postgres_uri" {
   type        = string
-  description = "The postgres uri of your postgres db, if none provided a postgres db in rds is made"
+  description = "The postgres uri of your postgres db, if none provided a postgres db in rds is made. Format \"<db_username>:<db_password>@<db_endpoint>:<db_port>/<db_name>\""
   default     = ""
 }
 
