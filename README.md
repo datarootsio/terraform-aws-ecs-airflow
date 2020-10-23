@@ -2,11 +2,30 @@
 
 This is a module for Terraform that deploys Airflow in AWS.
 
-[![maintained by dataroots](https://img.shields.io/badge/maintained%20by-dataroots-%2300b189)](https://dataroots.io)
+[![Maintained by dataroots](https://img.shields.io/badge/maintained%20by-dataroots-%2300b189)](https://dataroots.io)
+[![Airflow version](https://img.shields.io/badge/Apache%20Airflow-1.10.12-e27d60.svg)]()
 [![Terraform 0.13](https://img.shields.io/badge/terraform-0.13-%23623CE4)](https://www.terraform.io)
 [![Terraform Registry](https://img.shields.io/badge/terraform-registry-%23623CE4)](https://registry.terraform.io/modules/datarootsio/aws-airflow/module/)
-[![tests](https://github.com/datarootsio/terraform-aws-ecs-airflow/workflows/tests/badge.svg?branch=master)](https://github.com/datarootsio/terraform-aws-ecs-airflow/actions)
+[![Tests](https://github.com/datarootsio/terraform-aws-ecs-airflow/workflows/tests/badge.svg?branch=master)](https://github.com/datarootsio/terraform-aws-ecs-airflow/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/datarootsio/terraform-aws-ecs-airflow)](https://goreportcard.com/report/github.com/datarootsio/terraform-aws-ecs-airflow)
+
+## Setup
+
+- An ECS Cluster with:
+    - Sidecar injection container
+    - Airflow webserver container
+    - Airflow scheduler container
+- An ALB
+- A S3 Bucket (optional but recommended)
+- A RDS instance (optional but recommended)
+- A DNS Record (optional but recommended)
+
+Average cost of the minimal setup (with rds): ~40$/Month
+
+Why do I need a RDS instance? 
+1. This makes Airflow statefull, you will be able to rerun failed dags, keep history of failed/succeeded dags, ...
+2. It allows for dags to run concurrently, otherwise two dags will not be able to run at the same time
+3. The state of your dags persists, even if the Airflow container fails or if you update the container definition (this will trigger an update of the ECS task)
 
 ## Intend
 
@@ -33,9 +52,12 @@ module "airflow" {
 }
 ```
 
+To add dags, upload them to the created S3 bucket in the subdir "dags/". After you uploaded them run the seed dag. This will sync the s3 bucket with the local dags folder of the ECS container. 
+
 ## Todo
 
 - [ ] Option to use SQL instead of Postgres
+- [ ] Add a Lambda function that triggers the sync dag (so that you can auto sync through ci/cd)
 - [ ] RBAC
 - [ ] Support for [Google OAUTH ](https://airflow.readthedocs.io/en/latest/security.html#google-authentication)
 
