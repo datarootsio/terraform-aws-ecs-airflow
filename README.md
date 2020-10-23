@@ -53,6 +53,7 @@ module "airflow" {
 ```
 (This will create Airflow, backed up by an RDS)
 
+## Adding DAGs
 
 To add dags, upload them to the created S3 bucket in the subdir "dags/". After you uploaded them run the seed dag. This will sync the s3 bucket with the local dags folder of the ECS container. 
 
