@@ -230,6 +230,7 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 	terraformOptions.Vars["airflow_image_tag"] = "1.10.12"
 	terraformOptions.Vars["airflow_log_region"] = "eu-west-1"
 	terraformOptions.Vars["airflow_log_retention"] = "7"
+	terraformOptions.Vars["airflow_example_dag"] = true
 
 	terraformOptions.Vars["ecs_cpu"] = 1024
 	terraformOptions.Vars["ecs_memory"] = 2048

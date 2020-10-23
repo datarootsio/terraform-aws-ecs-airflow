@@ -25,9 +25,3 @@ resource "aws_db_subnet_group" "airflow" {
 
   tags = local.common_tags
 }
-
-
-locals {
-  timestamp           = timestamp()
-  timestamp_sanitized = replace(local.timestamp, "/[- TZ:]/", "")
-}
