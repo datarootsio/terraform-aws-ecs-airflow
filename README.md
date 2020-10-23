@@ -10,13 +10,13 @@ This is a module for Terraform that deploys Airflow in AWS.
 
 ## Intend
 
-The airflow setup provided with this module is 
+The Airflow setup provided with this module, is a setup where the only task of Airflow is to manage your jobs/workflows. So not to do actually heavy lifting like SQL queries, Spark jobs, ... . Offload as many task to AWS Lambda, AWS EMR, AWS Glue, ... . If you want Airflow to have access to these services, use the output role and give it permissions to these services through IAM.
 
 ## Usage
 
 ```hcl
 module "airflow" {
-    source = "../terraform-aws-ecs-airflow"
+    source = "datarootsio/aws-airflow/module/"
 
     resource_prefix = "my-awesome-company"
     resource_suffix = "env"
