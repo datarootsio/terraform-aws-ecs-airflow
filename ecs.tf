@@ -35,10 +35,10 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
-            "\"aws s3 cp s3://${local.s3_bucket_name}/${local.s3_key} ${var.airflow_container_home} --recursive && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
+            "/bin/sh -c \"aws s3 cp s3://${local.s3_bucket_name}/${local.s3_key} ${var.airflow_container_home} --recursive && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
         ],
         "entryPoint": [
-            "/bin/sh",
+            "sh",
             "-c"
         ],
         "logConfiguration": {
@@ -67,10 +67,10 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "\"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key}\""
+            "/bin/sh -c \"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key}\""
         ],
         "entryPoint": [
-            "/bin/sh",
+            "sh",
             "-c"
         ],
         "environment": [
@@ -102,16 +102,14 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "\"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key}\""
+            "/bin/sh -c \"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key}\""
         ],
         "entryPoint": [
-            "/bin/sh ",
+            "sh",
             "-c"
         ],
         "environment": [
-          %{for k, v in local.airflow_variables~}
-          {"name": "${k}", "value": "${v}"},
-          %{endfor~}
+          ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
