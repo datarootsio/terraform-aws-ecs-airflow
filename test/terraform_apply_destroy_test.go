@@ -337,7 +337,6 @@ func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutor(t *testing.T) {
 	resourcePrefix := "dtr"
 	resourceSuffix := "http-seq-dev"
 
-
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
 	t.Parallel()

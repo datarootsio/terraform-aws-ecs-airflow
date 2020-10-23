@@ -6,12 +6,12 @@ variable "region" {
 
 variable "resource_prefix" {
   type        = string
-  description = "A prefix for the create resources, example your company name"
+  description = "A prefix for the create resources, example your company name (be aware of the resource name length)"
 }
 
 variable "resource_suffix" {
   type        = string
-  description = "A suffix for the created resources, example the environment for airflow to run in"
+  description = "A suffix for the created resources, example the environment for airflow to run in (be aware of the resource name length)"
 }
 
 variable "extra_tags" {
@@ -35,7 +35,7 @@ variable "airflow_image_tag" {
 
 variable "airflow_executor" {
   type        = string
-  description = "The executor mode that airflow will use. Only allowed values are \"Local\" and \"Sequential\". \"Local\": Run DAGs in parallel (will created a RDS); \"Local\": You can not run DAGs in parallel (will NOT created a RDS);"
+  description = "The executor mode that airflow will use. Only allowed values are \"Local\" and \"Sequential\". \"Local\": Run DAGs in parallel (will created a RDS); \"Sequential\": You can not run DAGs in parallel (will NOT created a RDS);"
   default     = "Local"
 
   validation {
@@ -112,7 +112,7 @@ variable "vpc_id" {
 
 variable "public_subnet_ids" {
   type        = list(string)
-  description = "A list of subnet ids of where the ALB will reside, if the no \"private_subnet_ids\" is provided ECS and RDS will also reside in these subnets"
+  description = "A list of subnet ids of where the ALB will reside, if the \"private_subnet_ids\" variable is not provided ECS and RDS will also reside in these subnets"
 
   validation {
     condition     = length(var.public_subnet_ids) >= 2
@@ -168,11 +168,13 @@ variable "postgres_uri" {
 variable "rds_username" {
   type        = string
   description = "Username of rds"
+  default     = "dataroots"
 }
 
 variable "rds_password" {
   type        = string
   description = "Password of rds"
+  default     = "dataroots"
 }
 
 variable "rds_instance_class" {
@@ -184,11 +186,13 @@ variable "rds_instance_class" {
 variable "rds_availability_zone" {
   type        = string
   description = "Availability zone for the rds instance"
+  default     = "eu-west-1a"
 }
 
 variable "rds_deletion_protection" {
   type        = bool
   description = "Deletion protection for the rds instance"
+  default     = false
 }
 
 // S3 Bucket

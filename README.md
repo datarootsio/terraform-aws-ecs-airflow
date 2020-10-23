@@ -42,16 +42,9 @@ module "airflow" {
 
     vpc_id             = "vpc-123456"
     public_subnet_ids  = ["subnet-456789", "subnet-098765"]
-
-    use_https = false
-
-    rds_username            = "dataroots"
-    rds_password            = "dataroots"
-    rds_availability_zone   = "eu-west-1a"
-    rds_deletion_protection = false
 }
 ```
-(This will create Airflow, backed up by an RDS)
+(This will create Airflow, backed up by an RDS (both in a public subnet) and without https)
 
 [Press here to see more examples](https://github.com/datarootsio/terraform-aws-ecs-airflow/tree/main/examples)
 
