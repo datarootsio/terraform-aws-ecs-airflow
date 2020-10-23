@@ -15,6 +15,7 @@ locals {
   rds_name             = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   created_postgres_uri = "${var.rds_username}:${var.rds_password}@${aws_db_instance.airflow.address}:${aws_db_instance.airflow.port}/${aws_db_instance.airflow.name}"
   postgres_uri         = var.postgres_uri != "" ? var.postgres_uri : local.created_postgres_uri
+  db_uri               = var.airflow_executor == "Local" ? local.postgres_uri : "sqlite:////opt/airflow/airflow.db"
 
   s3_bucket_name = var.s3_bucket_name != "" ? var.s3_bucket_name : aws_s3_bucket.airflow[0].id
   s3_key         = ""
@@ -24,10 +25,11 @@ locals {
   airflow_scheduler_container_name = "${var.resource_prefix}-airflow-scheduler-${var.resource_suffix}"
   airflow_sidecar_container_name   = "${var.resource_prefix}-airflow-sidecar-${var.resource_suffix}"
   airflow_volume_name              = "airflow"
-  airflow_variables = merge({
-    AIRFLOW__CORE__SQL_ALCHEMY_CONN : "postgresql+psycopg2://${local.postgres_uri}",
-    AIRFLOW__CORE__EXECUTOR : "LocalExecutor",
-  }, var.airflow_variables)
+  // Keep the 2 env vars second, we want to override them (this module manges these vars)
+  airflow_variables = merge(var.airflow_variables, {
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN : local.db_uri,
+    AIRFLOW__CORE__EXECUTOR : "${var.airflow_executor}Executor",
+  })
 
   rds_ecs_subnet_ids = length(var.private_subnet_ids) == 0 ? var.public_subnet_ids : var.private_subnet_ids
 

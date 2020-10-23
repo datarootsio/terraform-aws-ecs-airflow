@@ -59,6 +59,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 
 ## Todo
 
+- [ ] RDS Backup options
 - [ ] Option to use SQL instead of Postgres
 - [ ] Add a Lambda function that triggers the sync dag (so that you can auto sync through ci/cd)
 - [ ] RBAC

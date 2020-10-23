@@ -33,16 +33,27 @@ variable "airflow_image_tag" {
   default     = "1.10.12"
 }
 
-variable "airflow_container_home" {
+variable "airflow_executor" {
   type        = string
-  description = "Working dir for airflow (only change if you are using a different image)"
-  default     = "/opt/airflow"
+  description = "The executor mode that airflow will use. Only allowed values are \"Local\" and \"Sequential\". \"Local\": Run DAGs in parallel (will created a RDS); \"Local\": You can not run DAGs in parallel (will NOT created a RDS);"
+  default     = "Local"
+
+  validation {
+    condition     = var.airflow_executor == "Local" || var.airflow_executor == "Sequential"
+    error_message = "The only values that are allowed for \"airflow_executor\" are \"Local\" and \"Sequential\"."
+  }
 }
 
 variable "airflow_variables" {
   type        = map(string)
-  description = "The variables passed to airflow as an environment variable"
+  description = "The variables passed to airflow as an environment variable (see airflow docs for more info https://airflow.apache.org/docs/). You can not specify \"AIRFLOW__CORE__SQL_ALCHEMY_CONN\" and \"AIRFLOW__CORE__EXECUTOR\" (managed by this module)"
   default     = {}
+}
+
+variable "airflow_container_home" {
+  type        = string
+  description = "Working dir for airflow (only change if you are using a different image)"
+  default     = "/opt/airflow"
 }
 
 variable "airflow_log_region" {
