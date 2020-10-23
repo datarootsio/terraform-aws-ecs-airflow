@@ -30,15 +30,19 @@ resource "aws_s3_bucket_public_access_block" "airflow" {
 
 resource "aws_s3_bucket_object" "airflow_seed_dag" {
   bucket = local.s3_bucket_name
-  key    = "dags/airflow_seed.py"
-  content = templatefile("${path.module}/templates/dags/airflow_seed.py", {
+  key    = "dags/airflow_seed_dag.py"
+  content = templatefile("${path.module}/templates/dags/airflow_seed_dag.py", {
     BUCKET_NAME  = local.s3_bucket_name,
     KEY          = local.s3_key,
     AIRFLOW_HOME = local.airflow_container_home
+    YEAR         = local.year
+    MONTH        = local.month
+    DAY          = local.day
   })
 }
 
 resource "aws_s3_bucket_object" "airflow_example_dag" {
+  count   = var.airflow_example_dag ? 1 : 0
   bucket  = local.s3_bucket_name
   key     = "dags/example_dag.py"
   content = templatefile("${path.module}/templates/dags/example_dag.py", {})
