@@ -217,10 +217,11 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 		Logger:             logger.TestingT,
 	}
 
+	terraformOptions.Vars["region"] = "eu-west-1"
 	terraformOptions.Vars["resource_prefix"] = resourcePrefix
 	terraformOptions.Vars["resource_suffix"] = resourceSuffix
 	terraformOptions.Vars["extra_tags"] = map[string]interface{}{
-		"ATestTag": "a_test_tag",
+		"ATestTag":       "a_test_tag",
 		"ResourcePrefix": resourcePrefix,
 		"ResourceSuffix": resourceSuffix,
 	}
@@ -229,7 +230,6 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 	terraformOptions.Vars["airflow_image_tag"] = "1.10.12"
 	terraformOptions.Vars["airflow_log_region"] = "eu-west-1"
 	terraformOptions.Vars["airflow_log_retention"] = "7"
-	terraformOptions.Vars["airflow_navbar_color"] = "#e27d60"
 
 	terraformOptions.Vars["ecs_cpu"] = 1024
 	terraformOptions.Vars["ecs_memory"] = 2048
@@ -238,10 +238,14 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 		fmt.Sprintf("%s/32", getPublicIp()),
 	}
 	terraformOptions.Vars["vpc_id"] = "vpc-0eafa6867cb3bdaa3"
-	terraformOptions.Vars["public_subnet_id"] = "subnet-08da686d46e99872d"
-	terraformOptions.Vars["backup_public_subnet_id"] = "subnet-0e5bb83f963f8df0f"
-	terraformOptions.Vars["private_subnet_id"] = "subnet-03c2a3885cfc8a740"
-	terraformOptions.Vars["backup_private_subnet_id"] = "subnet-09c0ce0aff676904a"
+	terraformOptions.Vars["public_subnet_ids"] = []string{
+		"subnet-08da686d46e99872d",
+		"subnet-0e5bb83f963f8df0f",
+	}
+	terraformOptions.Vars["private_subnet_ids"] = []string{
+		"subnet-03c2a3885cfc8a740",
+		"subnet-09c0ce0aff676904a",
+	}
 
 	// Get password and username from env vars
 	terraformOptions.Vars["postgres_uri"] = ""

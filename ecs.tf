@@ -45,7 +45,7 @@ resource "aws_ecs_task_definition" "airflow" {
           "logDriver": "awslogs",
           "options": {
             "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
-            "awslogs-region": "${var.airflow_log_region}",
+            "awslogs-region": "${local.airflow_log_region}",
             "awslogs-stream-prefix": "airflow"
           }
         },
@@ -74,14 +74,13 @@ resource "aws_ecs_task_definition" "airflow" {
             "-c"
         ],
         "environment": [
-            {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"},
-            {"name": "AIRFLOW__WEBSERVER__NAVBAR_COLOR", "value": "${var.airflow_navbar_color}"}
+            {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"}
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
             "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
-            "awslogs-region": "${var.airflow_log_region}",
+            "awslogs-region": "${local.airflow_log_region}",
             "awslogs-stream-prefix": "airflow"
           }
         },
@@ -110,14 +109,13 @@ resource "aws_ecs_task_definition" "airflow" {
             "-c"
         ],
         "environment": [
-            {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"},
-            {"name": "AIRFLOW__WEBSERVER__NAVBAR_COLOR", "value": "${var.airflow_navbar_color}"}
+            {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"}
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
             "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
-            "awslogs-region": "${var.airflow_log_region}",
+            "awslogs-region": "${local.airflow_log_region}",
             "awslogs-stream-prefix": "airflow"
           }
         },
@@ -155,7 +153,7 @@ resource "aws_ecs_service" "airflow" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = [local.rds_ecs_subnet_id, local.rds_ecs_backup_subnet_id]
+    subnets          = local.rds_ecs_subnet_ids
     security_groups  = [aws_security_group.airflow.id]
     assign_public_ip = false
   }

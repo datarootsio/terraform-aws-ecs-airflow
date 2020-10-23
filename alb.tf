@@ -58,14 +58,13 @@ resource "aws_lb" "airflow" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id, aws_security_group.airflow.id]
-  subnets            = [var.public_subnet_id, var.backup_public_subnet_id]
+  subnets            = var.public_subnet_ids
 
   enable_deletion_protection = false
 
   tags = local.common_tags
 }
 
-// TODO: option to listen on 443 with SSL Cert
 resource "aws_lb_listener" "airflow" {
   load_balancer_arn = aws_lb.airflow.arn
   port              = var.use_https ? "443" : "80"

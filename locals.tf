@@ -15,6 +15,7 @@ locals {
   s3_bucket_name = var.s3_bucket_name != "" ? var.s3_bucket_name : aws_s3_bucket.airflow[0].id
   s3_key         = ""
 
+  airflow_log_region = var.airflow_log_region != "" ? var.airflow_log_region : var.region
   airflow_webserver_container_name = "${var.resource_prefix}-airflow-webserver-${var.resource_suffix}"
   airflow_scheduler_container_name = "${var.resource_prefix}-airflow-scheduler-${var.resource_suffix}"
   airflow_sidecar_container_name   = "${var.resource_prefix}-airflow-sidecar-${var.resource_suffix}"
@@ -22,8 +23,8 @@ locals {
 
   airflow_container_home = "/opt/airflow"
 
-  rds_ecs_subnet_id        = var.private_subnet_id != "" ? var.private_subnet_id : var.public_subnet_id
-  rds_ecs_backup_subnet_id = var.backup_private_subnet_id != "" ? var.backup_private_subnet_id : var.backup_public_subnet_id
+  rds_ecs_subnet_ids = length(var.private_subnet_ids) == 0 ? var.public_subnet_ids : var.private_subnet_ids
+
 
   dns_record      = var.dns_name != "" ? var.dns_name : (var.route53_zone_name != "" ? "${var.resource_prefix}-airflow-${var.resource_suffix}.${data.aws_route53_zone.zone[0].name}" : "")
   certificate_arn = var.use_https ? (var.certificate_arn != "" ? var.certificate_arn : aws_acm_certificate.cert[0].arn) : ""

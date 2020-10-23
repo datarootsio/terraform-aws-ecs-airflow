@@ -37,19 +37,14 @@ variable "airflow_image_tag" {
 
 variable "airflow_log_region" {
   type        = string
-  description = "The region you want your airflow logs in"
+  description = "The region you want your airflow logs in, defaults to the region variable"
+  default     = ""
 }
 
 variable "airflow_log_retention" {
   type        = string
   description = "The number of days you want to keep the log of airflow container"
   default     = "7"
-}
-
-variable "airflow_navbar_color" {
-  type        = string
-  description = "The color of the airflow navbar; good way to distinguish your dev/stag/prod airflow"
-  default     = "#007A87"
 }
 
 // ECS variables
@@ -65,9 +60,6 @@ variable "ecs_memory" {
   default     = 2048
 }
 
-// TODO: Add param to create SSL cert based on dns
-// TODO: Add param to give SSL arn
-// TODO: If no dns or ssl, put it public
 // Networking variables
 variable "ip_allow_list" {
   type        = list(string)
@@ -85,50 +77,28 @@ variable "vpc_id" {
   }
 }
 
-variable "public_subnet_id" {
-  type        = string
-  description = "The id of a public subnet for the alb/rds/ecs task to be in"
+variable "public_subnet_ids" {
+  type        = list(string)
+  description = "A list of subnet ids of where the ALB will reside, if the no \"private_subnet_ids\" is provided ECS and RDS will also reside in these subnets"
 
   validation {
-    condition     = can(regex("^subnet-", var.public_subnet_id))
-    error_message = "The public_subnet_id value must be a valid subnet id, starting with \"subnet-\"."
+    condition     = length(var.public_subnet_ids) >= 2
+    error_message = "The size of the list \"public_subnet_ids\" must be at least 2."
   }
 }
 
-variable "backup_public_subnet_id" {
-  type        = string
-  description = "The id of a public backup subnet for the alb to be in"
+variable "private_subnet_ids" {
+  type        = list(string)
+  description = "A list of subnet ids of where the ECS and RDS reside"
+  default     = []
 
   validation {
-    condition     = can(regex("^subnet-", var.backup_public_subnet_id))
-    error_message = "The backup_public_subnet_id value must be a valid subnet id, starting with \"subnet-\"."
-  }
-}
-
-variable "private_subnet_id" {
-  type        = string
-  description = "The id of a private subnet for the rds/ecs-task to be in (only if the the vpc contains a nat gateway)"
-  default     = ""
-
-  validation {
-    condition     = can(regex("^subnet-", var.private_subnet_id))
-    error_message = "The private_subnet_id value must be a valid subnet id, starting with \"subnet-\"."
-  }
-}
-
-variable "backup_private_subnet_id" {
-  type        = string
-  description = "The id of a private backup subnet for the rds/ecs-task to be in (only if the the vpc contains a nat gateway)"
-  default     = ""
-
-  validation {
-    condition     = can(regex("^subnet-", var.backup_private_subnet_id))
-    error_message = "The backup_private_subnet_id value must be a valid subnet id, starting with \"subnet-\"."
+    condition     = length(var.private_subnet_ids) >= 2 || length(var.private_subnet_ids) == 0
+    error_message = "The size of the list \"private_subnet_ids\" must be at least 2 or empty."
   }
 }
 
 // ACM + Route53
-
 variable "use_https" {
   type        = bool
   description = "Expose traffic using HTTPS or not"
@@ -192,5 +162,5 @@ variable "rds_deletion_protection" {
 variable "s3_bucket_name" {
   type        = string
   default     = ""
-  description = "The S3 bucket name where the DAG seed will be stored"
+  description = "The S3 bucket name where the DAGs and startup scripts will be stored"
 }
