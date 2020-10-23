@@ -70,12 +70,13 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | Name | Version |
 |------|---------|
 | terraform | ~> 0.13 |
+| aws | ~> 3.12.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
+| aws | ~> 3.12.0 |
 
 ## Inputs
 
@@ -106,7 +107,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | resource\_prefix | A prefix for the create resources, example your company name | `string` | n/a | yes |
 | resource\_suffix | A suffix for the created resources, example the environment for airflow to run in | `string` | n/a | yes |
 | route53\_zone\_name | The name of a Route53 zone that will be used for the certificate validation. | `string` | `""` | no |
-| s3\_bucket\_name | The S3 bucket name where the DAGs and startup scripts will be stored | `string` | `""` | no |
+| s3\_bucket\_name | The S3 bucket name where the DAGs and startup scripts will be stored, leave this blank to let this module create a s3 bucket for you. WARNING: this module will put files into the path "dags/" and "startup/" of the bucket | `string` | `""` | no |
 | use\_https | Expose traffic using HTTPS or not | `bool` | `true` | no |
 | vpc\_id | The id of the vpc where you will run ecs/rds | `string` | n/a | yes |
 
@@ -114,10 +115,10 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 
 | Name | Description |
 |------|-------------|
-| airflow\_alb\_dns | n/a |
-| airflow\_connection\_sg | n/a |
-| airflow\_dns\_record | n/a |
-| airflow\_task\_iam\_role | n/a |
+| airflow\_alb\_dns | The DNS name of the ALB, with this you can access the Airflow webserver |
+| airflow\_connection\_sg | The security group with which you can connect other instance to Airflow, for example EMR Livy |
+| airflow\_dns\_record | The created DNS record (only if "use\_https" = true) |
+| airflow\_task\_iam\_role | The IAM role of the airflow task, use this to give Airflow more permissions |
 
 <!--- END_TF_DOCS --->
 
