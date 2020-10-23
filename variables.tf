@@ -7,13 +7,11 @@ variable "region" {
 variable "resource_prefix" {
   type        = string
   description = "A prefix for the create resources, example your company name"
-  default     = "dataroots"
 }
 
 variable "resource_suffix" {
   type        = string
   description = "A suffix for the created resources, example the environment for airflow to run in"
-  default     = "dev"
 }
 
 variable "extra_tags" {
@@ -107,7 +105,7 @@ variable "public_subnet_ids" {
 
 variable "private_subnet_ids" {
   type        = list(string)
-  description = "A list of subnet ids of where the ECS and RDS reside"
+  description = "A list of subnet ids of where the ECS and RDS reside, this will only work if you have a NAT Gateway in your VPC"
   default     = []
 
   validation {
