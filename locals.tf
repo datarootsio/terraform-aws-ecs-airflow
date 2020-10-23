@@ -29,6 +29,8 @@ locals {
     AIRFLOW__CORE__EXECUTOR : "LocalExecutor",
   }, var.airflow_variables)
 
+  airflow_variables_list = formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables))
+
   rds_ecs_subnet_ids = length(var.private_subnet_ids) == 0 ? var.public_subnet_ids : var.private_subnet_ids
 
   dns_record      = var.dns_name != "" ? var.dns_name : (var.route53_zone_name != "" ? "${var.resource_prefix}-airflow-${var.resource_suffix}.${data.aws_route53_zone.zone[0].name}" : "")

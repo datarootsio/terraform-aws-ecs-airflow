@@ -74,9 +74,7 @@ resource "aws_ecs_task_definition" "airflow" {
             "-c"
         ],
         "environment": [
-          %{for k, v in local.airflow_variables~}
-          {"name": "${k}", "value": "${v}"},
-          %{endfor~}
+          ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
