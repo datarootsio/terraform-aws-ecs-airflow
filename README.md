@@ -82,7 +82,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 |------|-------------|------|---------|:--------:|
 | airflow\_container\_home | Working dir for airflow (only change if you are using a different image) | `string` | `"/opt/airflow"` | no |
 | airflow\_example\_dag | Add an example dag on startup (mostly for sanity check) | `bool` | `true` | no |
-| airflow\_executor | The executor mode that airflow will use. Only allowed values are "Local" and "Sequential". "Local": Run DAGs in parallel (will created a RDS); "Local": You can not run DAGs in parallel (will NOT created a RDS); | `string` | `"Local"` | no |
+| airflow\_executor | The executor mode that airflow will use. Only allowed values are "Local" and "Sequential". "Local": Run DAGs in parallel (will created a RDS); "Sequential": You can not run DAGs in parallel (will NOT created a RDS); | `string` | `"Local"` | no |
 | airflow\_image\_name | The name of the airflow image | `string` | `"apache/airflow"` | no |
 | airflow\_image\_tag | The tag of the airflow image | `string` | `"1.10.12"` | no |
 | airflow\_log\_region | The region you want your airflow logs in, defaults to the region variable | `string` | `""` | no |
@@ -97,15 +97,15 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | ip\_allow\_list | A list of ip ranges that are allowed to access the airflow webserver, default: full access | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
 | postgres\_uri | The postgres uri of your postgres db, if none provided a postgres db in rds is made. Format "<db\_username>:<db\_password>@<db\_endpoint>:<db\_port>/<db\_name>" | `string` | `""` | no |
 | private\_subnet\_ids | A list of subnet ids of where the ECS and RDS reside, this will only work if you have a NAT Gateway in your VPC | `list(string)` | `[]` | no |
-| public\_subnet\_ids | A list of subnet ids of where the ALB will reside, if the no "private\_subnet\_ids" is provided ECS and RDS will also reside in these subnets | `list(string)` | n/a | yes |
-| rds\_availability\_zone | Availability zone for the rds instance | `string` | n/a | yes |
-| rds\_deletion\_protection | Deletion protection for the rds instance | `bool` | n/a | yes |
+| public\_subnet\_ids | A list of subnet ids of where the ALB will reside, if the "private\_subnet\_ids" variable is not provided ECS and RDS will also reside in these subnets | `list(string)` | n/a | yes |
+| rds\_availability\_zone | Availability zone for the rds instance | `string` | `"eu-west-1a"` | no |
+| rds\_deletion\_protection | Deletion protection for the rds instance | `bool` | `false` | no |
 | rds\_instance\_class | The class of instance you want to give to your rds db | `string` | `"db.t2.micro"` | no |
-| rds\_password | Password of rds | `string` | n/a | yes |
-| rds\_username | Username of rds | `string` | n/a | yes |
+| rds\_password | Password of rds | `string` | `"dataroots"` | no |
+| rds\_username | Username of rds | `string` | `"dataroots"` | no |
 | region | The region to deploy your solution to | `string` | `"eu-west-1"` | no |
-| resource\_prefix | A prefix for the create resources, example your company name | `string` | n/a | yes |
-| resource\_suffix | A suffix for the created resources, example the environment for airflow to run in | `string` | n/a | yes |
+| resource\_prefix | A prefix for the create resources, example your company name (be aware of the resource name length) | `string` | n/a | yes |
+| resource\_suffix | A suffix for the created resources, example the environment for airflow to run in (be aware of the resource name length) | `string` | n/a | yes |
 | route53\_zone\_name | The name of a Route53 zone that will be used for the certificate validation. | `string` | `""` | no |
 | s3\_bucket\_name | The S3 bucket name where the DAGs and startup scripts will be stored, leave this blank to let this module create a s3 bucket for you. WARNING: this module will put files into the path "dags/" and "startup/" of the bucket | `string` | `""` | no |
 | use\_https | Expose traffic using HTTPS or not | `bool` | `false` | no |
