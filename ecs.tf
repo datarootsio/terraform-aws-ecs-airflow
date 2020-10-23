@@ -74,8 +74,7 @@ resource "aws_ecs_task_definition" "airflow" {
             "-c"
         ],
         "environment": [
-          {"name": "AIRFLOW__CORE__SQL_ALCHEMY_CONN", "value": "postgresql+psycopg2://${local.postgres_uri}"},
-          {"name": "AIRFLOW__CORE__EXECUTOR", "value": "LocalExecutor"}
+          ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
@@ -110,8 +109,7 @@ resource "aws_ecs_task_definition" "airflow" {
             "-c"
         ],
         "environment": [
-          {"name": "AIRFLOW__CORE__SQL_ALCHEMY_CONN", "value": "postgresql+psycopg2://${local.postgres_uri}"},
-          {"name": "AIRFLOW__CORE__EXECUTOR", "value": "LocalExecutor"}
+          ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
