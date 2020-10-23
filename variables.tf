@@ -35,6 +35,18 @@ variable "airflow_image_tag" {
   default     = "1.10.12"
 }
 
+variable "airflow_container_home" {
+  type        = string
+  description = "Working dir for airflow (only change if you are using a different image)"
+  default     = "/opt/airflow"
+}
+
+variable "airflow_variables" {
+  type        = map(string)
+  description = "The variables passed to airflow as an environment variable"
+  default     = {}
+}
+
 variable "airflow_log_region" {
   type        = string
   description = "The region you want your airflow logs in, defaults to the region variable"

@@ -34,7 +34,7 @@ resource "aws_s3_bucket_object" "airflow_seed_dag" {
   content = templatefile("${path.module}/templates/dags/airflow_seed_dag.py", {
     BUCKET_NAME  = local.s3_bucket_name,
     KEY          = local.s3_key,
-    AIRFLOW_HOME = local.airflow_container_home
+    AIRFLOW_HOME = var.airflow_container_home
     YEAR         = local.year
     MONTH        = local.month
     DAY          = local.day
@@ -51,13 +51,13 @@ resource "aws_s3_bucket_object" "airflow_example_dag" {
 resource "aws_s3_bucket_object" "airflow_scheduler_entrypoint" {
   bucket  = local.s3_bucket_name
   key     = "startup/entrypoint_scheduler.sh"
-  content = templatefile("${path.module}/templates/startup/entrypoint_scheduler.sh", { AIRFLOW_HOME = local.airflow_container_home })
+  content = templatefile("${path.module}/templates/startup/entrypoint_scheduler.sh", { AIRFLOW_HOME = var.airflow_container_home })
 }
 
 resource "aws_s3_bucket_object" "airflow_webserver_entrypoint" {
   bucket  = local.s3_bucket_name
   key     = "startup/entrypoint_webserver.sh"
-  content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", { AIRFLOW_HOME = local.airflow_container_home })
+  content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", { AIRFLOW_HOME = var.airflow_container_home })
 }
 
 resource "aws_s3_bucket_object" "airflow_requirements" {

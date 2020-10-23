@@ -35,10 +35,10 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
-            "/bin/sh -c \"aws s3 cp s3://${local.s3_bucket_name}/${local.s3_key} ${local.airflow_container_home} --recursive && chmod +x ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${local.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${local.airflow_container_home}\""
+            "\"aws s3 cp s3://${local.s3_bucket_name}/${local.s3_key} ${var.airflow_container_home} --recursive && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
         ],
         "entryPoint": [
-            "sh",
+            "/bin/sh",
             "-c"
         ],
         "logConfiguration": {
@@ -53,7 +53,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${local.airflow_container_home}"
+            "containerPath": "${var.airflow_container_home}"
           }
         ]
       },
@@ -67,14 +67,16 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "/bin/sh -c \"${local.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key}\""
+            "\"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key}\""
         ],
         "entryPoint": [
-            "sh",
+            "/bin/sh",
             "-c"
         ],
         "environment": [
-            {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"}
+          %{for k, v in local.airflow_variables~}
+          {"name": "${k}", "value": "${v}"},
+          %{endfor~}
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
@@ -88,7 +90,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${local.airflow_container_home}"
+            "containerPath": "${var.airflow_container_home}"
           }
         ]
       },
@@ -102,14 +104,16 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "/bin/sh -c \"${local.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key}\""
+            "\"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key}\""
         ],
         "entryPoint": [
-            "sh",
+            "/bin/sh ",
             "-c"
         ],
         "environment": [
-            {"name": "POSTGRES_URI", "value": "${local.postgres_uri}"}
+          %{for k, v in local.airflow_variables~}
+          {"name": "${k}", "value": "${v}"},
+          %{endfor~}
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
@@ -123,7 +127,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${local.airflow_container_home}"
+            "containerPath": "${var.airflow_container_home}"
           }
         ],
         "portMappings": [
@@ -138,6 +142,8 @@ resource "aws_ecs_task_definition" "airflow" {
 
   tags = local.common_tags
 }
+
+
 
 // Without depends_on I get this error:
 // Error:
@@ -157,8 +163,6 @@ resource "aws_ecs_service" "airflow" {
     security_groups  = [aws_security_group.airflow.id]
     assign_public_ip = false
   }
-
-
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"

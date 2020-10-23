@@ -24,8 +24,10 @@ locals {
   airflow_scheduler_container_name = "${var.resource_prefix}-airflow-scheduler-${var.resource_suffix}"
   airflow_sidecar_container_name   = "${var.resource_prefix}-airflow-sidecar-${var.resource_suffix}"
   airflow_volume_name              = "airflow"
-
-  airflow_container_home = "/opt/airflow"
+  airflow_variables = merge({
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN : "postgresql+psycopg2://${local.postgres_uri}",
+    AIRFLOW__CORE__EXECUTOR : "LocalExecutor",
+  }, var.airflow_variables)
 
   rds_ecs_subnet_ids = length(var.private_subnet_ids) == 0 ? var.public_subnet_ids : var.private_subnet_ids
 
