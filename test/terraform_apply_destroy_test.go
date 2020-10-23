@@ -205,7 +205,7 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 	}
 }
 
-func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
+func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "..", ".")
 
 	terraformOptions := &terraform.Options{
@@ -217,7 +217,7 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 		Logger:             logger.TestingT,
 	}
 
-	terraformOptions.Vars["region"] = "eu-west-1"
+	terraformOptions.Vars["region"] = region
 	terraformOptions.Vars["resource_prefix"] = resourcePrefix
 	terraformOptions.Vars["resource_suffix"] = resourceSuffix
 	terraformOptions.Vars["extra_tags"] = map[string]interface{}{
@@ -228,7 +228,7 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 
 	terraformOptions.Vars["airflow_image_name"] = "apache/airflow"
 	terraformOptions.Vars["airflow_image_tag"] = "1.10.12"
-	terraformOptions.Vars["airflow_log_region"] = "eu-west-1"
+	terraformOptions.Vars["airflow_log_region"] = region
 	terraformOptions.Vars["airflow_log_retention"] = "7"
 	terraformOptions.Vars["airflow_example_dag"] = true
 	terraformOptions.Vars["airflow_variables"] = map[string]interface{}{
@@ -257,7 +257,7 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 	terraformOptions.Vars["rds_username"] = "dataroots"
 	terraformOptions.Vars["rds_password"] = "dataroots"
 	terraformOptions.Vars["rds_instance_class"] = "db.t2.micro"
-	terraformOptions.Vars["rds_availability_zone"] = "eu-west-1a"
+	terraformOptions.Vars["rds_availability_zone"] = fmt.Sprintf("%sa", region)
 	terraformOptions.Vars["rds_deletion_protection"] = false
 
 	terraformOptions.Vars["use_https"] = true
@@ -270,12 +270,14 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 // 	fmt.Println("Starting test")
 // 	// 'GLOBAL' test vars
 // 	region := "eu-west-1"
+//  resourcePrefix := "dtr"
+//  resourceSuffix := "dev-https"
 
 // 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
 // 	t.Parallel()
 
-// 	options, err := getDefaultTerraformOptions(t, "dataroots", "dev")
+// 	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
 // 	assert.NoError(t, err)
 
 // 	// terraform destroy => when test completes
@@ -291,7 +293,7 @@ func getDefaultTerraformOptions(t *testing.T, resourcePrefix string, resourceSuf
 // 	// if there are terraform errors, do nothing
 // 	if err == nil {
 // 		fmt.Println("Terraform apply returned no error, continuing")
-// 		validateCluster(t, options, region, "dataroots", "dev")
+// 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 // 	}
 // }
 
@@ -299,12 +301,14 @@ func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
 	fmt.Println("Starting test")
 	// 'GLOBAL' test vars
 	region := "eu-west-1"
+	resourcePrefix := "dtr"
+	resourceSuffix := "http-local-dev"
 
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
 	t.Parallel()
 
-	options, err := getDefaultTerraformOptions(t, "dataroots", "devhttp")
+	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
 	assert.NoError(t, err)
 	options.Vars["use_https"] = false
 	options.Vars["route53_zone_name"] = ""
@@ -322,6 +326,42 @@ func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
 	// if there are terraform errors, do nothing
 	if err == nil {
 		fmt.Println("Terraform apply returned no error, continuing")
-		validateCluster(t, options, region, "dataroots", "devhttp")
+		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
+	}
+}
+
+func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutor(t *testing.T) {
+	fmt.Println("Starting test")
+	// 'GLOBAL' test vars
+	region := "eu-west-1"
+	resourcePrefix := "dtr"
+	resourceSuffix := "http-seq-dev"
+
+
+	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
+
+	t.Parallel()
+
+	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
+	assert.NoError(t, err)
+	options.Vars["airflow_executor"] = "Sequential"
+
+	options.Vars["use_https"] = false
+	options.Vars["route53_zone_name"] = ""
+
+	// terraform destroy => when test completes
+	defer terraform.Destroy(t, options)
+	fmt.Println("Running: terraform init && terraform apply")
+	_, err = terraform.InitE(t, options)
+	assert.NoError(t, err)
+	_, err = terraform.PlanE(t, options)
+	assert.NoError(t, err)
+	_, err = terraform.ApplyE(t, options)
+	assert.NoError(t, err)
+
+	// if there are terraform errors, do nothing
+	if err == nil {
+		fmt.Println("Terraform apply returned no error, continuing")
+		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
