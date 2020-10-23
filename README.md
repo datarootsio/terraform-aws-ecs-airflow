@@ -1,13 +1,13 @@
-# Terraform module Airflow on AWS ECS
-
-This is a module for Terraform that deploys Airflow in AWS.
-
 [![Maintained by dataroots](https://img.shields.io/badge/maintained%20by-dataroots-%2300b189)](https://dataroots.io)
 [![Airflow version](https://img.shields.io/badge/Apache%20Airflow-1.10.12-e27d60.svg)]()
 [![Terraform 0.13](https://img.shields.io/badge/terraform-0.13-%23623CE4)](https://www.terraform.io)
 [![Terraform Registry](https://img.shields.io/badge/terraform-registry-%23623CE4)](https://registry.terraform.io/modules/datarootsio/aws-airflow/module/)
 [![Tests](https://github.com/datarootsio/terraform-aws-ecs-airflow/workflows/tests/badge.svg?branch=master)](https://github.com/datarootsio/terraform-aws-ecs-airflow/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/datarootsio/terraform-aws-ecs-airflow)](https://goreportcard.com/report/github.com/datarootsio/terraform-aws-ecs-airflow)
+
+# Terraform module Airflow on AWS ECS
+
+This is a module for Terraform that deploys Airflow in AWS.
 
 ## Setup
 
@@ -121,6 +121,18 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | airflow\_task\_iam\_role | The IAM role of the airflow task, use this to give Airflow more permissions |
 
 <!--- END_TF_DOCS --->
+
+## Makefile Targets
+
+```text
+Available targets:
+
+  tools                             Pull Go and Terraform dependencies
+  fmt                               Format Go and Terraform code
+  lint/lint-tf/lint-go              Lint Go and Terraform code
+  test/testverbose                  Run tests
+
+```
 
 ## Contributing
 
