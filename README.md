@@ -102,7 +102,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | ecs\_memory | The allocated memory for your airflow instance | `number` | `2048` | no |
 | extra\_tags | Extra tags that you would like to add to all created resources | `map(string)` | `{}` | no |
 | ip\_allow\_list | A list of ip ranges that are allowed to access the airflow webserver, default: full access | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
-| postgres\_uri | The postgres uri of your postgres db, if none provided a postgres db in rds is made | `string` | `""` | no |
+| postgres\_uri | The postgres uri of your postgres db, if none provided a postgres db in rds is made. Format "<db\_username>:<db\_password>@<db\_endpoint>:<db\_port>/<db\_name>" | `string` | `""` | no |
 | private\_subnet\_ids | A list of subnet ids of where the ECS and RDS reside, this will only work if you have a NAT Gateway in your VPC | `list(string)` | `[]` | no |
 | public\_subnet\_ids | A list of subnet ids of where the ALB will reside, if the no "private\_subnet\_ids" is provided ECS and RDS will also reside in these subnets | `list(string)` | n/a | yes |
 | rds\_availability\_zone | Availability zone for the rds instance | `string` | n/a | yes |
