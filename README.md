@@ -16,9 +16,9 @@ This is a module for Terraform that deploys Airflow in AWS.
     - Airflow webserver container
     - Airflow scheduler container
 - An ALB
-- A S3 Bucket (optional but recommended)
 - A RDS instance (optional but recommended)
 - A DNS Record (optional but recommended)
+- A S3 Bucket (optional)
 
 Average cost of the minimal setup (with rds): ~40$/Month
 
@@ -51,6 +51,8 @@ module "airflow" {
     rds_deletion_protection = false
 }
 ```
+(This will create Airflow, backed up by an RDS)
+
 
 To add dags, upload them to the created S3 bucket in the subdir "dags/". After you uploaded them run the seed dag. This will sync the s3 bucket with the local dags folder of the ECS container. 
 
