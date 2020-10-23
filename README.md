@@ -20,7 +20,7 @@ This is a module for Terraform that deploys Airflow in AWS.
 - A DNS Record (optional but recommended)
 - A S3 Bucket (optional)
 
-Average cost of the minimal setup (with rds): ~40$/Month
+Average cost of the minimal setup (with RDS): ~40$/Month
 
 Why do I need a RDS instance? 
 1. This makes Airflow statefull, you will be able to rerun failed dags, keep history of failed/succeeded dags, ...
