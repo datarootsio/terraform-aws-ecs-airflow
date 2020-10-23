@@ -103,10 +103,10 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "\"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key}\""
+            "/bin/sh -c \"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key}\""
         ],
         "entryPoint": [
-            "sh ",
+            "sh",
             "-c"
         ],
         "environment": [
