@@ -168,13 +168,13 @@ variable "postgres_uri" {
 variable "rds_username" {
   type        = string
   description = "Username of rds"
-  default     = "dataroots"
+  default     = "airflow"
 }
 
 variable "rds_password" {
   type        = string
   description = "Password of rds"
-  default     = "dataroots"
+  default     = ""
 }
 
 variable "rds_instance_class" {
