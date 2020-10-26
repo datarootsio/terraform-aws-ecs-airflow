@@ -23,11 +23,6 @@ module "airflow" {
     airflow_executor = "Sequential"
 
     use_https = false
-
-    rds_username            = "dataroots"
-    rds_password            = "dataroots"
-    rds_availability_zone   = "eu-west-1a"
-    rds_deletion_protection = false
 }
 
 output "airflow_alb_dns" {
