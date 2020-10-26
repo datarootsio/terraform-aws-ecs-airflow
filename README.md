@@ -103,8 +103,8 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | rds\_availability\_zone | Availability zone for the rds instance | `string` | `"eu-west-1a"` | no |
 | rds\_deletion\_protection | Deletion protection for the rds instance | `bool` | `false` | no |
 | rds\_instance\_class | The class of instance you want to give to your rds db | `string` | `"db.t2.micro"` | no |
-| rds\_password | Password of rds | `string` | `"dataroots"` | no |
-| rds\_username | Username of rds | `string` | `"dataroots"` | no |
+| rds\_password | Password of rds | `string` | `""` | no |
+| rds\_username | Username of rds | `string` | `"airflow"` | no |
 | region | The region to deploy your solution to | `string` | `"eu-west-1"` | no |
 | resource\_prefix | A prefix for the create resources, example your company name (be aware of the resource name length) | `string` | n/a | yes |
 | resource\_suffix | A suffix for the created resources, example the environment for airflow to run in (be aware of the resource name length) | `string` | n/a | yes |
