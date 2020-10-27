@@ -15,12 +15,13 @@ resource "aws_db_instance" "airflow" {
   final_snapshot_identifier = "airflow-final-snapshot-${local.timestamp_sanitized}"
   identifier                = local.rds_name
   vpc_security_group_ids    = [aws_security_group.airflow.id]
-  db_subnet_group_name      = aws_db_subnet_group.airflow.name
+  db_subnet_group_name      = aws_db_subnet_group.airflow[0].name
 
   tags = local.common_tags
 }
 
 resource "aws_db_subnet_group" "airflow" {
+  count      = var.postgres_uri != "" || var.airflow_executor == "Sequential" ? 0 : 1
   name       = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   subnet_ids = local.rds_ecs_subnet_ids
 
