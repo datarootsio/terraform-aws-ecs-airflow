@@ -7,6 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.35.11
 	github.com/go-errors/errors v1.1.1 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/gruntwork-io/terratest v0.30.11
 	github.com/stretchr/testify v1.6.1

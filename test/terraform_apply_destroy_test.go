@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/logger"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	testStructure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -339,7 +341,7 @@ func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
 	// 'GLOBAL' test vars
 	region := "eu-west-1"
 	resourcePrefix := "dtr"
-	resourceSuffix := "http-local-dev"
+	resourceSuffix := strings.ToLower(random.UniqueId())
 
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
@@ -372,7 +374,7 @@ func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutor(t *testing.T) {
 	// 'GLOBAL' test vars
 	region := "eu-west-1"
 	resourcePrefix := "dtr"
-	resourceSuffix := "http-seq-dev"
+	resourceSuffix := strings.ToLower(random.UniqueId())
 
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
@@ -407,7 +409,7 @@ func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 	// 'GLOBAL' test vars
 	region := "eu-west-1"
 	resourcePrefix := "dtr"
-	resourceSuffix := "http-local-dev-rds"
+	resourceSuffix := strings.ToLower(random.UniqueId())
 
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
