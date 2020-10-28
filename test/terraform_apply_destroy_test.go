@@ -305,36 +305,36 @@ func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix stri
 	return terraformOptions, nil
 }
 
-// func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
-// 	fmt.Println("Starting test")
-// 	// 'GLOBAL' test vars
-// 	region := "eu-west-1"
-//  resourcePrefix := "dtr"
-//  resourceSuffix := "dev-https"
+func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
+	fmt.Println("Starting test")
+	// 'GLOBAL' test vars
+	region := "eu-west-1"
+	resourcePrefix := "dtr"
+	resourceSuffix := strings.ToLower(random.UniqueId())
 
-// 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
+	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
-// 	t.Parallel()
+	t.Parallel()
 
-// 	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
-// 	assert.NoError(t, err)
+	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
+	assert.NoError(t, err)
 
-// 	// terraform destroy => when test completes
-// 	defer terraform.Destroy(t, options)
-// 	fmt.Println("Running: terraform init && terraform apply")
-// 	_, err = terraform.InitE(t, options)
-// 	assert.NoError(t, err)
-// 	_, err = terraform.PlanE(t, options)
-// 	assert.NoError(t, err)
-// 	_, err = terraform.ApplyE(t, options)
-// 	assert.NoError(t, err)
+	// terraform destroy => when test completes
+	defer terraform.Destroy(t, options)
+	fmt.Println("Running: terraform init && terraform apply")
+	_, err = terraform.InitE(t, options)
+	assert.NoError(t, err)
+	_, err = terraform.PlanE(t, options)
+	assert.NoError(t, err)
+	_, err = terraform.ApplyE(t, options)
+	assert.NoError(t, err)
 
-// 	// if there are terraform errors, do nothing
-// 	if err == nil {
-// 		fmt.Println("Terraform apply returned no error, continuing")
-// 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
-// 	}
-// }
+	// if there are terraform errors, do nothing
+	if err == nil {
+		fmt.Println("Terraform apply returned no error, continuing")
+		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
+	}
+}
 
 func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
 	fmt.Println("Starting test")
