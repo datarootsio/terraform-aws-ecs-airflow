@@ -403,7 +403,7 @@ func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutor(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
-
+*/
 func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 	fmt.Println("Starting test")
 	// 'GLOBAL' test vars
@@ -448,4 +448,3 @@ func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
-*/
