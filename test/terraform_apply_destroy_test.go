@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -20,12 +19,6 @@ import (
 	testStructure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
 )
-
-/*func getPublicIp() string {
-	res, _ := http.Get("https://api.ipify.org")
-	ip, _ := ioutil.ReadAll(res.Body)
-	return string(ip)
-}*/
 
 func AddPreAndSuffix(resourceName string, resourcePrefix string, resourceSuffix string) string {
 	if resourcePrefix == "" {
@@ -238,7 +231,7 @@ func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix 
 		"subnet-09c0ce0aff676904a",
 	}
 
-	terraformOptions.Vars["rds_name"] = AddPreAndSuffix("preexisting",resourcePrefix,resourceSuffix)
+	terraformOptions.Vars["rds_name"] = AddPreAndSuffix("preexisting", resourcePrefix, resourceSuffix)
 	terraformOptions.Vars["route53_zone_name"] = "aws-sandbox.dataroots.io"
 
 	return terraformOptions, nil
