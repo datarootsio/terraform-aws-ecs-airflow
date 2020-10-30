@@ -82,11 +82,11 @@ resource "aws_ecs_task_definition" "airflow" {
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
-                "condition": "COMPLETE"
+                "condition": "SUCCESS"
             },
             {
                 "containerName": "${local.airflow_initdb_container_name}",
-                "condition": "COMPLETE"
+                "condition": "SUCCESS"
             }
         ],
         "command": [
@@ -121,11 +121,11 @@ resource "aws_ecs_task_definition" "airflow" {
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
-                "condition": "COMPLETE"
+                "condition": "SUCCESS"
             },
             {
                 "containerName": "${local.airflow_initdb_container_name}",
-                "condition": "COMPLETE"
+                "condition": "SUCCESS"
             }
         ],
         "command": [
