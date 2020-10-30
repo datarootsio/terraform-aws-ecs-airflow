@@ -21,11 +21,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func getPublicIp() string {
+/*func getPublicIp() string {
 	res, _ := http.Get("https://api.ipify.org")
 	ip, _ := ioutil.ReadAll(res.Body)
 	return string(ip)
-}
+}*/
 
 func AddPreAndSuffix(resourceName string, resourcePrefix string, resourceSuffix string) string {
 	if resourcePrefix == "" {
