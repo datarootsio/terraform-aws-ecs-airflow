@@ -107,7 +107,7 @@ resource "aws_security_group" "rds" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "TCP"
-    cidr_blocks = ["10.100.0.0/16"]
+    cidr_blocks = ["10.150.0.0/16"]
   }
 
   tags = local.common_tags
