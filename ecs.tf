@@ -61,7 +61,6 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_initdb_container_name}",
         "command": [
-            "airflow",
             "initdb"
         ],
         "environment": [

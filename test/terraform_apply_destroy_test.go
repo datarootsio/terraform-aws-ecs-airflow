@@ -42,10 +42,10 @@ func GetContainerWithName(containerName string, containers []*ecs.Container) *ec
 func validateCluster(t *testing.T, options *terraform.Options, region string, resourcePrefix string, resourceSuffix string) {
 
 	retrySleepTime := time.Duration(10) * time.Second
-	ecsGetTaskArnMaxRetries := 10
-	ecsGetTaskStatusMaxRetries := 15
-	httpStatusCodeMaxRetries := 30
-	amountOfConsecutiveGetsToBeHealthy := 6
+	ecsGetTaskArnMaxRetries := 5
+	ecsGetTaskStatusMaxRetries := 5
+	httpStatusCodeMaxRetries := 15
+	amountOfConsecutiveGetsToBeHealthy := 3
 	desiredStatusRunning := "RUNNING"
 	clusterName := AddPreAndSuffix("airflow", resourcePrefix, resourceSuffix)
 	serviceName := AddPreAndSuffix("airflow", resourcePrefix, resourceSuffix)
