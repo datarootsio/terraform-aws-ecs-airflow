@@ -59,10 +59,34 @@ resource "aws_ecs_task_definition" "airflow" {
       },
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
+        "name": "${local.airflow_initdb_container_name}",
+        "command": [
+            "airflow",
+            "initdb"
+        ],
+        "environment": [
+          ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
+            "awslogs-region": "${local.airflow_log_region}",
+            "awslogs-stream-prefix": "airflow"
+          }
+        },
+        "essential": false
+      },
+      {
+        "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_scheduler_container_name}",
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
+                "condition": "COMPLETE"
+            },
+            {
+                "containerName": "${local.airflow_initdb_container_name}",
                 "condition": "COMPLETE"
             }
         ],
@@ -98,6 +122,10 @@ resource "aws_ecs_task_definition" "airflow" {
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
+                "condition": "COMPLETE"
+            },
+            {
+                "containerName": "${local.airflow_initdb_container_name}",
                 "condition": "COMPLETE"
             }
         ],

@@ -24,6 +24,7 @@ locals {
   airflow_webserver_container_name = "${var.resource_prefix}-airflow-webserver-${var.resource_suffix}"
   airflow_scheduler_container_name = "${var.resource_prefix}-airflow-scheduler-${var.resource_suffix}"
   airflow_sidecar_container_name   = "${var.resource_prefix}-airflow-sidecar-${var.resource_suffix}"
+  airflow_initdb_container_name    = "${var.resource_prefix}-airflow-initdb-${var.resource_suffix}"
   airflow_volume_name              = "airflow"
   // Keep the 2 env vars second, we want to override them (this module manges these vars)
   airflow_variables = merge(var.airflow_variables, {

@@ -279,7 +279,7 @@ func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix stri
 	terraformOptions.Vars["ecs_memory"] = 2048
 
 	terraformOptions.Vars["ip_allow_list"] = []string{
-		fmt.Sprintf("%s/32", getPublicIp()),
+		"0.0.0.0/0",
 	}
 	terraformOptions.Vars["vpc_id"] = "vpc-0eafa6867cb3bdaa3"
 	terraformOptions.Vars["public_subnet_ids"] = []string{
