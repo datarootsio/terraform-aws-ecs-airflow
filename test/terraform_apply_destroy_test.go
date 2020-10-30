@@ -199,7 +199,7 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 		}
 	}
 }
-
+/*
 func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "preexisting", ".")
 
@@ -236,7 +236,7 @@ func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix 
 
 	return terraformOptions, nil
 }
-
+*/
 func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "..", ".")
 
@@ -297,7 +297,7 @@ func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix stri
 
 	return terraformOptions, nil
 }
-
+/*
 func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 	fmt.Println("Starting test")
 	// 'GLOBAL' test vars
@@ -328,7 +328,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
-
+*/
 func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
 	fmt.Println("Starting test")
 	// 'GLOBAL' test vars
@@ -361,7 +361,7 @@ func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
-
+/*
 func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutor(t *testing.T) {
 	fmt.Println("Starting test")
 	// 'GLOBAL' test vars
@@ -441,3 +441,4 @@ func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
+*/

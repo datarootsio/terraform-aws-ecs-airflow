@@ -60,6 +60,12 @@ resource "aws_ecs_task_definition" "airflow" {
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_initdb_container_name}",
+        "dependsOn": [
+            {
+                "containerName": "${local.airflow_sidecar_container_name}",
+                "condition": "SUCCESS"
+            }
+        ],
         "command": [
             "/bin/sh -c \"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_initdb_entrypoint.key}\""
         ],
@@ -78,7 +84,13 @@ resource "aws_ecs_task_definition" "airflow" {
             "awslogs-stream-prefix": "airflow"
           }
         },
-        "essential": false
+        "essential": false,
+        "mountPoints": [
+          {
+            "sourceVolume": "${local.airflow_volume_name}",
+            "containerPath": "${var.airflow_container_home}"
+          }
+        ]
       },
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
