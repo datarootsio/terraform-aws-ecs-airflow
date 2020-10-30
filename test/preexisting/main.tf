@@ -127,7 +127,7 @@ resource "aws_db_instance" "airflow" {
   availability_zone         = "eu-west-1a"
   publicly_accessible       = false
   deletion_protection       = false
-  final_snapshot_identifier = "airflow-final-snapshot-${local.timestamp_sanitized}"
+  final_snapshot_identifier = "${var.resource_prefix}-airflow-${var.resource_suffix}-${local.timestamp_sanitized}"
   identifier                = var.rds_name
   vpc_security_group_ids    = [aws_security_group.rds.id]
   db_subnet_group_name      = aws_db_subnet_group.airflow.name
