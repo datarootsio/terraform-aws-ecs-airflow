@@ -1,8 +1,8 @@
 [![Maintained by dataroots](https://img.shields.io/badge/maintained%20by-dataroots-%2300b189)](https://dataroots.io)
-[![Airflow version](https://img.shields.io/badge/Apache%20Airflow-1.10.12-e27d60.svg)]()
+[![Airflow version](https://img.shields.io/badge/Apache%20Airflow-1.10.12-e27d60.svg)](https://airflow.apache.org/)
 [![Terraform 0.13](https://img.shields.io/badge/terraform-0.13-%23623CE4)](https://www.terraform.io)
-[![Terraform Registry](https://img.shields.io/badge/terraform-registry-%23623CE4)](https://registry.terraform.io/modules/datarootsio/aws-airflow/module/)
-[![Tests](https://github.com/datarootsio/terraform-aws-ecs-airflow/workflows/tests/badge.svg?branch=master)](https://github.com/datarootsio/terraform-aws-ecs-airflow/actions)
+[![Terraform Registry](https://img.shields.io/badge/terraform-registry-%23623CE4)](https://registry.terraform.io/modules/datarootsio/ecs-airflow/aws)
+[![Tests](https://github.com/datarootsio/terraform-aws-ecs-airflow/workflows/tests/badge.svg?branch=main)](https://github.com/datarootsio/terraform-aws-ecs-airflow/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/datarootsio/terraform-aws-ecs-airflow)](https://goreportcard.com/report/github.com/datarootsio/terraform-aws-ecs-airflow)
 
 ![](https://scontent.fbru1-1.fna.fbcdn.net/v/t1.0-9/94305647_112517570431823_3318660558911176704_o.png?_nc_cat=111&_nc_sid=e3f864&_nc_ohc=-spbrtnzSpQAX_qi7iI&_nc_ht=scontent.fbru1-1.fna&oh=483d147a29972c72dfb588b91d57ac3c&oe=5F99368A "Logo")
@@ -37,7 +37,7 @@ The Airflow setup provided with this module, is a setup where the only task of A
 
 ```hcl
 module "airflow" {
-    source = "datarootsio/aws-airflow/module/"
+    source = "datarootsio/ecs-airflow/aws"
 
     resource_prefix = "my-awesome-company"
     resource_suffix = "env"
