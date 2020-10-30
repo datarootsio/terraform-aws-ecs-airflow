@@ -157,7 +157,7 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 		if options.Vars["route53_zone_name"] == "" {
 			airflowAlbDNS = terraform.Output(t, options, "airflow_alb_dns")
 		}
-		airflowURL := fmt.Sprintf("%s://%s", protocol, airflowAlbDNS)
+		airflowURL := fmt.Sprintf("%s://%s/admin/", protocol, airflowAlbDNS)
 
 		var amountOfConsecutiveHealthyChecks int
 		var res *http.Response
@@ -199,7 +199,7 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 		}
 	}
 }
-/*
+
 func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "preexisting", ".")
 
@@ -236,7 +236,7 @@ func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix 
 
 	return terraformOptions, nil
 }
-*/
+
 func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "..", ".")
 
@@ -328,7 +328,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
-/*
+
 func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
 	fmt.Println("Starting test")
 	// 'GLOBAL' test vars
@@ -441,4 +441,3 @@ func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
-*/
