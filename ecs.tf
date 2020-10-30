@@ -119,6 +119,10 @@ resource "aws_ecs_task_definition" "airflow" {
             "awslogs-stream-prefix": "airflow"
           }
         },
+        "healthCheck": {
+          "command": [ "CMD-SHELL", "curl -f http://localhost:8080/health || exit 1" ],
+          "startPeriod": 120
+        },
         "essential": true,
         "mountPoints": [
           {
@@ -154,7 +158,7 @@ resource "aws_ecs_service" "airflow" {
   task_definition = aws_ecs_task_definition.airflow.id
   desired_count   = 1
 
-  health_check_grace_period_seconds = 90
+  health_check_grace_period_seconds = 120
 
   network_configuration {
     subnets          = local.rds_ecs_subnet_ids

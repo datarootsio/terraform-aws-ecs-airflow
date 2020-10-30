@@ -238,7 +238,7 @@ func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix 
 		"subnet-09c0ce0aff676904a",
 	}
 
-	terraformOptions.Vars["rds_name"] = "preexistingairflow"
+	terraformOptions.Vars["rds_name"] = AddPreAndSuffix("preexisting",resourcePrefix,resourceSuffix)
 	terraformOptions.Vars["route53_zone_name"] = "aws-sandbox.dataroots.io"
 
 	return terraformOptions, nil
@@ -335,7 +335,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
-/*
+
 func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
 	fmt.Println("Starting test")
 	// 'GLOBAL' test vars
@@ -403,7 +403,7 @@ func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutor(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
-*/
+
 func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 	fmt.Println("Starting test")
 	// 'GLOBAL' test vars
