@@ -6,16 +6,27 @@ on:
   pull_request:
     branches:
       - main
-env:
-  tests_timeout: "2h"
-  golangci_lint_version: "v1.26"
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: eu-west-1
+      - open-pr-here
 jobs:
+  docs:
+    name: "Docs"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    - name: Render terraform docs inside the README.md and push changes back to PR branch
+      uses: Dirrk/terraform-docs@v1.0.8
+      with:
+        tf_docs_working_dir: .
+        tf_docs_output_file: README.md
+        tf_docs_output_method: inject
+        tf_docs_git_push: 'true'
   validate:
     name: "Validate"
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@master
@@ -36,8 +47,15 @@ jobs:
       - name: tflint
         run: docker run --rm -v $(pwd):/data -t wata727/tflint
   test:
+    env:
+      tests_timeout: "2h"
+      golangci_lint_version: "v1.26"
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: eu-west-1
     name: "Tests"
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' && (github.actor == 'samueldumont' || github.actor == 'nicogelders')}}
     steps:
       - name: "Checkout"
         uses: actions/checkout@master
