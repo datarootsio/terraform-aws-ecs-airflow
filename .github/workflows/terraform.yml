@@ -6,12 +6,7 @@ on:
   pull_request:
     branches:
       - main
-env:
-  tests_timeout: "2h"
-  golangci_lint_version: "v1.26"
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: eu-west-1
+      - open-pr-here
 jobs:
   docs:
     name: "Docs"
@@ -28,14 +23,11 @@ jobs:
         tf_docs_output_file: README.md
         tf_docs_output_method: inject
         tf_docs_git_push: 'true'
-
   validate:
     name: "Validate"
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
-      - name: Get the github actor
-        run: echo ${{ github.actor }}
-        
       - name: "Checkout"
         uses: actions/checkout@master
 
@@ -55,8 +47,15 @@ jobs:
       - name: tflint
         run: docker run --rm -v $(pwd):/data -t wata727/tflint
   test:
+    env:
+      tests_timeout: "2h"
+      golangci_lint_version: "v1.26"
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: eu-west-1
     name: "Tests"
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' && contains(['samueldumont','nicogelders'], github.actor) }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@master
