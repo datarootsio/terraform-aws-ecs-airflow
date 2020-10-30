@@ -34,10 +34,3 @@ jobs:
             Automatic release for ${{ steps.next_tag.outputs.v_patch }}
           draft: false
           prerelease: false
-      - name: "Refresh PR branch"
-        uses: Embraser01/update-git-branch-action@v1.0.0
-        if: github.ref == 'refs/heads/master'
-        with:
-          branch: open-pr-here
-          force: 1
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
