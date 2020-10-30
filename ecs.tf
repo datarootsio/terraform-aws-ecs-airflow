@@ -61,7 +61,11 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_initdb_container_name}",
         "command": [
-            "initdb"
+            "/bin/sh -c \"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_initdb_entrypoint.key}\""
+        ],
+        "entryPoint": [
+            "sh",
+            "-c"
         ],
         "environment": [
           ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}

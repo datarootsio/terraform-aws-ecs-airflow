@@ -42,8 +42,8 @@ func GetContainerWithName(containerName string, containers []*ecs.Container) *ec
 func validateCluster(t *testing.T, options *terraform.Options, region string, resourcePrefix string, resourceSuffix string) {
 
 	retrySleepTime := time.Duration(10) * time.Second
-	ecsGetTaskArnMaxRetries := 5
-	ecsGetTaskStatusMaxRetries := 5
+	ecsGetTaskArnMaxRetries := 20
+	ecsGetTaskStatusMaxRetries := 50
 	httpStatusCodeMaxRetries := 15
 	amountOfConsecutiveGetsToBeHealthy := 3
 	desiredStatusRunning := "RUNNING"
@@ -268,8 +268,8 @@ func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix stri
 	}
 	terraformOptions.Vars["airflow_executor"] = "Local"
 
-	terraformOptions.Vars["ecs_cpu"] = 1024
-	terraformOptions.Vars["ecs_memory"] = 2048
+	terraformOptions.Vars["ecs_cpu"] = 2048
+	terraformOptions.Vars["ecs_memory"] = 4096
 
 	terraformOptions.Vars["ip_allow_list"] = []string{
 		"0.0.0.0/0",
