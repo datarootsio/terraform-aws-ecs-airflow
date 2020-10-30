@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@master
+        uses: actions/checkout@main
       - name: Find Tag
         id: get_latest_tag
         uses: jimschubert/query-tag-action@v1
@@ -34,3 +34,9 @@ jobs:
             Automatic release for ${{ steps.next_tag.outputs.v_patch }}
           draft: false
           prerelease: false
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: open-pr-here
+          force: true
