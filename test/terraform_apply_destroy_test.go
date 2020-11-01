@@ -290,6 +290,7 @@ func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix stri
 	terraformOptions.Vars["rds_password"] = "dataroots"
 	terraformOptions.Vars["rds_instance_class"] = "db.t2.micro"
 	terraformOptions.Vars["rds_availability_zone"] = fmt.Sprintf("%sa", region)
+	terraformOptions.Vars["rds_skip_final_snapshot"] = true
 	terraformOptions.Vars["rds_deletion_protection"] = false
 
 	terraformOptions.Vars["use_https"] = true
