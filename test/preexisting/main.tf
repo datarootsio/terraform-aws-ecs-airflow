@@ -126,6 +126,7 @@ resource "aws_db_instance" "airflow" {
   multi_az                  = false
   availability_zone         = "eu-west-1a"
   publicly_accessible       = false
+  skip_final_snapshot       = true
   deletion_protection       = false
   final_snapshot_identifier = "${var.resource_prefix}-airflow-${var.resource_suffix}-${local.timestamp_sanitized}"
   identifier                = var.rds_name

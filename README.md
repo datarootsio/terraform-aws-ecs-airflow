@@ -15,6 +15,7 @@ This is a module for Terraform that deploys Airflow in AWS.
 
 - An ECS Cluster with:
     - Sidecar injection container
+    - Airflow init container
     - Airflow webserver container
     - Airflow scheduler container
 - An ALB
@@ -22,7 +23,7 @@ This is a module for Terraform that deploys Airflow in AWS.
 - A DNS Record (optional but recommended)
 - A S3 Bucket (optional)
 
-Average cost of the minimal setup (with RDS): ~40$/Month
+Average cost of the minimal setup (with RDS): ~50$/Month
 
 Why do I need a RDS instance? 
 1. This makes Airflow statefull, you will be able to rerun failed dags, keep history of failed/succeeded dags, ...
@@ -44,6 +45,8 @@ module "airflow" {
 
     vpc_id             = "vpc-123456"
     public_subnet_ids  = ["subnet-456789", "subnet-098765"]
+
+    rds_password = "super-secret-pass"
 }
 ```
 (This will create Airflow, backed up by an RDS (both in a public subnet) and without https)
@@ -62,7 +65,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 - [ ] Option to use SQL instead of Postgres
 - [ ] Add a Lambda function that triggers the sync dag (so that you can auto sync through ci/cd)
 - [ ] RBAC
-- [ ] Support for [Google OAUTH ](https://airflow.readthedocs.io/en/latest/security.html#google-authentication)
+- [ ] Support for [Google OAUTH](https://airflow.readthedocs.io/en/latest/security.html#google-authentication)
 
 <!--- BEGIN_TF_DOCS --->
 ## Requirements
@@ -104,6 +107,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | rds\_deletion\_protection | Deletion protection for the rds instance | `bool` | `false` | no |
 | rds\_instance\_class | The class of instance you want to give to your rds db | `string` | `"db.t2.micro"` | no |
 | rds\_password | Password of rds | `string` | `""` | no |
+| rds\_skip\_final\_snapshot | Whether or not to skip the final snapshot before deleting (mainly for tests) | `bool` | `false` | no |
 | rds\_username | Username of rds | `string` | `"airflow"` | no |
 | region | The region to deploy your solution to | `string` | `"eu-west-1"` | no |
 | resource\_prefix | A prefix for the create resources, example your company name (be aware of the resource name length) | `string` | n/a | yes |

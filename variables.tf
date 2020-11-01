@@ -189,6 +189,12 @@ variable "rds_availability_zone" {
   default     = "eu-west-1a"
 }
 
+variable "rds_skip_final_snapshot" {
+  type        = bool
+  description = "Whether or not to skip the final snapshot before deleting (mainly for tests)"
+  default     = false
+}
+
 variable "rds_deletion_protection" {
   type        = bool
   description = "Deletion protection for the rds instance"

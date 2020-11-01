@@ -21,6 +21,9 @@ module "airflow" {
     public_subnet_ids  = ["subnet-456789", "subnet-098765"]
 
     airflow_executor = "Sequential"
+    airflow_variables = {
+      AIRFLOW__WEBSERVER__NAVBAR_COLOR : "#e27d60"
+    }
 
     use_https = false
 }

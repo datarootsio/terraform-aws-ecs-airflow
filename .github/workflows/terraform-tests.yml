@@ -3,26 +3,17 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**/README.md'
+      - 'examples'
   pull_request:
     branches:
       - main
       - open-pr-here
+    paths-ignore:
+      - '**/README.md'
+      - 'examples'
 jobs:
-  docs:
-    name: "Docs"
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: ${{ github.event.pull_request.head.ref }}
-
-    - name: Render terraform docs inside the README.md and push changes back to PR branch
-      uses: Dirrk/terraform-docs@v1.0.8
-      with:
-        tf_docs_working_dir: .
-        tf_docs_output_file: README.md
-        tf_docs_output_method: inject
-        tf_docs_git_push: 'true'
   validate:
     name: "Validate"
     runs-on: ubuntu-latest

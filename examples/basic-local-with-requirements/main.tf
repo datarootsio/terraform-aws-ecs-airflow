@@ -28,8 +28,8 @@ module "airflow" {
       AIRFLOW__WEBSERVER__NAVBAR_COLOR : "#e27d60"
     }
 
-    rds_username            = "dataroots"
-    rds_password            = "dataroots"
+    rds_username            = "airflow"
+    rds_password            = "super-secret-pass"
     rds_availability_zone   = "eu-west-1a"
     rds_deletion_protection = false
 }

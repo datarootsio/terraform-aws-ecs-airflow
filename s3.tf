@@ -60,13 +60,14 @@ resource "aws_s3_bucket_object" "airflow_webserver_entrypoint" {
   content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", { AIRFLOW_HOME = var.airflow_container_home })
 }
 
-resource "aws_s3_bucket_object" "airflow_initdb_entrypoint" {
+resource "aws_s3_bucket_object" "airflow_init_entrypoint" {
   bucket  = local.s3_bucket_name
-  key     = "startup/entrypoint_initdb.sh"
-  content = templatefile("${path.module}/templates/startup/entrypoint_initdb.sh", { AIRFLOW_HOME = var.airflow_container_home })
+  key     = "startup/entrypoint_init.sh"
+  content = templatefile("${path.module}/templates/startup/entrypoint_init.sh", { AIRFLOW_HOME = var.airflow_container_home })
 }
 
 resource "aws_s3_bucket_object" "airflow_requirements" {
+  count   = var.airflow_py_requirements_path == "" ? 0 : 1
   bucket  = local.s3_bucket_name
   key     = "startup/requirements.txt"
   content = templatefile(local.airflow_py_requirements_path, {})

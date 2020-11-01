@@ -12,6 +12,7 @@ resource "aws_db_instance" "airflow" {
   availability_zone         = var.rds_availability_zone
   publicly_accessible       = false
   deletion_protection       = var.rds_deletion_protection
+  skip_final_snapshot       = var.rds_skip_final_snapshot
   final_snapshot_identifier = "${var.resource_prefix}-airflow-${var.resource_suffix}-${local.timestamp_sanitized}"
   identifier                = local.rds_name
   vpc_security_group_ids    = [aws_security_group.airflow.id]
