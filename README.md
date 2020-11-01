@@ -15,6 +15,7 @@ This is a module for Terraform that deploys Airflow in AWS.
 
 - An ECS Cluster with:
     - Sidecar injection container
+    - Airflow init container
     - Airflow webserver container
     - Airflow scheduler container
 - An ALB
@@ -22,7 +23,7 @@ This is a module for Terraform that deploys Airflow in AWS.
 - A DNS Record (optional but recommended)
 - A S3 Bucket (optional)
 
-Average cost of the minimal setup (with RDS): ~40$/Month
+Average cost of the minimal setup (with RDS): ~50$/Month
 
 Why do I need a RDS instance? 
 1. This makes Airflow statefull, you will be able to rerun failed dags, keep history of failed/succeeded dags, ...
@@ -64,7 +65,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 - [ ] Option to use SQL instead of Postgres
 - [ ] Add a Lambda function that triggers the sync dag (so that you can auto sync through ci/cd)
 - [ ] RBAC
-- [ ] Support for [Google OAUTH ](https://airflow.readthedocs.io/en/latest/security.html#google-authentication)
+- [ ] Support for [Google OAUTH](https://airflow.readthedocs.io/en/latest/security.html#google-authentication)
 
 <!--- BEGIN_TF_DOCS --->
 ## Requirements
