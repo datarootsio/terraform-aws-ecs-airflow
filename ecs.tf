@@ -59,7 +59,7 @@ resource "aws_ecs_task_definition" "airflow" {
       },
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
-        "name": "${local.airflow_initdb_container_name}",
+        "name": "${local.airflow_init_container_name}",
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
@@ -67,7 +67,7 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "/bin/sh -c \"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_initdb_entrypoint.key}\""
+            "/bin/sh -c \"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_init_entrypoint.key}\""
         ],
         "entryPoint": [
             "sh",
@@ -101,7 +101,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 "condition": "SUCCESS"
             },
             {
-                "containerName": "${local.airflow_initdb_container_name}",
+                "containerName": "${local.airflow_init_container_name}",
                 "condition": "SUCCESS"
             }
         ],
@@ -140,7 +140,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 "condition": "SUCCESS"
             },
             {
-                "containerName": "${local.airflow_initdb_container_name}",
+                "containerName": "${local.airflow_init_container_name}",
                 "condition": "SUCCESS"
             }
         ],
