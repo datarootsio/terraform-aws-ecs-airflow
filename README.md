@@ -44,6 +44,8 @@ module "airflow" {
 
     vpc_id             = "vpc-123456"
     public_subnet_ids  = ["subnet-456789", "subnet-098765"]
+
+    rds_password = "super-secret-pass"
 }
 ```
 (This will create Airflow, backed up by an RDS (both in a public subnet) and without https)
