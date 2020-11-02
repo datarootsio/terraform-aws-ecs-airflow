@@ -206,7 +206,7 @@ resource "aws_ecs_service" "airflow" {
   network_configuration {
     subnets          = local.rds_ecs_subnet_ids
     security_groups  = [aws_security_group.airflow.id]
-    assign_public_ip = false
+    assign_public_ip = length(var.private_subnet_ids) == 0 ? true : false
   }
 
   capacity_provider_strategy {

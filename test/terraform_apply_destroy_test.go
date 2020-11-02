@@ -300,7 +300,7 @@ func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix stri
 }
 
 func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
-	fmt.Println("Starting test")
+	fmt.Println("Starting test: TestApplyAndDestroyWithDefaultValues")
 	// 'GLOBAL' test vars
 	region := "eu-west-1"
 	resourcePrefix := "dtr"
@@ -331,7 +331,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 }
 
 func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
-	fmt.Println("Starting test")
+	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTP")
 	// 'GLOBAL' test vars
 	region := "eu-west-1"
 	resourcePrefix := "dtr"
@@ -364,7 +364,7 @@ func TestApplyAndDestroyWithPlainHTTP(t *testing.T) {
 }
 
 func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutor(t *testing.T) {
-	fmt.Println("Starting test")
+	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTPAndSequentialExecutor")
 	// 'GLOBAL' test vars
 	region := "eu-west-1"
 	resourcePrefix := "dtr"
@@ -398,8 +398,45 @@ func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutor(t *testing.T) {
 	}
 }
 
+func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutorOnlyPublicSubnet(t *testing.T) {
+	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTPAndSequentialExecutorOnlyPublicSubnet")
+	// 'GLOBAL' test vars
+	region := "eu-west-1"
+	resourcePrefix := "dtr"
+	resourceSuffix := strings.ToLower(random.UniqueId())
+
+	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
+
+	t.Parallel()
+
+	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
+	assert.NoError(t, err)
+	options.Vars["airflow_executor"] = "Sequential"
+
+	options.Vars["private_subnet_ids"] = []string{}
+
+	options.Vars["use_https"] = false
+	options.Vars["route53_zone_name"] = ""
+
+	// terraform destroy => when test completes
+	defer terraform.Destroy(t, options)
+	fmt.Println("Running: terraform init && terraform apply")
+	_, err = terraform.InitE(t, options)
+	assert.NoError(t, err)
+	_, err = terraform.PlanE(t, options)
+	assert.NoError(t, err)
+	_, err = terraform.ApplyE(t, options)
+	assert.NoError(t, err)
+
+	// if there are terraform errors, do nothing
+	if err == nil {
+		fmt.Println("Terraform apply returned no error, continuing")
+		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
+	}
+}
+
 func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
-	fmt.Println("Starting test")
+	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS")
 	// 'GLOBAL' test vars
 	region := "eu-west-1"
 	resourcePrefix := "dtr"
