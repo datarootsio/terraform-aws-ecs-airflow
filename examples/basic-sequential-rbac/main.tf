@@ -12,7 +12,7 @@ provider "aws" {
 }
 
 module "airflow" {
-    source = "../../"
+    source = "datarootsio/ecs-airflow/aws"
 
     resource_prefix = "my-awesome-company"
     resource_suffix = "env"
