@@ -40,7 +40,6 @@ func GetContainerWithName(containerName string, containers []*ecs.Container) *ec
 }
 
 func validateCluster(t *testing.T, options *terraform.Options, region string, resourcePrefix string, resourceSuffix string) {
-
 	retrySleepTime := time.Duration(10) * time.Second
 	ecsGetTaskArnMaxRetries := 20
 	ecsGetTaskStatusMaxRetries := 50
@@ -52,6 +51,8 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 	webserverContainerName := AddPreAndSuffix("airflow-webserver", resourcePrefix, resourceSuffix)
 	schedulerContainerName := AddPreAndSuffix("airflow-webserver", resourcePrefix, resourceSuffix)
 	sidecarContainerName := AddPreAndSuffix("airflow-sidecar", resourcePrefix, resourceSuffix)
+
+	expectedNavbarColor := "#e27d60"
 
 	iamClient := aws.NewIamClient(t, region)
 
@@ -157,7 +158,7 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 		if options.Vars["route53_zone_name"] == "" {
 			airflowAlbDNS = terraform.Output(t, options, "airflow_alb_dns")
 		}
-		airflowURL := fmt.Sprintf("%s://%s/admin/", protocol, airflowAlbDNS)
+		airflowURL := fmt.Sprintf("%s://%s", protocol, airflowAlbDNS)
 
 		var amountOfConsecutiveHealthyChecks int
 		var res *http.Response
@@ -182,10 +183,10 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 		}
 
 		if res != nil {
-			assert.Equal(t, 200, res.StatusCode)
+			assert.Equal(t, true, res.StatusCode >= 200 && res.StatusCode < 400)
 			assert.Equal(t, amountOfConsecutiveGetsToBeHealthy, amountOfConsecutiveHealthyChecks)
 
-			if res.StatusCode == 200 {
+			if res.StatusCode >= 200 && res.StatusCode < 400 {
 				fmt.Println("Getting the actual HTML code")
 				defer res.Body.Close()
 				doc, err := goquery.NewDocumentFromReader(res.Body)
@@ -194,7 +195,7 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 				fmt.Println("Checking if the navbar has the correct color")
 				navbarStyle, exists := doc.Find(".navbar.navbar-inverse.navbar-fixed-top").First().Attr("style")
 				assert.Equal(t, true, exists)
-				assert.Contains(t, navbarStyle, "background-color: #e27d60")
+				assert.Contains(t, navbarStyle, fmt.Sprintf("background-color: %s", expectedNavbarColor))
 			}
 		}
 	}
@@ -435,6 +436,42 @@ func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutorOnlyPublicSubnet(t *te
 	}
 }
 
+func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutorUsingRBAC(t *testing.T) {
+	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTPAndSequentialExecutorUsingRBAC")
+	// 'GLOBAL' test vars
+	region := "eu-west-1"
+	resourcePrefix := "dtr"
+	resourceSuffix := strings.ToLower(random.UniqueId())
+
+	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
+
+	t.Parallel()
+
+	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
+	assert.NoError(t, err)
+	options.Vars["airflow_executor"] = "Sequential"
+	options.Vars["airflow_authentication"] = "rbac"
+
+	options.Vars["use_https"] = false
+	options.Vars["route53_zone_name"] = ""
+
+	// terraform destroy => when test completes
+	defer terraform.Destroy(t, options)
+	fmt.Println("Running: terraform init && terraform apply")
+	_, err = terraform.InitE(t, options)
+	assert.NoError(t, err)
+	_, err = terraform.PlanE(t, options)
+	assert.NoError(t, err)
+	_, err = terraform.ApplyE(t, options)
+	assert.NoError(t, err)
+
+	// if there are terraform errors, do nothing
+	if err == nil {
+		fmt.Println("Terraform apply returned no error, continuing")
+		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
+	}
+}
+
 func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS")
 	// 'GLOBAL' test vars
@@ -479,5 +516,3 @@ func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
-
-// TODO: add test for rbac
