@@ -34,8 +34,8 @@ locals {
   airflow_variables = merge(var.airflow_variables, {
     AIRFLOW__CORE__SQL_ALCHEMY_CONN : local.db_uri,
     AIRFLOW__CORE__EXECUTOR : "${var.airflow_executor}Executor",
-    AIRFLOW__WEBSERVER__RBAC: var.airflow_authentication == "" ? false : true,
-    AIRFLOW__WEBSERVER__AUTH_BACKEND: lookup(local.auth_map, var.airflow_authentication, "")
+    AIRFLOW__WEBSERVER__RBAC : var.airflow_authentication == "" ? false : true,
+    AIRFLOW__WEBSERVER__AUTH_BACKEND : lookup(local.auth_map, var.airflow_authentication, "")
   })
 
   airflow_variables_list = formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables))

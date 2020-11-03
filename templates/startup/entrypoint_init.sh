@@ -1,9 +1,8 @@
-echo "starting the init"
+echo "Starting the init"
 airflow initdb
 
-# add admin user if not exists
+# add admin user if rbac enabled and not exists
 if [[ "${RBAC_AUTH}" == "true" ]]; then
-    # todo if no users add admin user
     amount_of_users=$(python -c 'import sys;print((sys.argv.count("│") // 7) - 1)' $(airflow list_users))
     if [[ "$amount_of_users" == "0" ]]; then
         echo "Adding admin users, users list is empty!"

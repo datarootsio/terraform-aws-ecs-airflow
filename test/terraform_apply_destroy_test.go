@@ -479,3 +479,5 @@ func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
 	}
 }
+
+// TODO: add test for rbac
