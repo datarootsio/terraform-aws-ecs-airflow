@@ -85,9 +85,10 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| airflow\_authentication | Authentication backend to be used | `string` | `""` | no |
 | airflow\_container\_home | Working dir for airflow (only change if you are using a different image) | `string` | `"/opt/airflow"` | no |
 | airflow\_example\_dag | Add an example dag on startup (mostly for sanity check) | `bool` | `true` | no |
-| airflow\_executor | The executor mode that airflow will use. Only allowed values are "Local" and "Sequential". "Local": Run DAGs in parallel (will created a RDS); "Sequential": You can not run DAGs in parallel (will NOT created a RDS); | `string` | `"Local"` | no |
+| airflow\_executor | The executor mode that airflow will use. Only allowed values are ["Local", "Sequential"]. "Local": Run DAGs in parallel (will created a RDS); "Sequential": You can not run DAGs in parallel (will NOT created a RDS); | `string` | `"Local"` | no |
 | airflow\_image\_name | The name of the airflow image | `string` | `"apache/airflow"` | no |
 | airflow\_image\_tag | The tag of the airflow image | `string` | `"1.10.12"` | no |
 | airflow\_log\_region | The region you want your airflow logs in, defaults to the region variable | `string` | `""` | no |
