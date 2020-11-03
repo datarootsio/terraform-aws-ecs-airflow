@@ -1,4 +1,9 @@
 echo "starting the init"
-exec airflow initdb
+airflow initdb
 
-# TODO: add admin user if rbac is enabled and admin user doesn't exist
+# add admin user if not exists
+if [ "${RBAC_AUTH}" == "true" ]; then
+    # todo if no users add admin user
+    airflow list_users
+    airflow create_user -r Admin -u admin -e admin@admin.com -f Admin -l airflow -p admin
+fi
