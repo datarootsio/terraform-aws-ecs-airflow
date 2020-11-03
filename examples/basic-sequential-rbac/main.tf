@@ -20,9 +20,10 @@ module "airflow" {
     vpc_id             = "vpc-123456"
     public_subnet_ids  = ["subnet-456789", "subnet-098765"]
 
-    airflow_executor       = "Sequential"
-    airflow_authentication = "rbac"
-    airflow_variables      = {
+    airflow_executor             = "Sequential"
+    airflow_py_requirements_path = "./requirements.txt"
+    airflow_authentication       = "rbac"
+    airflow_variables            = {
       AIRFLOW__WEBSERVER__NAVBAR_COLOR : "#e27d60"
     }
 
