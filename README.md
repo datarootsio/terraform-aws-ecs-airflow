@@ -116,7 +116,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | route53\_zone\_name | The name of a Route53 zone that will be used for the certificate validation. | `string` | `""` | no |
 | s3\_bucket\_name | The S3 bucket name where the DAGs and startup scripts will be stored, leave this blank to let this module create a s3 bucket for you. WARNING: this module will put files into the path "dags/" and "startup/" of the bucket | `string` | `""` | no |
 | use\_https | Expose traffic using HTTPS or not | `bool` | `false` | no |
-| vpc\_id | The id of the vpc where you will run ecs/rds | `string` | n/a | yes |
+| vpc\_id | The id of the vpc where you will run ECS/RDS | `string` | n/a | yes |
 
 ## Outputs
 
