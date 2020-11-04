@@ -6,6 +6,7 @@ ls /opt/airflow/dags
 python -m pip install boto3==1.14.38 --user
 # Intall python packages through req.txt and pip (if exists)
 if [[ -f "${AIRFLOW_HOME}/startup/requirements.txt" ]]; then
+    echo "requirements.txt provided, installing it with pip"
     python -m pip install -r ${AIRFLOW_HOME}/startup/requirements.txt --user
 fi
 # Run the airflow webserver

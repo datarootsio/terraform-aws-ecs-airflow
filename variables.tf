@@ -35,12 +35,23 @@ variable "airflow_image_tag" {
 
 variable "airflow_executor" {
   type        = string
-  description = "The executor mode that airflow will use. Only allowed values are \"Local\" and \"Sequential\". \"Local\": Run DAGs in parallel (will created a RDS); \"Sequential\": You can not run DAGs in parallel (will NOT created a RDS);"
+  description = "The executor mode that airflow will use. Only allowed values are [\"Local\", \"Sequential\"]. \"Local\": Run DAGs in parallel (will created a RDS); \"Sequential\": You can not run DAGs in parallel (will NOT created a RDS);"
   default     = "Local"
 
   validation {
-    condition     = var.airflow_executor == "Local" || var.airflow_executor == "Sequential"
-    error_message = "The only values that are allowed for \"airflow_executor\" are \"Local\" and \"Sequential\"."
+    condition     = contains(["Local", "Sequential"], var.airflow_executor)
+    error_message = "The only values that are allowed for \"airflow_executor\" are [\"Local\", \"Sequential\"]."
+  }
+}
+
+variable "airflow_authentication" {
+  type        = string
+  description = "Authentication backend to be used, supported backends [\"\", \"rbac\"]"
+  default     = ""
+
+  validation {
+    condition     = contains(["", "rbac"], var.airflow_authentication)
+    error_message = "The only values that are allowed for \"airflow_executor\" are [\"\", \"rbac\"]."
   }
 }
 
@@ -102,7 +113,7 @@ variable "ip_allow_list" {
 
 variable "vpc_id" {
   type        = string
-  description = "The id of the vpc where you will run ecs/rds"
+  description = "The id of the vpc where you will run ECS/RDS"
 
   validation {
     condition     = can(regex("^vpc-", var.vpc_id))

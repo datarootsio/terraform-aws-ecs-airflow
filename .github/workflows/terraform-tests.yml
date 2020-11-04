@@ -3,16 +3,10 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - '**/README.md'
-      - 'examples'
   pull_request:
     branches:
       - main
       - open-pr-here
-    paths-ignore:
-      - '**/README.md'
-      - 'examples'
 jobs:
   validate:
     name: "Validate"

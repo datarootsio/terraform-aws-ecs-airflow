@@ -64,7 +64,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 - [ ] RDS Backup options
 - [ ] Option to use SQL instead of Postgres
 - [ ] Add a Lambda function that triggers the sync dag (so that you can auto sync through ci/cd)
-- [ ] RBAC
+- [x] RBAC
 - [ ] Support for [Google OAUTH](https://airflow.readthedocs.io/en/latest/security.html#google-authentication)
 
 <!--- BEGIN_TF_DOCS --->
@@ -85,9 +85,10 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| airflow\_authentication | Authentication backend to be used, supported backends ["", "rbac"] | `string` | `""` | no |
 | airflow\_container\_home | Working dir for airflow (only change if you are using a different image) | `string` | `"/opt/airflow"` | no |
 | airflow\_example\_dag | Add an example dag on startup (mostly for sanity check) | `bool` | `true` | no |
-| airflow\_executor | The executor mode that airflow will use. Only allowed values are "Local" and "Sequential". "Local": Run DAGs in parallel (will created a RDS); "Sequential": You can not run DAGs in parallel (will NOT created a RDS); | `string` | `"Local"` | no |
+| airflow\_executor | The executor mode that airflow will use. Only allowed values are ["Local", "Sequential"]. "Local": Run DAGs in parallel (will created a RDS); "Sequential": You can not run DAGs in parallel (will NOT created a RDS); | `string` | `"Local"` | no |
 | airflow\_image\_name | The name of the airflow image | `string` | `"apache/airflow"` | no |
 | airflow\_image\_tag | The tag of the airflow image | `string` | `"1.10.12"` | no |
 | airflow\_log\_region | The region you want your airflow logs in, defaults to the region variable | `string` | `""` | no |
@@ -115,7 +116,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | route53\_zone\_name | The name of a Route53 zone that will be used for the certificate validation. | `string` | `""` | no |
 | s3\_bucket\_name | The S3 bucket name where the DAGs and startup scripts will be stored, leave this blank to let this module create a s3 bucket for you. WARNING: this module will put files into the path "dags/" and "startup/" of the bucket | `string` | `""` | no |
 | use\_https | Expose traffic using HTTPS or not | `bool` | `false` | no |
-| vpc\_id | The id of the vpc where you will run ecs/rds | `string` | n/a | yes |
+| vpc\_id | The id of the vpc where you will run ECS/RDS | `string` | n/a | yes |
 
 ## Outputs
 

@@ -63,7 +63,7 @@ resource "aws_s3_bucket_object" "airflow_webserver_entrypoint" {
 resource "aws_s3_bucket_object" "airflow_init_entrypoint" {
   bucket  = local.s3_bucket_name
   key     = "startup/entrypoint_init.sh"
-  content = templatefile("${path.module}/templates/startup/entrypoint_init.sh", { AIRFLOW_HOME = var.airflow_container_home })
+  content = templatefile("${path.module}/templates/startup/entrypoint_init.sh", { RBAC_AUTH = var.airflow_authentication == "rbac" ? "true" : "false" })
 }
 
 resource "aws_s3_bucket_object" "airflow_requirements" {
