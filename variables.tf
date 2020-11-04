@@ -46,7 +46,7 @@ variable "airflow_executor" {
 
 variable "airflow_authentication" {
   type        = string
-  description = "Authentication backend to be used"
+  description = "Authentication backend to be used, supported backends [\"\", \"rbac\"]"
   default     = ""
 
   validation {
