@@ -113,7 +113,7 @@ variable "ip_allow_list" {
 
 variable "vpc_id" {
   type        = string
-  description = "The id of the vpc where you will run ecs/rds"
+  description = "The id of the vpc where you will run ECS/RDS"
 
   validation {
     condition     = can(regex("^vpc-", var.vpc_id))
