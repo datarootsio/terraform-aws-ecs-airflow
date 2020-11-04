@@ -1,5 +1,5 @@
 echo "Starting up airflow"
-# sanity check the dags
+# Sanity check the dags
 ls /opt/airflow/dags
 
 # Install boto for the seed dag
