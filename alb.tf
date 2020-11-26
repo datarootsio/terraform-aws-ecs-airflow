@@ -16,13 +16,15 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group_rule" "alb_outside_http" {
+  for_each          = local.http_ports
   security_group_id = aws_security_group.alb.id
   type              = "ingress"
   protocol          = "TCP"
-  from_port         = var.use_https ? 443 : 80
-  to_port           = var.use_https ? 443 : 80
+  from_port         = each.value
+  to_port           = each.value
   cidr_blocks       = var.ip_allow_list
 }
+
 
 // Give this SG to all the instances that want to connect to
 // the airflow ecs task. For example rds and the alb
