@@ -65,11 +65,43 @@ resource "aws_lb" "airflow" {
   tags = local.common_tags
 }
 
-resource "aws_lb_listener" "airflow" {
+resource "aws_lb_listener" "airflow_http_forward" {
+  count             = var.use_https ? 0 : 1
   load_balancer_arn = aws_lb.airflow.arn
-  port              = var.use_https ? "443" : "80"
-  protocol          = var.use_https ? "HTTPS" : "HTTP"
-  certificate_arn   = var.use_https ? local.certificate_arn : ""
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.airflow.arn
+  }
+
+}
+
+resource "aws_lb_listener" "airflow_http_redirect" {
+  count             = var.use_https ? 1 : 0
+  load_balancer_arn = aws_lb.airflow.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+
+resource "aws_lb_listener" "airflow_https" {
+  count             = var.use_https ? 1 : 0
+  load_balancer_arn = aws_lb.airflow.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  certificate_arn   = local.certificate_arn
 
   default_action {
     type             = "forward"
