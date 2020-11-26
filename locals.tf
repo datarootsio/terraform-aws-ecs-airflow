@@ -45,5 +45,6 @@ locals {
 
   dns_record      = var.dns_name != "" ? var.dns_name : (var.route53_zone_name != "" ? "${var.resource_prefix}-airflow-${var.resource_suffix}.${data.aws_route53_zone.zone[0].name}" : "")
   certificate_arn = var.use_https ? (var.certificate_arn != "" ? var.certificate_arn : aws_acm_certificate.cert[0].arn) : ""
-  http_ports      = var.use_https ? [80, 443] : [80]
+  
+  inbound_ports   = var.use_https ? ["80", "443"] : ["80"]
 }

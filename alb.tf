@@ -16,7 +16,7 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group_rule" "alb_outside_http" {
-  for_each          = local.http_ports
+  for_each          = local.inbound_ports
   security_group_id = aws_security_group.alb.id
   type              = "ingress"
   protocol          = "TCP"
@@ -69,7 +69,7 @@ resource "aws_lb" "airflow" {
 
 resource "aws_lb_listener" "airflow_forward" {
   load_balancer_arn = aws_lb.airflow.arn
-  port              = var.use_https ? 443 : 80
+  port              = var.use_https ? "443" : "80"
   protocol          = var.use_https ? "HTTPS" : "HTTP"
 
   default_action {
