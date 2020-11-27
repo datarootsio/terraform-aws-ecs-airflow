@@ -57,7 +57,11 @@ Note: After that Terraform is done deploying everything, it can take up to a min
 
 ## Adding DAGs
 
-To add dags, upload them to the created S3 bucket in the subdir "dags/". After you uploaded them run the seed dag. This will sync the s3 bucket with the local dags folder of the ECS container. 
+To add dags, upload them to the created S3 bucket in the subdir "dags/". After you uploaded them run the seed dag. This will sync the s3 bucket with the local dags folder of the ECS container.
+
+## Authentication
+
+For now the only authentication option is 'RBAC'. When enabling this, this module will create a default admin role (only if there are no users in the database). This default role is just a one time entrypoint in to the airflow web interface. When you log in for the first time immediately change the password! Also with this default admin role you can create any user you want.
 
 ## Todo
 
