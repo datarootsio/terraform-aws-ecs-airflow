@@ -204,17 +204,17 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 				// this is to prevent 'issue #9' of happening again
 				// ref: https://github.com/datarootsio/terraform-aws-ecs-airflow/issues/9
 				if options.Vars["airflow_authentication"] == "rbac" {
-					loginToAirflow(t, airflowAlbDNS)
+					loginToAirflow(t, airflowURL)
 				}
 			}
 		}
 	}
 }
 
-func loginToAirflow(t *testing.T, airflowAlbDNS string) {
+func loginToAirflow(t *testing.T, airflowURL string) {
 	username := "admin"
 	password := "admin"
-	airflowLoginURL := fmt.Sprintf("%s/login/", airflowAlbDNS)
+	airflowLoginURL := fmt.Sprintf("%s/login/", airflowURL)
 
 	// we create a client/session to persist some headers
 	// throughout the calls that we do
