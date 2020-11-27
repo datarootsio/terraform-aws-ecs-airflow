@@ -260,7 +260,7 @@ func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix stri
 	}
 
 	terraformOptions.Vars["airflow_image_name"] = "apache/airflow"
-	terraformOptions.Vars["airflow_image_tag"] = "1.10.12"
+	terraformOptions.Vars["airflow_image_tag"] = "1.10.13"
 	terraformOptions.Vars["airflow_log_region"] = region
 	terraformOptions.Vars["airflow_log_retention"] = "7"
 	terraformOptions.Vars["airflow_example_dag"] = true
