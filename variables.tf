@@ -46,7 +46,7 @@ variable "airflow_executor" {
 
 variable "airflow_authentication" {
   type        = string
-  description = "Authentication backend to be used, supported backends [\"\", \"rbac\"]"
+  description = "Authentication backend to be used, supported backends [\"\", \"rbac\"]. When \"rbac\" is selected an admin role is create if there are no other users in the db, from here you can create all the other users. Make sure to change the admin password directly upon first login! (if you don't change the rbac_admin options the default login is => username: admin, password: admin)"
   default     = ""
 
   validation {
@@ -89,6 +89,37 @@ variable "airflow_example_dag" {
   type        = bool
   description = "Add an example dag on startup (mostly for sanity check)"
   default     = true
+}
+
+// RBAC
+variable "rbac_admin_username" {
+  type        = string
+  description = "RBAC Username (only when airflow_authentication = 'rbac')"
+  default     = "admin"
+}
+
+variable "rbac_admin_password" {
+  type        = string
+  description = "RBAC Password (only when airflow_authentication = 'rbac')"
+  default     = "admin"
+}
+
+variable "rbac_admin_email" {
+  type        = string
+  description = "RBAC Email (only when airflow_authentication = 'rbac')"
+  default     = "admin@admin.com"
+}
+
+variable "rbac_admin_firstname" {
+  type        = string
+  description = "RBAC Firstname (only when airflow_authentication = 'rbac')"
+  default     = "admin"
+}
+
+variable "rbac_admin_lastname" {
+  type        = string
+  description = "RBAC Lastname (only when airflow_authentication = 'rbac')"
+  default     = "airflow"
 }
 
 // ECS variables

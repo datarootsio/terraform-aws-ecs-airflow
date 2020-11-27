@@ -57,7 +57,11 @@ Note: After that Terraform is done deploying everything, it can take up to a min
 
 ## Adding DAGs
 
-To add dags, upload them to the created S3 bucket in the subdir "dags/". After you uploaded them run the seed dag. This will sync the s3 bucket with the local dags folder of the ECS container. 
+To add dags, upload them to the created S3 bucket in the subdir "dags/". After you uploaded them run the seed dag. This will sync the s3 bucket with the local dags folder of the ECS container.
+
+## Authentication
+
+For now the only authentication option is 'RBAC'. When enabling this, this module will create a default admin role (only if there are no users in the database). This default role is just a one time entrypoint in to the airflow web interface. When you log in for the first time immediately change the password! Also with this default admin role you can create any user you want.
 
 ## Todo
 
@@ -85,7 +89,7 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| airflow\_authentication | Authentication backend to be used, supported backends ["", "rbac"] | `string` | `""` | no |
+| airflow\_authentication | Authentication backend to be used, supported backends ["", "rbac"]. When "rbac" is selected an admin role is create if there are no other users in the db, from here you can create all the other users. Make sure to change the admin password directly upon first login! (if you don't change the rbac\_admin options the default login is => username: admin, password: admin) | `string` | `""` | no |
 | airflow\_container\_home | Working dir for airflow (only change if you are using a different image) | `string` | `"/opt/airflow"` | no |
 | airflow\_example\_dag | Add an example dag on startup (mostly for sanity check) | `bool` | `true` | no |
 | airflow\_executor | The executor mode that airflow will use. Only allowed values are ["Local", "Sequential"]. "Local": Run DAGs in parallel (will created a RDS); "Sequential": You can not run DAGs in parallel (will NOT created a RDS); | `string` | `"Local"` | no |
@@ -104,6 +108,11 @@ To add dags, upload them to the created S3 bucket in the subdir "dags/". After y
 | postgres\_uri | The postgres uri of your postgres db, if none provided a postgres db in rds is made. Format "<db\_username>:<db\_password>@<db\_endpoint>:<db\_port>/<db\_name>" | `string` | `""` | no |
 | private\_subnet\_ids | A list of subnet ids of where the ECS and RDS reside, this will only work if you have a NAT Gateway in your VPC | `list(string)` | `[]` | no |
 | public\_subnet\_ids | A list of subnet ids of where the ALB will reside, if the "private\_subnet\_ids" variable is not provided ECS and RDS will also reside in these subnets | `list(string)` | n/a | yes |
+| rbac\_admin\_email | RBAC Email (only when airflow\_authentication = 'rbac') | `string` | `"admin@admin.com"` | no |
+| rbac\_admin\_firstname | RBAC Firstname (only when airflow\_authentication = 'rbac') | `string` | `"admin"` | no |
+| rbac\_admin\_lastname | RBAC Lastname (only when airflow\_authentication = 'rbac') | `string` | `"airflow"` | no |
+| rbac\_admin\_password | RBAC Password (only when airflow\_authentication = 'rbac') | `string` | `"admin"` | no |
+| rbac\_admin\_username | RBAC Username (only when airflow\_authentication = 'rbac') | `string` | `"admin"` | no |
 | rds\_availability\_zone | Availability zone for the rds instance | `string` | `"eu-west-1a"` | no |
 | rds\_deletion\_protection | Deletion protection for the rds instance | `bool` | `false` | no |
 | rds\_instance\_class | The class of instance you want to give to your rds db | `string` | `"db.t2.micro"` | no |

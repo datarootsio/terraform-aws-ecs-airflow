@@ -6,7 +6,7 @@ if [[ "${RBAC_AUTH}" == "true" ]]; then
     amount_of_users=$(python -c 'import sys;print((sys.argv.count("│") // 7) - 1)' $(airflow list_users))
     if [[ "$amount_of_users" == "0" ]]; then
         echo "Adding admin users, users list is empty!"
-        airflow create_user -r Admin -u admin -e admin@admin.com -f Admin -l airflow -p admin
+        airflow create_user -r Admin -u ${RBAC_USERNAME} -e ${RBAC_EMAIL} -f ${RBAC_FIRSTNAME} -l ${RBAC_LASTNAME} -p ${RBAC_PASSWORD}
     else
         echo "No admin user added, users already exists!"
     fi
