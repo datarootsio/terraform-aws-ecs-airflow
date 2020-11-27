@@ -2,7 +2,10 @@ package test
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/http/cookiejar"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -196,9 +199,74 @@ func validateCluster(t *testing.T, options *terraform.Options, region string, re
 				navbarStyle, exists := doc.Find(".navbar.navbar-inverse.navbar-fixed-top").First().Attr("style")
 				assert.Equal(t, true, exists)
 				assert.Contains(t, navbarStyle, fmt.Sprintf("background-color: %s", expectedNavbarColor))
+
+				// if rbac is enabled check if you can log in
+				// this is to prevent 'issue #9' of happening again
+				// ref: https://github.com/datarootsio/terraform-aws-ecs-airflow/issues/9
+				if options.Vars["airflow_authentication"] == "rbac" {
+					loginToAirflow(t, airflowAlbDNS)
+				}
 			}
 		}
 	}
+}
+
+func loginToAirflow(t *testing.T, airflowAlbDNS string) {
+	username := "admin"
+	password := "admin"
+	airflowLoginURL := fmt.Sprintf("%s/login/", airflowAlbDNS)
+
+	// we create a client/session to persist some headers
+	// throughout the calls that we do
+	jar, _ := cookiejar.New(nil)
+	client := &http.Client{
+		Jar: jar,
+	}
+
+	// get the page to fill in some headers in the http session
+	// and to parse out the csrfToken
+	res, err := client.Get(airflowLoginURL)
+	assert.NoError(t, err)
+	assert.Equal(t, true, res.StatusCode >= 200 && res.StatusCode < 400)
+	defer res.Body.Close()
+
+	// read the plain body html and get the csrfToken
+	bodyBytes, _ := ioutil.ReadAll(res.Body)
+	bodyLines := strings.Split(string(bodyBytes), "\n")
+
+	// parse out the csrfToken
+	// TODO: replace this with regex
+	var csrfToken string
+	for _, bodyLine := range bodyLines {
+		if strings.Contains(bodyLine, "csrfToken") {
+			stringNoSpaces := strings.ReplaceAll(bodyLine, " ", "")
+			stringRemovedLeft := strings.ReplaceAll(stringNoSpaces, "varcsrfToken='", "")
+			csrfToken = strings.ReplaceAll(stringRemovedLeft, "';", "")
+			break
+		}
+	}
+
+	// create the url vals to be posted, so that we can login
+	values := make(url.Values)
+	values.Set("username", username)
+	values.Set("password", password)
+	values.Set("csrf_token", csrfToken)
+
+	// try to login into airflow with given creds
+	// if we can't login w'll come back to the login page
+	// if we can w'll see the dags table
+	res, err = client.PostForm(airflowLoginURL, values)
+	assert.NoError(t, err)
+	assert.Equal(t, true, res.StatusCode >= 200 && res.StatusCode < 400)
+	defer res.Body.Close()
+
+	// check on which page we are login or dags
+	doc, _ := goquery.NewDocumentFromReader(res.Body)
+	loginBoxExists := doc.Find("div#loginbox").Length() == 1
+	dagsTableExists := doc.Find("table#dags").Length() == 1
+
+	assert.Equal(t, false, loginBoxExists)
+	assert.Equal(t, true, dagsTableExists)
 }
 
 func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
