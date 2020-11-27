@@ -67,7 +67,7 @@ For now the only authentication option is 'RBAC'. When enabling this, this modul
 
 - [ ] RDS Backup options
 - [ ] Option to use SQL instead of Postgres
-- [ ] Add a Lambda function that triggers the sync dag (so that you can auto sync through ci/cd)
+- [x] Add a Lambda function that triggers the sync dag (so that you can auto sync through ci/cd)
 - [x] RBAC
 - [ ] Support for [Google OAUTH](https://airflow.readthedocs.io/en/latest/security.html#google-authentication)
 
