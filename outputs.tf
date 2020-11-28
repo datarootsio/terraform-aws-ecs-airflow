@@ -17,3 +17,8 @@ output "airflow_connection_sg" {
   description = "The security group with which you can connect other instance to Airflow, for example EMR Livy"
   value       = aws_security_group.airflow
 }
+
+output "cicd_lambda_name" {
+  description = "The name of the lambda function that invokes the seed dag (only if \"cicd_lambda\" is enabled)"
+  value       = aws_lambda_function.cicd_lambda.function_name
+}
