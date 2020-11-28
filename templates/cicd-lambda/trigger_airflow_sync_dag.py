@@ -15,12 +15,12 @@ def get_airflow_private_ip() -> str:
         maxResults=1,
         desiredStatus='RUNNING',
     )["taskArns"]
-    
+
     task_details = client.describe_tasks(
         cluster=airflow_arn,
         tasks=task_arns
     )["tasks"][0]["attachments"][0]["details"]
-    
+
     for td in task_details:
         if td["name"] == "privateIPv4Address":
             return td["value"]
@@ -32,7 +32,7 @@ def unpause_dag(airflow_ip: str, dag_id: str) -> None:
     """Unpause a dag via the airflow api."""
     url = f"http://{airflow_ip}:8080/api/experimental/dags/{dag_id}/paused/false"
     res = requests.get(url)
-    print(f"unpause_dag returned:\n{res}")
+    print(f"unpause_dag returned:\n{res.json()}")
 
 
 def start_dag(airflow_ip: str, dag_id: str) -> None:
@@ -43,7 +43,7 @@ def start_dag(airflow_ip: str, dag_id: str) -> None:
         "Cache-Control": "no-cache"
     }
     res = requests.post(url, data=json.dumps(payload), headers=headers)
-    print(f"start_dag returned:\n{res}")
+    print(f"start_dag returned:\n{res.json()}")
 
 
 def lambda_handler(event: dict, context: dict) -> dict:
