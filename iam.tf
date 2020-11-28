@@ -87,6 +87,8 @@ resource "aws_iam_role_policy" "log_agent" {
 
 # airflow cicd lambda role
 data "aws_iam_policy_document" "lambda_assume" {
+  count = var.cicd_lambda ? 1 : 0
+
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -99,6 +101,8 @@ data "aws_iam_policy_document" "lambda_assume" {
 }
 
 data "aws_iam_policy_document" "airflow_cicd_lambda_permissions" {
+  count = var.cicd_lambda ? 1 : 0
+
   // to run the lambda in a vpc subnet
   statement {
     effect = "Allow"
@@ -162,14 +166,18 @@ data "aws_iam_policy_document" "airflow_cicd_lambda_permissions" {
 }
 
 resource "aws_iam_role" "cicd_lambda" {
+  count = var.cicd_lambda ? 1 : 0
+
   name               = "${var.resource_prefix}-airflow-cicd-lambda-${var.resource_suffix}"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume[0].json
 
   tags = local.common_tags
 }
 
 resource "aws_iam_role_policy" "cicd_lambda" {
+  count = var.cicd_lambda ? 1 : 0
+
   name   = "${var.resource_prefix}-airflow-cicd-lambda-permissions-${var.resource_suffix}"
-  role   = aws_iam_role.cicd_lambda.id
-  policy = data.aws_iam_policy_document.airflow_cicd_lambda_permissions.json
+  role   = aws_iam_role.cicd_lambda[0].id
+  policy = data.aws_iam_policy_document.airflow_cicd_lambda_permissions[0].json
 }

@@ -1,4 +1,6 @@
 data "archive_file" "cicd_lambda" {
+  count = var.cicd_lambda ? 1 : 0
+
   type        = "zip"
   output_path = "/tmp/cicd_lambda.zip"
 
@@ -11,6 +13,8 @@ data "archive_file" "cicd_lambda" {
 }
 
 resource "aws_cloudwatch_log_group" "cicd_lambda" {
+  count = var.cicd_lambda ? 1 : 0
+
   name              = "${var.resource_prefix}-airflow-cicd-lambda-${var.resource_suffix}"
   retention_in_days = var.airflow_log_retention
 
@@ -18,13 +22,15 @@ resource "aws_cloudwatch_log_group" "cicd_lambda" {
 }
 
 resource "aws_lambda_function" "cicd_lambda" {
+  count = var.cicd_lambda ? 1 : 0
+
   function_name = "${var.resource_prefix}-airflow-cicd-lambda-${var.resource_suffix}"
 
-  filename         = data.archive_file.cicd_lambda.output_path
-  source_code_hash = data.archive_file.cicd_lambda.output_base64sha256
-  description      = "A Lambda function to invoke from your CICD to sync the dags in your airflow instance"
+  filename         = data.archive_file.cicd_lambda[0].output_path
+  source_code_hash = data.archive_file.cicd_lambda[0].output_base64sha256
+  description      = "A Lambda function to invoke from your CI/CD pipeline to sync the dags in your airflow instance."
 
-  role = aws_iam_role.cicd_lambda.arn
+  role = aws_iam_role.cicd_lambda[0].arn
 
   handler = "trigger_airflow_sync_dag.lambda_handler"
   runtime = "python3.7"
