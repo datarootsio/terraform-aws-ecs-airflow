@@ -59,6 +59,8 @@ Note: After that Terraform is done deploying everything, it can take up to a min
 
 To add dags, upload them to the created S3 bucket in the subdir "dags/". After you uploaded them run the seed dag. This will sync the s3 bucket with the local dags folder of the ECS container.
 
+You can also enable the cicd_lambda variable. This will create a lambda function that can invoke the seed dag through the airflow api. The intended use is to upload all your dags through a CI/CD pipeline to S3 and at the end of this invoke the lambda function. The name of the lambda function is in the outputs.
+
 ## Authentication
 
 For now the only authentication option is 'RBAC'. When enabling this, this module will create a default admin role (only if there are no users in the database). This default role is just a one time entrypoint in to the airflow web interface. When you log in for the first time immediately change the password! Also with this default admin role you can create any user you want.
