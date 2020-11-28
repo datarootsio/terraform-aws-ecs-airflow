@@ -30,13 +30,14 @@ locals {
   airflow_sidecar_container_name   = "${var.resource_prefix}-airflow-sidecar-${var.resource_suffix}"
   airflow_init_container_name      = "${var.resource_prefix}-airflow-init-${var.resource_suffix}"
   airflow_volume_name              = "airflow"
-  // Keep the 2 env vars second, we want to override them (this module manges these vars)
+  // Overrides some of the env var because this module manages them
   airflow_variables = merge(var.airflow_variables, {
     AIRFLOW__CORE__SQL_ALCHEMY_CONN : local.db_uri,
     AIRFLOW__CORE__EXECUTOR : "${var.airflow_executor}Executor",
     AIRFLOW__WEBSERVER__RBAC : var.airflow_authentication == "" ? false : true,
     AIRFLOW__WEBSERVER__AUTH_BACKEND : lookup(local.auth_map, var.airflow_authentication, "")
     AIRFLOW__WEBSERVER__BASE_URL : var.use_https ? "https://${local.dns_record}" : "http://localhost:8080" # localhost is default value
+    AIRFLOW__API__AUTH_BACKEND : var.cicd_lambda ? "airflow.api.auth.backend.default" : "airflow.api.auth.backend.deny_all"
   })
 
   airflow_variables_list = formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables))

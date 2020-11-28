@@ -122,6 +122,13 @@ variable "rbac_admin_lastname" {
   default     = "airflow"
 }
 
+// CI/CD Lambda
+variable "cicd_lambda" {
+  type        = bool
+  description = "Deploy a lambda function that can trigger the s3 sync dag. This lambda function can be easily triggerd from a CI/CD pipeline to upload/remove dags."
+  default     = false
+}
+
 // ECS variables
 variable "ecs_cpu" {
   type        = number

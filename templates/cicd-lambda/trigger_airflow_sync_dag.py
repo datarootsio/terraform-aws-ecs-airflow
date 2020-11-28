@@ -8,21 +8,19 @@ def get_airflow_private_ip() -> str:
     """Return the private ip address of the running airflow webserver."""
     client = boto3.client("ecs")
 
-    airflow_arn = "put arn here"
+    airflow_arn = "${AIRFLOW_ECS_CLUSTER_ARN}"
 
-    task_arn = client.list_tasks(
+    task_arns = client.list_tasks(
         cluster=airflow_arn,
         maxResults=1,
         desiredStatus='RUNNING',
-    )["taskArns"][0]
-
+    )["taskArns"]
+    
     task_details = client.describe_tasks(
         cluster=airflow_arn,
-        tasks=[
-            task_arn,
-        ]
+        tasks=task_arns
     )["tasks"][0]["attachments"][0]["details"]
-
+    
     for td in task_details:
         if td["name"] == "privateIPv4Address":
             return td["value"]
@@ -33,7 +31,8 @@ def get_airflow_private_ip() -> str:
 def unpause_dag(airflow_ip: str, dag_id: str) -> None:
     """Unpause a dag via the airflow api."""
     url = f"http://{airflow_ip}:8080/api/experimental/dags/{dag_id}/paused/false"
-    requests.get(url)
+    res = requests.get(url)
+    print(f"unpause_dag returned:\n{res}")
 
 
 def start_dag(airflow_ip: str, dag_id: str) -> None:
@@ -43,7 +42,8 @@ def start_dag(airflow_ip: str, dag_id: str) -> None:
     headers = {
         "Cache-Control": "no-cache"
     }
-    requests.post(url, data=json.dumps(payload), headers=headers)
+    res = requests.post(url, data=json.dumps(payload), headers=headers)
+    print(f"start_dag returned:\n{res}")
 
 
 def lambda_handler(event: dict, context: dict) -> dict:

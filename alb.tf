@@ -64,6 +64,8 @@ resource "aws_lb" "airflow" {
 
   enable_deletion_protection = false
 
+
+
   tags = local.common_tags
 }
 

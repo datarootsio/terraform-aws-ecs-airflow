@@ -84,3 +84,92 @@ resource "aws_iam_role_policy" "log_agent" {
   role   = aws_iam_role.task.id
   policy = data.aws_iam_policy_document.task_permissions.json
 }
+
+# airflow cicd lambda role
+data "aws_iam_policy_document" "lambda_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "airflow_cicd_lambda_permissions" {
+  // to run the lambda in a vpc subnet
+  statement {
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+
+    actions = [
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:CreateNetworkInterface",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeInstances",
+      "ec2:AttachNetworkInterface"
+    ]
+  }
+
+  // to create logs
+  statement {
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+  }
+
+  // to get the private ip of the ecs task
+  statement {
+    effect = "Allow"
+
+    resources = [
+      aws_ecs_cluster.airflow.arn,
+      "${replace(aws_ecs_cluster.airflow.arn, ":cluster/", ":task/")}/*"
+    ]
+
+    actions = [
+      "ecs:Describe*",
+      "ecs:List*"
+    ]
+  }
+
+  // the list_tasks from boto3 ecs needs this otherwise it will not work
+  // the error you get: lambda is not authorized to perform: ecs:ListTasks on resource: *
+  // even if we provide a specific cluster arn...
+  statement {
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+
+    actions = [
+      "ecs:ListTasks"
+    ]
+  }
+}
+
+resource "aws_iam_role" "cicd_lambda" {
+  name               = "${var.resource_prefix}-airflow-cicd-lambda-${var.resource_suffix}"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy" "cicd_lambda" {
+  name   = "${var.resource_prefix}-airflow-cicd-lambda-permissions-${var.resource_suffix}"
+  role   = aws_iam_role.cicd_lambda.id
+  policy = data.aws_iam_policy_document.airflow_cicd_lambda_permissions.json
+}
