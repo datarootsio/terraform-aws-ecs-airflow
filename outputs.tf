@@ -20,5 +20,5 @@ output "airflow_connection_sg" {
 
 output "cicd_lambda_name" {
   description = "The name of the lambda function that invokes the seed dag (only if \"cicd_lambda\" is enabled)"
-  value       = aws_lambda_function.cicd_lambda.function_name
+  value       = aws_lambda_function.cicd_lambda[0].function_name
 }
