@@ -18,34 +18,44 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// ValidateCluster validates that the clusters works
-func ValidateCluster(t *testing.T, options *terraform.Options, region string, resourcePrefix string, resourceSuffix string) {
-	retrySleepTime := time.Duration(10) * time.Second
-	ecsGetTaskArnMaxRetries := 20
-	ecsGetTaskStatusMaxRetries := 50
-	httpStatusCodeMaxRetries := 15
-	amountOfConsecutiveGetsToBeHealthy := 3
-	desiredStatusRunning := "RUNNING"
-	clusterName := AddPreAndSuffix("airflow", resourcePrefix, resourceSuffix)
-	serviceName := AddPreAndSuffix("airflow", resourcePrefix, resourceSuffix)
-	webserverContainerName := AddPreAndSuffix("airflow-webserver", resourcePrefix, resourceSuffix)
-	schedulerContainerName := AddPreAndSuffix("airflow-webserver", resourcePrefix, resourceSuffix)
-	sidecarContainerName := AddPreAndSuffix("airflow-sidecar", resourcePrefix, resourceSuffix)
+func TerraformInitPlanApply(t *testing.T, terraformOptions *terraform.Options) {
+	t.Parallel()
+	defer terraform.Destroy(t, terraformOptions)
 
-	expectedNavbarColor := "#e27d60"
+	fmt.Println("Running: terraform init")
+	_, errInit := terraform.InitE(t, terraformOptions)
+	assert.NoError(t, errInit)
+	fmt.Println("Running: terraform plan")
+	_, errPlan := terraform.PlanE(t, terraformOptions)
+	assert.NoError(t, errPlan)
+	fmt.Println("Running: terraform apply")
+	_, errApply := terraform.ApplyE(t, terraformOptions)
+	assert.NoError(t, errApply)
+}
 
+func CheckIfRolesExist(t *testing.T, region string, rolesToCheck []string) {
+	fmt.Println("Checking if roles exists")
 	iamClient := aws.NewIamClient(t, region)
 
-	fmt.Println("Checking if roles exists")
-	rolesToCheck := []string{
-		AddPreAndSuffix("airflow-task-execution-role", resourcePrefix, resourceSuffix),
-		AddPreAndSuffix("airflow-task-role", resourcePrefix, resourceSuffix),
-	}
 	for _, roleName := range rolesToCheck {
 		roleInput := &iam.GetRoleInput{RoleName: &roleName}
 		_, err := iamClient.GetRole(roleInput)
 		assert.NoError(t, err)
 	}
+}
+
+func CheckClusterAndContainerStates(t *testing.T, region string, resourcePrefix string, resourceSuffix string) {
+	retrySleepTime := time.Duration(10) * time.Second
+	ecsGetTaskArnMaxRetries := 20
+	ecsGetTaskStatusMaxRetries := 50
+	desiredStatusRunning := "RUNNING"
+
+	clusterName := AddPreAndSuffix("airflow", resourcePrefix, resourceSuffix)
+	serviceName := AddPreAndSuffix("airflow", resourcePrefix, resourceSuffix)
+	webserverContainerName := AddPreAndSuffix("airflow-webserver", resourcePrefix, resourceSuffix)
+	schedulerContainerName := AddPreAndSuffix("airflow-scheduler", resourcePrefix, resourceSuffix)
+	sidecarContainerName := AddPreAndSuffix("airflow-sidecar", resourcePrefix, resourceSuffix)
+	initContainerName := AddPreAndSuffix("airflow-init", resourcePrefix, resourceSuffix)
 
 	fmt.Println("Checking if ecs cluster exists")
 	_, err := aws.GetEcsClusterE(t, region, clusterName)
@@ -81,7 +91,7 @@ func ValidateCluster(t *testing.T, options *terraform.Options, region string, re
 		}
 		time.Sleep(retrySleepTime)
 	}
-	fmt.Println("Getting that there is only one task running")
+	fmt.Println("Checking that there is only one task running")
 	assert.Equal(t, 1, len(taskArns))
 
 	// If there is no task running you can't do the following tests so skip them
@@ -101,6 +111,7 @@ func ValidateCluster(t *testing.T, options *terraform.Options, region string, re
 		var webserverContainer ecs.Container
 		var schedulerContainer ecs.Container
 		var sidecarContainer ecs.Container
+		var initContainer ecs.Container
 		for i := 0; i < ecsGetTaskStatusMaxRetries; i++ {
 			fmt.Printf("Getting container statuses, try... %d\n", i)
 
@@ -111,10 +122,12 @@ func ValidateCluster(t *testing.T, options *terraform.Options, region string, re
 			webserverContainer = *GetContainerWithName(webserverContainerName, containers)
 			schedulerContainer = *GetContainerWithName(schedulerContainerName, containers)
 			sidecarContainer = *GetContainerWithName(sidecarContainerName, containers)
+			initContainer = *GetContainerWithName(initContainerName, containers)
 
 			if *webserverContainer.LastStatus == "RUNNING" &&
 				*schedulerContainer.LastStatus == "RUNNING" &&
-				*sidecarContainer.LastStatus == "STOPPED" {
+				*sidecarContainer.LastStatus == "STOPPED" &&
+				*initContainer.LastStatus == "STOPPED" {
 				break
 			}
 			time.Sleep(retrySleepTime)
@@ -122,73 +135,65 @@ func ValidateCluster(t *testing.T, options *terraform.Options, region string, re
 		assert.Equal(t, "RUNNING", *webserverContainer.LastStatus)
 		assert.Equal(t, "RUNNING", *schedulerContainer.LastStatus)
 		assert.Equal(t, "STOPPED", *sidecarContainer.LastStatus)
-
-		// We do consecutive checks because sometime it could be that
-		// the webserver is available for a short amount of time and crashes
-		// a couple of seconds later
-		fmt.Println("Doing HTTP request/checking health")
-
-		protocol := "https"
-		airflowAlbDNS := terraform.Output(t, options, "airflow_dns_record")
-
-		if options.Vars["use_https"] == false {
-			protocol = "http"
-		}
-
-		if options.Vars["route53_zone_name"] == "" {
-			airflowAlbDNS = terraform.Output(t, options, "airflow_alb_dns")
-		}
-		airflowURL := fmt.Sprintf("%s://%s", protocol, airflowAlbDNS)
-
-		var amountOfConsecutiveHealthyChecks int
-		var res *http.Response
-		for i := 0; i < httpStatusCodeMaxRetries; i++ {
-			fmt.Printf("Doing HTTP request to airflow webservice, try... %d\n", i)
-			res, err = http.Get(airflowURL)
-			if res != nil && err == nil {
-				fmt.Println(res.StatusCode)
-				if res.StatusCode >= 200 && res.StatusCode < 400 {
-					amountOfConsecutiveHealthyChecks++
-					fmt.Println("Webservice is healthy")
-				} else {
-					amountOfConsecutiveHealthyChecks = 0
-					fmt.Println("Webservice is NOT healthy")
-				}
-
-				if amountOfConsecutiveHealthyChecks == amountOfConsecutiveGetsToBeHealthy {
-					break
-				}
-			}
-			time.Sleep(retrySleepTime)
-		}
-
-		if res != nil {
-			assert.Equal(t, true, res.StatusCode >= 200 && res.StatusCode < 400)
-			assert.Equal(t, amountOfConsecutiveGetsToBeHealthy, amountOfConsecutiveHealthyChecks)
-
-			if res.StatusCode >= 200 && res.StatusCode < 400 {
-				fmt.Println("Getting the actual HTML code")
-				defer res.Body.Close()
-				doc, err := goquery.NewDocumentFromReader(res.Body)
-				assert.NoError(t, err)
-
-				fmt.Println("Checking if the navbar has the correct color")
-				navbarStyle, exists := doc.Find(".navbar.navbar-inverse.navbar-fixed-top").First().Attr("style")
-				assert.Equal(t, true, exists)
-				assert.Contains(t, navbarStyle, fmt.Sprintf("background-color: %s", expectedNavbarColor))
-
-				// if rbac is enabled check if you can log in
-				// this is to prevent 'issue #9' of happening again
-				// ref: https://github.com/datarootsio/terraform-aws-ecs-airflow/issues/9
-				if options.Vars["airflow_authentication"] == "rbac" {
-					loginToAirflow(t, airflowURL)
-				}
-			}
-		}
+		assert.Equal(t, "STOPPED", *initContainer.LastStatus)
 	}
 }
 
-func loginToAirflow(t *testing.T, airflowURL string) {
+func CheckIfWebserverIsHealthy(t *testing.T, airflowURL string) {
+	// We do consecutive checks because sometime it could be that
+	// the webserver is available for a short amount of time and crashes
+	// a couple of seconds later
+	fmt.Println("Doing HTTP request/checking health")
+	retrySleepTime := time.Duration(10) * time.Second
+	httpStatusCodeMaxRetries := 15
+	amountOfConsecutiveGetsToBeHealthy := 3
+
+	var amountOfConsecutiveHealthyChecks int
+	var res *http.Response
+	for i := 0; i < httpStatusCodeMaxRetries; i++ {
+		fmt.Printf("Doing HTTP request to airflow webservice, try... %d\n", i)
+		res, errGet := http.Get(airflowURL)
+		if res != nil && errGet == nil {
+			fmt.Println(res.StatusCode)
+			if res.StatusCode >= 200 && res.StatusCode < 400 {
+				fmt.Println("Webservice is healthy")
+				amountOfConsecutiveHealthyChecks++
+			} else {
+				fmt.Println("Webservice is NOT healthy")
+				amountOfConsecutiveHealthyChecks = 0
+			}
+
+			if amountOfConsecutiveHealthyChecks == amountOfConsecutiveGetsToBeHealthy {
+				break
+			}
+		}
+		time.Sleep(retrySleepTime)
+	}
+
+	if res != nil {
+		assert.Equal(t, true, res.StatusCode >= 200 && res.StatusCode < 400)
+		assert.Equal(t, amountOfConsecutiveGetsToBeHealthy, amountOfConsecutiveHealthyChecks)
+	}
+}
+
+func CheckAirflowNavbarColor(t *testing.T, airflowURL string, expectedNavbarColor string) {
+	res, errGet := http.Get(airflowURL)
+	assert.NoError(t, errGet)
+
+	if res != nil && res.StatusCode >= 200 && res.StatusCode < 400 {
+		fmt.Println("Getting the actual HTML code")
+		defer res.Body.Close()
+		doc, err := goquery.NewDocumentFromReader(res.Body)
+		assert.NoError(t, err)
+
+		fmt.Println("Checking if the navbar has the correct color")
+		navbarStyle, exists := doc.Find(".navbar.navbar-inverse.navbar-fixed-top").First().Attr("style")
+		assert.Equal(t, true, exists)
+		assert.Contains(t, navbarStyle, fmt.Sprintf("background-color: %s", expectedNavbarColor))
+	}
+}
+
+func CheckIfLoginToAirflowIsPossible(t *testing.T, airflowURL string) {
 	username := "admin"
 	password := "admin"
 	airflowLoginURL := fmt.Sprintf("%s/login/", airflowURL)
