@@ -65,7 +65,7 @@ func GetRBACPassword(terraformOptions *terraform.Options) string {
 	return rbacPassword
 }
 
-// GetAirflowURL creates the correct airflow url
+// GetAirflowURL creates the correct airflow url to do requests to the airflow webserver
 func GetAirflowURL(t *testing.T, terraformOptions *terraform.Options) string {
 	protocol := "http"
 	airflowAlbDNS := terraform.Output(t, terraformOptions, "airflow_dns_record")
