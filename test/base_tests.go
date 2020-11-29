@@ -193,9 +193,7 @@ func CheckAirflowNavbarColor(t *testing.T, airflowURL string, expectedNavbarColo
 	}
 }
 
-func CheckIfLoginToAirflowIsPossible(t *testing.T, airflowURL string) {
-	username := "admin"
-	password := "admin"
+func CheckIfLoginToAirflowIsPossible(t *testing.T, airflowURL string, username string, password string) {
 	airflowLoginURL := fmt.Sprintf("%s/login/", airflowURL)
 
 	// we create a client/session to persist some headers
