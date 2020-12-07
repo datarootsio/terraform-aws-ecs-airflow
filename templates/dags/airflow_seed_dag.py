@@ -12,8 +12,6 @@ from airflow.operators.dummy_operator import DummyOperator
 
 import boto3
 
-from commons.utils import create_dummy_task
-
 # The bucket name and key the of where dags are stored in S3
 S3_BUCKET_NAME = "${BUCKET_NAME}"
 # airflow home directory where dags & plugins reside
@@ -30,9 +28,9 @@ with DAG(
     schedule_interval=None
 ) as dag:
 
-    start_task = DummyOperator(
-        dag=dag,
-        task_id="start_task"
+    list_dags_before = BashOperator(
+        task_id="list_dags_before",
+        bash_command="ls ${AIRFLOW_HOME}/dags",
     )
     
     sync_dags = BashOperator(
@@ -55,4 +53,4 @@ with DAG(
         bash_command="ls ${AIRFLOW_HOME}/dags",
     )
 
-    dag >> start_task >> [sync_dags, sync_plugins] >> refresh_dag_bag >> list_dags_after
+    dag >> list_dags_before >> [sync_dags, sync_plugins] >> refresh_dag_bag >> list_dags_after
