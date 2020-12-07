@@ -8,7 +8,6 @@ from typing import Dict
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.dummy_operator import DummyOperator
 
 import boto3
 
