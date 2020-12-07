@@ -25,7 +25,7 @@ args = {
 
 # we prefix the dag with '0' to make it the first dag
 with DAG(
-    dag_id="sync_airflow_from_s3",
+    dag_id="0_sync_dags_in_s3_to_local_airflow_dags_folder",
     default_args=args,
     schedule_interval=None
 ) as dag:
