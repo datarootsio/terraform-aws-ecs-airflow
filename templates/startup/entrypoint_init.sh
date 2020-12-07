@@ -1,3 +1,6 @@
+# installation of dependencies
+python -m pip install awscli
+
 echo "Starting the init"
 airflow initdb
 
