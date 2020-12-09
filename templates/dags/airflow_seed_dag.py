@@ -26,12 +26,11 @@ with DAG(
     default_args=args,
     schedule_interval=None
 ) as dag:
-
     list_dags_before = BashOperator(
         task_id="list_dags_before",
         bash_command="ls ${AIRFLOW_HOME}/dags",
     )
-    
+
     sync_dags = BashOperator(
         task_id="sync_dag_s3_to_airflow",
         bash_command=f"python -m awscli s3 sync --exclude='*' --include='*.py' --size-only --delete s3://{S3_BUCKET_NAME}/dags/ {AIRFLOW_HOME}/dags/"
@@ -52,4 +51,9 @@ with DAG(
         bash_command="ls ${AIRFLOW_HOME}/dags",
     )
 
-    dag >> list_dags_before >> [sync_dags, sync_plugins] >> refresh_dag_bag >> list_dags_after
+    (
+        list_dags_before >>
+        [sync_dags, sync_plugins] >>
+        refresh_dag_bag >>
+        list_dags_after
+    )
