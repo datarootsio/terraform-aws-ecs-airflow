@@ -161,6 +161,8 @@ Make sure to install [Terraform](https://learn.hashicorp.com/terraform/getting-s
 * Linting: `make lint`
 * Run tests: `make test` (or `go test -timeout 2h ./...` without Make)
 
+Make sure you branch from the 'open-pr-here' branch, and submit a PR back to the 'open-pr-here' branch.
+
 ## License
 
 MIT license. Please see [LICENSE](LICENSE.md) for details.
