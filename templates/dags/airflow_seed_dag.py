@@ -28,7 +28,7 @@ with DAG(
 ) as dag:
     list_dags_before = BashOperator(
         task_id="list_dags_before",
-        bash_command="ls ${AIRFLOW_HOME}/dags",
+        bash_command="find ${AIRFLOW_HOME}/dags -not -path '*__pycache__*'",
     )
 
     sync_dags = BashOperator(
@@ -48,7 +48,7 @@ with DAG(
 
     list_dags_after = BashOperator(
         task_id="list_dags_after",
-        bash_command="ls ${AIRFLOW_HOME}/dags",
+        bash_command="find ${AIRFLOW_HOME}/dags -not -path '*__pycache__*'",
     )
 
     (
