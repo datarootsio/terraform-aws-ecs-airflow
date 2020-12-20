@@ -377,7 +377,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
-	t.Parallel()
+	// t.Parallel()
 
 	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
 	assert.NoError(t, err)
@@ -549,7 +549,7 @@ func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
-	t.Parallel()
+	// t.Parallel()
 
 	preExistingOptions, err := getPreexistingTerraformOptions(t, region, resourcePrefix, resourceSuffix)
 	assert.NoError(t, err)
