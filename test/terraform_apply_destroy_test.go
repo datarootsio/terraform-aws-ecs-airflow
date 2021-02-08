@@ -269,42 +269,42 @@ func loginToAirflow(t *testing.T, airflowURL string) {
 	assert.Equal(t, true, dagsTableExists)
 }
 
-func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
-	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "preexisting", ".")
+// func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
+// 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "preexisting", ".")
 
-	terraformOptions := &terraform.Options{
-		TerraformDir:       tempTestFolder,
-		Vars:               map[string]interface{}{},
-		MaxRetries:         5,
-		TimeBetweenRetries: 5 * time.Minute,
-		NoColor:            true,
-		Logger:             logger.TestingT,
-	}
+// 	terraformOptions := &terraform.Options{
+// 		TerraformDir:       tempTestFolder,
+// 		Vars:               map[string]interface{}{},
+// 		MaxRetries:         5,
+// 		TimeBetweenRetries: 5 * time.Minute,
+// 		NoColor:            true,
+// 		Logger:             logger.TestingT,
+// 	}
 
-	terraformOptions.Vars["region"] = region
-	terraformOptions.Vars["resource_prefix"] = resourcePrefix
-	terraformOptions.Vars["resource_suffix"] = resourceSuffix
-	terraformOptions.Vars["extra_tags"] = map[string]interface{}{
-		"ATestTag":       "a_test_tag",
-		"ResourcePrefix": resourcePrefix,
-		"ResourceSuffix": resourceSuffix,
-	}
+// 	terraformOptions.Vars["region"] = region
+// 	terraformOptions.Vars["resource_prefix"] = resourcePrefix
+// 	terraformOptions.Vars["resource_suffix"] = resourceSuffix
+// 	terraformOptions.Vars["extra_tags"] = map[string]interface{}{
+// 		"ATestTag":       "a_test_tag",
+// 		"ResourcePrefix": resourcePrefix,
+// 		"ResourceSuffix": resourceSuffix,
+// 	}
 
-	terraformOptions.Vars["vpc_id"] = "vpc-0eafa6867cb3bdaa3"
-	terraformOptions.Vars["public_subnet_ids"] = []string{
-		"subnet-08da686d46e99872d",
-		"subnet-0e5bb83f963f8df0f",
-	}
-	terraformOptions.Vars["private_subnet_ids"] = []string{
-		"subnet-03c2a3885cfc8a740",
-		"subnet-09c0ce0aff676904a",
-	}
+// 	terraformOptions.Vars["vpc_id"] = "vpc-0eafa6867cb3bdaa3"
+// 	terraformOptions.Vars["public_subnet_ids"] = []string{
+// 		"subnet-08da686d46e99872d",
+// 		"subnet-0e5bb83f963f8df0f",
+// 	}
+// 	terraformOptions.Vars["private_subnet_ids"] = []string{
+// 		"subnet-03c2a3885cfc8a740",
+// 		"subnet-09c0ce0aff676904a",
+// 	}
 
-	terraformOptions.Vars["rds_name"] = AddPreAndSuffix("preexisting", resourcePrefix, resourceSuffix)
-	terraformOptions.Vars["route53_zone_name"] = ""
+// 	terraformOptions.Vars["rds_name"] = AddPreAndSuffix("preexisting", resourcePrefix, resourceSuffix)
+// 	terraformOptions.Vars["route53_zone_name"] = ""
 
-	return terraformOptions, nil
-}
+// 	return terraformOptions, nil
+// }
 
 func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "..", ".")
