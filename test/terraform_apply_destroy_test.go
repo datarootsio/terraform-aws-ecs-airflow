@@ -300,7 +300,6 @@ func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix 
 		"subnet-09c0ce0aff676904a",
 	}
 
-	terraformOptions.Vars["use_https"] = false
 	terraformOptions.Vars["rds_name"] = AddPreAndSuffix("preexisting", resourcePrefix, resourceSuffix)
 	terraformOptions.Vars["route53_zone_name"] = ""
 
@@ -569,6 +568,7 @@ func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
 	assert.NoError(t, err)
 	options.Vars["postgres_uri"] = terraform.Output(t, preExistingOptions, "postgres_uri")
 	options.Vars["certificate_arn"] = ""
+	options.Vars["use_https"] = false
 
 	// terraform destroy => when test completes
 	defer terraform.Destroy(t, options)
