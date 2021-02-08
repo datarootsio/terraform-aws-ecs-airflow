@@ -269,42 +269,42 @@ func loginToAirflow(t *testing.T, airflowURL string) {
 	assert.Equal(t, true, dagsTableExists)
 }
 
-func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
-	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "preexisting", ".")
+// func getPreexistingTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
+// 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "preexisting", ".")
 
-	terraformOptions := &terraform.Options{
-		TerraformDir:       tempTestFolder,
-		Vars:               map[string]interface{}{},
-		MaxRetries:         5,
-		TimeBetweenRetries: 5 * time.Minute,
-		NoColor:            true,
-		Logger:             logger.TestingT,
-	}
+// 	terraformOptions := &terraform.Options{
+// 		TerraformDir:       tempTestFolder,
+// 		Vars:               map[string]interface{}{},
+// 		MaxRetries:         5,
+// 		TimeBetweenRetries: 5 * time.Minute,
+// 		NoColor:            true,
+// 		Logger:             logger.TestingT,
+// 	}
 
-	terraformOptions.Vars["region"] = region
-	terraformOptions.Vars["resource_prefix"] = resourcePrefix
-	terraformOptions.Vars["resource_suffix"] = resourceSuffix
-	terraformOptions.Vars["extra_tags"] = map[string]interface{}{
-		"ATestTag":       "a_test_tag",
-		"ResourcePrefix": resourcePrefix,
-		"ResourceSuffix": resourceSuffix,
-	}
+// 	terraformOptions.Vars["region"] = region
+// 	terraformOptions.Vars["resource_prefix"] = resourcePrefix
+// 	terraformOptions.Vars["resource_suffix"] = resourceSuffix
+// 	terraformOptions.Vars["extra_tags"] = map[string]interface{}{
+// 		"ATestTag":       "a_test_tag",
+// 		"ResourcePrefix": resourcePrefix,
+// 		"ResourceSuffix": resourceSuffix,
+// 	}
 
-	terraformOptions.Vars["vpc_id"] = "vpc-0eafa6867cb3bdaa3"
-	terraformOptions.Vars["public_subnet_ids"] = []string{
-		"subnet-08da686d46e99872d",
-		"subnet-0e5bb83f963f8df0f",
-	}
-	terraformOptions.Vars["private_subnet_ids"] = []string{
-		"subnet-03c2a3885cfc8a740",
-		"subnet-09c0ce0aff676904a",
-	}
+// 	terraformOptions.Vars["vpc_id"] = "vpc-0eafa6867cb3bdaa3"
+// 	terraformOptions.Vars["public_subnet_ids"] = []string{
+// 		"subnet-08da686d46e99872d",
+// 		"subnet-0e5bb83f963f8df0f",
+// 	}
+// 	terraformOptions.Vars["private_subnet_ids"] = []string{
+// 		"subnet-03c2a3885cfc8a740",
+// 		"subnet-09c0ce0aff676904a",
+// 	}
 
-	terraformOptions.Vars["rds_name"] = AddPreAndSuffix("preexisting", resourcePrefix, resourceSuffix)
-	terraformOptions.Vars["route53_zone_name"] = "aws-sandbox.dataroots.io"
+// 	terraformOptions.Vars["rds_name"] = AddPreAndSuffix("preexisting", resourcePrefix, resourceSuffix)
+// 	terraformOptions.Vars["route53_zone_name"] = ""
 
-	return terraformOptions, nil
-}
+// 	return terraformOptions, nil
+// }
 
 func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "..", ".")
@@ -377,7 +377,7 @@ func TestApplyAndDestroyWithDefaultValues(t *testing.T) {
 
 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
-	t.Parallel()
+	// t.Parallel()
 
 	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
 	assert.NoError(t, err)
@@ -540,47 +540,48 @@ func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutorUsingRBAC(t *testing.T
 	}
 }
 
-func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
-	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS")
-	// 'GLOBAL' test vars
-	region := "eu-west-1"
-	resourcePrefix := "dtr"
-	resourceSuffix := strings.ToLower(random.UniqueId())
+// func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
+// 	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS")
+// 	// 'GLOBAL' test vars
+// 	region := "eu-west-1"
+// 	resourcePrefix := "dtr"
+// 	resourceSuffix := strings.ToLower(random.UniqueId())
 
-	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
+// 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
-	t.Parallel()
+// 	// t.Parallel()
 
-	preExistingOptions, err := getPreexistingTerraformOptions(t, region, resourcePrefix, resourceSuffix)
-	assert.NoError(t, err)
+// 	preExistingOptions, err := getPreexistingTerraformOptions(t, region, resourcePrefix, resourceSuffix)
+// 	assert.NoError(t, err)
 
-	// terraform destroy => when test completes
-	defer terraform.Destroy(t, preExistingOptions)
-	fmt.Println("Running: terraform init && terraform apply")
-	_, err = terraform.InitE(t, preExistingOptions)
-	assert.NoError(t, err)
-	_, err = terraform.PlanE(t, preExistingOptions)
-	assert.NoError(t, err)
-	_, err = terraform.ApplyE(t, preExistingOptions)
-	assert.NoError(t, err)
+// 	// terraform destroy => when test completes
+// 	defer terraform.Destroy(t, preExistingOptions)
+// 	fmt.Println("Running: terraform init && terraform apply")
+// 	_, err = terraform.InitE(t, preExistingOptions)
+// 	assert.NoError(t, err)
+// 	_, err = terraform.PlanE(t, preExistingOptions)
+// 	assert.NoError(t, err)
+// 	_, err = terraform.ApplyE(t, preExistingOptions)
+// 	assert.NoError(t, err)
 
-	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
-	assert.NoError(t, err)
-	options.Vars["postgres_uri"] = terraform.Output(t, preExistingOptions, "postgres_uri")
-	options.Vars["certificate_arn"] = terraform.Output(t, preExistingOptions, "certificate_arn")
+// 	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
+// 	assert.NoError(t, err)
+// 	options.Vars["postgres_uri"] = terraform.Output(t, preExistingOptions, "postgres_uri")
+// 	options.Vars["certificate_arn"] = ""
+// 	options.Vars["use_https"] = false
 
-	// terraform destroy => when test completes
-	defer terraform.Destroy(t, options)
-	fmt.Println("Running: terraform init && terraform apply")
-	_, err = terraform.InitE(t, options)
-	assert.NoError(t, err)
-	_, err = terraform.PlanE(t, options)
-	assert.NoError(t, err)
-	_, err = terraform.ApplyE(t, options)
-	assert.NoError(t, err)
-	// if there are terraform errors, do nothing
-	if err == nil {
-		fmt.Println("Terraform apply returned no error, continuing")
-		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
-	}
-}
+// 	// terraform destroy => when test completes
+// 	defer terraform.Destroy(t, options)
+// 	fmt.Println("Running: terraform init && terraform apply")
+// 	_, err = terraform.InitE(t, options)
+// 	assert.NoError(t, err)
+// 	_, err = terraform.PlanE(t, options)
+// 	assert.NoError(t, err)
+// 	_, err = terraform.ApplyE(t, options)
+// 	assert.NoError(t, err)
+// 	// if there are terraform errors, do nothing
+// 	if err == nil {
+// 		fmt.Println("Terraform apply returned no error, continuing")
+// 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
+// 	}
+// }
