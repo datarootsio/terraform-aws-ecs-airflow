@@ -540,48 +540,48 @@ func TestApplyAndDestroyWithPlainHTTPAndSequentialExecutorUsingRBAC(t *testing.T
 	}
 }
 
-func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
-	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS")
-	// 'GLOBAL' test vars
-	region := "eu-west-1"
-	resourcePrefix := "dtr"
-	resourceSuffix := strings.ToLower(random.UniqueId())
+// func TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS(t *testing.T) {
+// 	fmt.Println("Starting test: TestApplyAndDestroyWithPlainHTTPAndPreexistingRDS")
+// 	// 'GLOBAL' test vars
+// 	region := "eu-west-1"
+// 	resourcePrefix := "dtr"
+// 	resourceSuffix := strings.ToLower(random.UniqueId())
 
-	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
+// 	// TODO: Check the task def rev number before and after apply and see if the rev num has increased by 1
 
-	// t.Parallel()
+// 	// t.Parallel()
 
-	preExistingOptions, err := getPreexistingTerraformOptions(t, region, resourcePrefix, resourceSuffix)
-	assert.NoError(t, err)
+// 	preExistingOptions, err := getPreexistingTerraformOptions(t, region, resourcePrefix, resourceSuffix)
+// 	assert.NoError(t, err)
 
-	// terraform destroy => when test completes
-	defer terraform.Destroy(t, preExistingOptions)
-	fmt.Println("Running: terraform init && terraform apply")
-	_, err = terraform.InitE(t, preExistingOptions)
-	assert.NoError(t, err)
-	_, err = terraform.PlanE(t, preExistingOptions)
-	assert.NoError(t, err)
-	_, err = terraform.ApplyE(t, preExistingOptions)
-	assert.NoError(t, err)
+// 	// terraform destroy => when test completes
+// 	defer terraform.Destroy(t, preExistingOptions)
+// 	fmt.Println("Running: terraform init && terraform apply")
+// 	_, err = terraform.InitE(t, preExistingOptions)
+// 	assert.NoError(t, err)
+// 	_, err = terraform.PlanE(t, preExistingOptions)
+// 	assert.NoError(t, err)
+// 	_, err = terraform.ApplyE(t, preExistingOptions)
+// 	assert.NoError(t, err)
 
-	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
-	assert.NoError(t, err)
-	options.Vars["postgres_uri"] = terraform.Output(t, preExistingOptions, "postgres_uri")
-	options.Vars["certificate_arn"] = ""
-	options.Vars["use_https"] = false
+// 	options, err := getDefaultTerraformOptions(t, region, resourcePrefix, resourceSuffix)
+// 	assert.NoError(t, err)
+// 	options.Vars["postgres_uri"] = terraform.Output(t, preExistingOptions, "postgres_uri")
+// 	options.Vars["certificate_arn"] = ""
+// 	options.Vars["use_https"] = false
 
-	// terraform destroy => when test completes
-	defer terraform.Destroy(t, options)
-	fmt.Println("Running: terraform init && terraform apply")
-	_, err = terraform.InitE(t, options)
-	assert.NoError(t, err)
-	_, err = terraform.PlanE(t, options)
-	assert.NoError(t, err)
-	_, err = terraform.ApplyE(t, options)
-	assert.NoError(t, err)
-	// if there are terraform errors, do nothing
-	if err == nil {
-		fmt.Println("Terraform apply returned no error, continuing")
-		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
-	}
-}
+// 	// terraform destroy => when test completes
+// 	defer terraform.Destroy(t, options)
+// 	fmt.Println("Running: terraform init && terraform apply")
+// 	_, err = terraform.InitE(t, options)
+// 	assert.NoError(t, err)
+// 	_, err = terraform.PlanE(t, options)
+// 	assert.NoError(t, err)
+// 	_, err = terraform.ApplyE(t, options)
+// 	assert.NoError(t, err)
+// 	// if there are terraform errors, do nothing
+// 	if err == nil {
+// 		fmt.Println("Terraform apply returned no error, continuing")
+// 		validateCluster(t, options, region, resourcePrefix, resourceSuffix)
+// 	}
+// }
