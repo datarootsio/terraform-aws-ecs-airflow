@@ -64,12 +64,13 @@ resource "aws_s3_bucket_object" "airflow_init_entrypoint" {
   bucket = local.s3_bucket_name
   key    = "startup/entrypoint_init.sh"
   content = templatefile("${path.module}/templates/startup/entrypoint_init.sh", {
-    RBAC_AUTH      = var.airflow_authentication == "rbac" ? "true" : "false",
-    RBAC_USERNAME  = var.rbac_admin_username,
-    RBAC_EMAIL     = var.rbac_admin_email,
-    RBAC_FIRSTNAME = var.rbac_admin_firstname,
-    RBAC_LASTNAME  = var.rbac_admin_lastname,
-    RBAC_PASSWORD  = var.rbac_admin_password
+    RBAC_AUTH       = var.airflow_authentication == "rbac" ? "true" : "false",
+    RBAC_USERNAME   = var.rbac_admin_username,
+    RBAC_EMAIL      = var.rbac_admin_email,
+    RBAC_FIRSTNAME  = var.rbac_admin_firstname,
+    RBAC_LASTNAME   = var.rbac_admin_lastname,
+    RBAC_PASSWORD   = var.rbac_admin_password,
+    AIRFLOW_VERSION = var.airflow_image_tag
   })
 }
 

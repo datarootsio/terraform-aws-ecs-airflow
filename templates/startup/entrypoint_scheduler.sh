@@ -1,10 +1,9 @@
-echo "Starting up airflow"
+echo "Starting up airflow scheduler"
 # Sanity check the dags
 ls /opt/airflow/dags
 
 # Install boto and awscli for the seed dag
-python -m pip install boto3==1.14.38 --user
-python -m pip install awscli==1.18.192 --user
+python -m pip install awscli --user
 
 # Intall python packages through req.txt and pip (if exists)
 if [[ -f "${AIRFLOW_HOME}/startup/requirements.txt" ]]; then
@@ -12,4 +11,4 @@ if [[ -f "${AIRFLOW_HOME}/startup/requirements.txt" ]]; then
     python -m pip install -r ${AIRFLOW_HOME}/startup/requirements.txt --user
 fi
 # Run the airflow webserver
-exec airflow scheduler
+airflow scheduler

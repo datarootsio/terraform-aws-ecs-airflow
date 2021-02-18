@@ -30,7 +30,7 @@ variable "airflow_image_name" {
 variable "airflow_image_tag" {
   type        = string
   description = "The tag of the airflow image"
-  default     = "1.10.12"
+  default     = "2.0.1"
 }
 
 variable "airflow_executor" {
