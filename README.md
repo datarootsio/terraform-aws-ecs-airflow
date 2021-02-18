@@ -1,5 +1,5 @@
 [![Maintained by dataroots](https://img.shields.io/badge/maintained%20by-dataroots-%2300b189)](https://dataroots.io)
-[![Airflow version](https://img.shields.io/badge/Apache%20Airflow-1.10.12-e27d60.svg)](https://airflow.apache.org/)
+[![Airflow version](https://img.shields.io/badge/Apache%20Airflow-2.0.1-e27d60.svg)](https://airflow.apache.org/)
 [![Terraform 0.13](https://img.shields.io/badge/terraform-0.13-%23623CE4)](https://www.terraform.io)
 [![Terraform Registry](https://img.shields.io/badge/terraform-registry-%23623CE4)](https://registry.terraform.io/modules/datarootsio/ecs-airflow/aws)
 [![Tests](https://github.com/datarootsio/terraform-aws-ecs-airflow/workflows/tests/badge.svg?branch=main)](https://github.com/datarootsio/terraform-aws-ecs-airflow/actions)
