@@ -57,10 +57,10 @@ resource "aws_security_group_rule" "airflow_connection" {
 // ALB
 resource "aws_lb" "airflow" {
   name               = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-  internal           = false
+  internal           = var.internal_lb
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id, aws_security_group.airflow.id]
-  subnets            = var.public_subnet_ids
+  subnets            = var.internal_lb ? var.private_subnet_ids : var.public_subnet_ids
 
   enable_deletion_protection = false
 

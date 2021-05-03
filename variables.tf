@@ -152,6 +152,12 @@ variable "vpc_id" {
   }
 }
 
+variable "internal_lb" {
+  type        = bool
+  description = "If true, the ALB will be internal."
+  default     = false
+}
+
 variable "public_subnet_ids" {
   type        = list(string)
   description = "A list of subnet ids of where the ALB will reside, if the \"private_subnet_ids\" variable is not provided ECS and RDS will also reside in these subnets"
