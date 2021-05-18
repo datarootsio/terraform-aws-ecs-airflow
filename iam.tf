@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "task_execution_permissions" {
     effect = "Allow"
 
     resources = [
-      "arn:aws:ssm:${var.region}:${data.aws_caller_identity.this.account_id}:parameter/${var.resource_suffix}/airflow/*",
+      "arn:aws:ssm:${var.region}:${data.aws_caller_identity.this.account_id}:parameter/${var.resource_suffix}/airflow/fernet_key",
     ]
 
     actions = [
