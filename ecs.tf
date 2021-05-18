@@ -76,6 +76,10 @@ resource "aws_ecs_task_definition" "airflow" {
         "environment": [
           ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
         ],
+        "secrets": [{
+          "name": "AIRFLOW__CORE__FERNET_KEY",
+          "valueFrom": "arn:aws:ssm:${var.region}:${data.aws_caller_identity.this.account_id}:parameter/${var.resource_suffix}/airflow/fernet_key"
+        }],
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {

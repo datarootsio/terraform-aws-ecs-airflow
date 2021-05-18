@@ -55,6 +55,17 @@ data "aws_iam_policy_document" "task_execution_permissions" {
       "logs:PutLogEvents",
     ]
   }
+  statement {
+    effect = "Allow"
+
+    resources = [
+      "*",
+    ]
+
+    actions = [
+      "ssm:GetParameter"
+    ]
+  }
 }
 
 # role for ecs to create the instance
