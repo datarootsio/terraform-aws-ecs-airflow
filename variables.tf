@@ -243,6 +243,12 @@ variable "rds_deletion_protection" {
   default     = false
 }
 
+variable "rds_version" {
+  type        = string
+  description = "The DB version to use for the RDS instance"
+  default     = "11.8"
+}
+
 // S3 Bucket
 variable "s3_bucket_name" {
   type        = string
