@@ -215,7 +215,7 @@ variable "rds_allocated_storage" {
 variable "rds_storage_type" {
   type        = string
   description = <<EOT
-  One of "standard" (magnetic), "gp2" (general purpose SSD), or "io1" (provisioned IOPS SSD)
+  One of `"standard"` (magnetic), `"gp2"` (general purpose SSD), or `"io1"` (provisioned IOPS SSD)
   EOT
   default     = "standard"
 }
@@ -223,8 +223,7 @@ variable "rds_storage_type" {
 variable "rds_engine" {
   type        = string
   description = <<EOT
-  The database engine to use. For supported values, see the Engine parameter in 
-  [API action CreateDBInstance](https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html)
+  The database engine to use. For supported values, see the Engine parameter in [API action CreateDBInstance](https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html)
   EOT
   default     = "postgres"
 }
