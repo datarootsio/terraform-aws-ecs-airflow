@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -16,6 +17,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 
 	"github.com/gruntwork-io/terratest/modules/aws"
+	"github.com/gruntwork-io/terratest/modules/files"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -308,6 +310,10 @@ func loginToAirflow(t *testing.T, airflowURL string) {
 
 func getDefaultTerraformOptions(t *testing.T, region string, resourcePrefix string, resourceSuffix string) (*terraform.Options, error) {
 	tempTestFolder := testStructure.CopyTerraformFolderToTemp(t, "..", ".")
+	err := files.CopyFile("./provider.tf", filepath.Join(tempTestFolder, "provider.tf"))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	terraformOptions := &terraform.Options{
 		TerraformDir:       tempTestFolder,
