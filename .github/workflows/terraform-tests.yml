@@ -55,6 +55,10 @@ jobs:
           args: --timeout=3m0s
           version: ${{ env.golangci_lint_version }}
 
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.15.4
+
       - name: "go test"
         run: |
           go test -v  -timeout ${{ env.tests_timeout }} ./...
