@@ -40,7 +40,7 @@ jobs:
       AWS_DEFAULT_REGION: eu-west-1
     name: "Tests"
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' && (github.actor == 'samueldumont' || github.actor == 'nicogelders')}}
+    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' && github.head_ref == 'open-pr-here' }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@master
