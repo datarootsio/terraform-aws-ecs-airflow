@@ -60,8 +60,5 @@ jobs:
           terraform_version: 0.15.4
 
       - name: "go test"
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 0.15.4 
         run: |
           go test -v  -timeout ${{ env.tests_timeout }} ./...
