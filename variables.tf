@@ -267,7 +267,7 @@ variable "rds_deletion_protection" {
 variable "rds_version" {
   type        = string
   description = "The DB version to use for the RDS instance"
-  default     = "13.3"
+  default     = "12.7"
 }
 
 // S3 Bucket
