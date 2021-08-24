@@ -1,9 +1,9 @@
 resource "aws_db_instance" "airflow" {
   count                      = var.postgres_uri != "" || var.airflow_executor == "Sequential" ? 0 : 1
   name                       = replace(title(local.rds_name), "-", "")
-  allocated_storage          = 20
-  storage_type               = "standard"
-  engine                     = "postgres"
+  allocated_storage          = var.rds_allocated_storage
+  storage_type               = var.rds_storage_type
+  engine                     = var.rds_engine
   engine_version             = var.rds_version
   auto_minor_version_upgrade = false
   instance_class             = var.rds_instance_class
