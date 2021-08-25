@@ -122,6 +122,7 @@ For now the only authentication option is 'RBAC'. When enabling this, this modul
 | rds\_skip\_final\_snapshot | Whether or not to skip the final snapshot before deleting (mainly for tests) | `bool` | `false` | no |
 | rds\_storage\_type | One of `"standard"` (magnetic), `"gp2"` (general purpose SSD), or `"io1"` (provisioned IOPS SSD) | `string` | `"standard"` | no |
 | rds\_username | Username of rds | `string` | `"airflow"` | no |
+| rds\_version | The DB version to use for the RDS instance | `string` | `"12.7"` | no |
 | region | The region to deploy your solution to | `string` | `"eu-west-1"` | no |
 | resource\_prefix | A prefix for the create resources, example your company name (be aware of the resource name length) | `string` | n/a | yes |
 | resource\_suffix | A suffix for the created resources, example the environment for airflow to run in (be aware of the resource name length) | `string` | n/a | yes |
