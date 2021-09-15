@@ -37,6 +37,7 @@ locals {
     AIRFLOW__WEBSERVER__RBAC : var.airflow_authentication == "" ? false : true,
     AIRFLOW__WEBSERVER__AUTH_BACKEND : lookup(local.auth_map, var.airflow_authentication, "")
     AIRFLOW__WEBSERVER__BASE_URL : var.use_https ? "https://${local.dns_record}" : "http://localhost:8080" # localhost is default value
+    AIRFLOW__CORE__FERNET_KEY : "arn:aws:ssm:${var.region}:${data.aws_caller_identity.this.account_id}:parameter/${var.resource_suffix}/airflow/fernet_key"
   })
 
   airflow_variables_list = formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables))
