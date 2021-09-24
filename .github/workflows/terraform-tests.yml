@@ -18,7 +18,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 0.13.4
+          terraform_version: 0.15.4
 
       - name: Terraform Init
         run: terraform init
@@ -40,7 +40,7 @@ jobs:
       AWS_DEFAULT_REGION: eu-west-1
     name: "Tests"
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' && (github.actor == 'samueldumont' || github.actor == 'nicogelders')}}
+    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' && github.head_ref == 'open-pr-here' }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@master
@@ -54,6 +54,10 @@ jobs:
           # Optional: golangci-lint command line arguments.
           args: --timeout=3m0s
           version: ${{ env.golangci_lint_version }}
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.15.4
 
       - name: "go test"
         run: |
