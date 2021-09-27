@@ -206,7 +206,28 @@ variable "postgres_uri" {
   default     = ""
 }
 
-// TODO: Add more rds params
+variable "rds_allocated_storage" {
+  type        = number
+  description = "The allocated storage for the rds db in gibibytes"
+  default     = 20
+}
+
+variable "rds_storage_type" {
+  type        = string
+  description = <<EOT
+  One of `"standard"` (magnetic), `"gp2"` (general purpose SSD), or `"io1"` (provisioned IOPS SSD)
+  EOT
+  default     = "standard"
+}
+
+variable "rds_engine" {
+  type        = string
+  description = <<EOT
+  The database engine to use. For supported values, see the Engine parameter in [API action CreateDBInstance](https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html)
+  EOT
+  default     = "postgres"
+}
+
 variable "rds_username" {
   type        = string
   description = "Username of rds"
@@ -241,6 +262,12 @@ variable "rds_deletion_protection" {
   type        = bool
   description = "Deletion protection for the rds instance"
   default     = false
+}
+
+variable "rds_version" {
+  type        = string
+  description = "The DB version to use for the RDS instance"
+  default     = "12.7"
 }
 
 // S3 Bucket
