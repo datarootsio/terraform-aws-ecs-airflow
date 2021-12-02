@@ -41,6 +41,14 @@ resource "aws_security_group" "airflow" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "Allow postgres in"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = local.common_tags
 
 }

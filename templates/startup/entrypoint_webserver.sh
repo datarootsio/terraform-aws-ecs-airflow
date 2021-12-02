@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Starting up airflow webserver"
 # sanity check the dags
 ls /opt/airflow/dags

@@ -17,3 +17,7 @@ output "airflow_connection_sg" {
   description = "The security group with which you can connect other instance to Airflow, for example EMR Livy"
   value       = aws_security_group.airflow
 }
+
+output "postgres_uri" {
+  value = local.postgres_uri
+}
