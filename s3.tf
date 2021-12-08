@@ -74,6 +74,12 @@ resource "aws_s3_bucket_object" "airflow_init_entrypoint" {
   })
 }
 
+resource "aws_s3_bucket_object" "airflow_init_db_script" {
+  bucket = local.s3_bucket_name
+  key    = "startup/init.py"
+  source = "${path.module}/templates/startup/init.py"
+}
+
 resource "aws_s3_bucket_object" "airflow_requirements" {
   count   = var.airflow_py_requirements_path == "" ? 0 : 1
   bucket  = local.s3_bucket_name

@@ -200,12 +200,6 @@ variable "route53_zone_name" {
 
 
 // Database variables
-variable "postgres_uri" {
-  type        = string
-  description = "The postgres uri of your postgres db, if none provided a postgres db in rds is made. Format \"<db_username>:<db_password>@<db_endpoint>:<db_port>/<db_name>\""
-  default     = ""
-}
-
 variable "rds_allocated_storage" {
   type        = number
   description = "The allocated storage for the rds db in gibibytes"
@@ -268,6 +262,24 @@ variable "rds_version" {
   type        = string
   description = "The DB version to use for the RDS instance"
   default     = "12.7"
+}
+
+variable "rds_endpoint" {
+  type        = string
+  description = "The endpoint for a hosted RDS. If this is set RDS instance will not be created."
+  default     = ""
+}
+
+variable "rds_port" {
+  type        = string
+  description = "The port that will be used for the RDS instance."
+  default     = "5432"
+}
+
+variable "rds_database_name" {
+  type        = string
+  description = "The name of the database that will be used for airflow."
+  default     = ""
 }
 
 // S3 Bucket

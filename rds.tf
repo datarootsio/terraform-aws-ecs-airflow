@@ -1,6 +1,6 @@
 resource "aws_db_instance" "airflow" {
-  count                      = var.postgres_uri != "" || var.airflow_executor == "Sequential" ? 0 : 1
-  name                       = replace(title(local.rds_name), "-", "")
+  count                      = var.rds_endpoint != "" || var.airflow_executor == "Sequential" ? 0 : 1
+  name                       = local.database_name
   allocated_storage          = var.rds_allocated_storage
   storage_type               = var.rds_storage_type
   engine                     = var.rds_engine
@@ -23,7 +23,7 @@ resource "aws_db_instance" "airflow" {
 }
 
 resource "aws_db_subnet_group" "airflow" {
-  count      = var.postgres_uri != "" || var.airflow_executor == "Sequential" ? 0 : 1
+  count      = var.rds_endpoint != "" || var.airflow_executor == "Sequential" ? 0 : 1
   name       = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   subnet_ids = local.rds_ecs_subnet_ids
 
