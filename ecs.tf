@@ -193,7 +193,11 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "python -m awscli s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${s3_bucket_name}/dags/ ${airflow_volume_path}/dags/"
+            "/bin/bash -c \"aws s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${local.s3_bucket_name}/dags/ ${var.airflow_container_home}/dags/"
+        ],
+        "entryPoint": [
+            "sh",
+            "-c"
         ],
         "environment": [
           ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
