@@ -181,26 +181,14 @@ resource "aws_ecs_task_definition" "airflow" {
         ]
       },
       {
-        "image": "python:3.8-slim",
+        "image": "mikesir87/aws-cli",
         "name": "${local.airflow_dags_sync_container_name}",
-        "dependsOn": [
-            {
-                "containerName": "${local.airflow_sidecar_container_name}",
-                "condition": "SUCCESS"
-            },
-            {
-                "containerName": "${local.airflow_init_container_name}",
-                "condition": "SUCCESS"
-            }
-        ],
         "command": [
-            "python -m awscli s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${local.s3_bucket_name}/dags/ ${var.airflow_container_home}/dags/"
+            "/bin/bash -c \"aws s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${local.s3_bucket_name}/dags/ ${var.airflow_container_home}/dags/\""
         ],
         "entryPoint": [
-            "sh"
-        ],
-        "environment": [
-          ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
+            "sh",
+            "-c"
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
@@ -210,7 +198,7 @@ resource "aws_ecs_task_definition" "airflow" {
             "awslogs-stream-prefix": "airflow"
           }
         },
-        "essential": true,
+        "essential": false,
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
