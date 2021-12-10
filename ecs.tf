@@ -181,6 +181,7 @@ resource "aws_ecs_task_definition" "airflow" {
         ]
       },
       {
+        "image": "python:3.8-slim",
         "name": "${local.airflow_dags_sync_container_name}",
         "dependsOn": [
             {
@@ -193,11 +194,10 @@ resource "aws_ecs_task_definition" "airflow" {
             }
         ],
         "command": [
-            "/bin/bash -c \"aws s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${local.s3_bucket_name}/dags/ ${var.airflow_container_home}/dags/"
+            "python -m awscli s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${local.s3_bucket_name}/dags/ ${var.airflow_container_home}/dags/"
         ],
         "entryPoint": [
-            "sh",
-            "-c"
+            "sh"
         ],
         "environment": [
           ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
