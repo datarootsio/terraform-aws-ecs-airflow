@@ -179,6 +179,40 @@ resource "aws_ecs_task_definition" "airflow" {
                 "hostPort": 8080
             }
         ]
+      },
+      {
+        "name": "${local.airflow_dags_sync_container_name}",
+        "dependsOn": [
+            {
+                "containerName": "${local.airflow_sidecar_container_name}",
+                "condition": "SUCCESS"
+            },
+            {
+                "containerName": "${local.airflow_init_container_name}",
+                "condition": "SUCCESS"
+            }
+        ],
+        "command": [
+            "python -m awscli s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${s3_bucket_name}/dags/ ${airflow_volume_path}/dags/"
+        ],
+        "environment": [
+          ${join(",\n", formatlist("{\"name\":\"%s\",\"value\":\"%s\"}", keys(local.airflow_variables), values(local.airflow_variables)))}
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
+            "awslogs-region": "${local.airflow_log_region}",
+            "awslogs-stream-prefix": "airflow"
+          }
+        },
+        "essential": true,
+        "mountPoints": [
+          {
+            "sourceVolume": "${local.airflow_volume_name}",
+            "containerPath": "${var.airflow_container_home}"
+          }
+        ]
       }
     ]
   TASK_DEFINITION
