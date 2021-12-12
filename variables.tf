@@ -126,13 +126,13 @@ variable "rbac_admin_lastname" {
 variable "ecs_cpu" {
   type        = number
   description = "The allocated cpu for your airflow instance"
-  default     = 4096
+  default     = 2048
 }
 
 variable "ecs_memory" {
   type        = number
   description = "The allocated memory for your airflow instance"
-  default     = 8192
+  default     = 4096
 }
 
 // Networking variables
