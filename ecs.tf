@@ -19,8 +19,8 @@ resource "aws_ecs_cluster" "airflow" {
 resource "aws_ecs_task_definition" "airflow" {
   family                   = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.ecs_cpu
-  memory                   = var.ecs_memory
+  cpu                      = "${var.ecs_cpu}"
+  memory                   = "${var.ecs_memory}"
   network_mode             = "awsvpc"
   task_role_arn            = aws_iam_role.task.arn
   execution_role_arn       = aws_iam_role.execution.arn
