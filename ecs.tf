@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
-            "/bin/bash -c \"chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
+            "/bin/bash -c \"aws s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${locals.s3_bucket_name}/dags/ ${var.airflow_container_home} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
         ],
         "entryPoint": [
             "sh",
@@ -178,24 +178,6 @@ resource "aws_ecs_task_definition" "airflow" {
                 "containerPort": 8080,
                 "hostPort": 8080
             }
-        ]
-      },
-      {
-        "image": "mikesir87/aws-cli",
-        "name": "${local.airflow_dags_sync_container_name}",
-        "command": "/bin/bash -c \"aws s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${locals.s3_bucket_name}/dags/ ${var.airflow_container_home}\"",
-        "entryPoint": [
-            "sh",
-            "-c"
-        ],
-        "logConfiguration": {
-          "logDriver": "awslogs",
-          "options": {
-            "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
-            "awslogs-region": "${local.airflow_log_region}",
-            "awslogs-stream-prefix": "airflow"
-          }
-        }
         ]
       }
     ]
