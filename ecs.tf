@@ -41,6 +41,8 @@ resource "aws_ecs_task_definition" "airflow" {
             "sh",
             "-c"
         ],
+        "cpu": ${var.task_cpu},
+        "memory": ${var.task_memory},
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
@@ -60,6 +62,8 @@ resource "aws_ecs_task_definition" "airflow" {
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_init_container_name}",
+        "cpu": ${var.task_cpu},
+        "memory": ${var.task_memory},
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
@@ -95,6 +99,8 @@ resource "aws_ecs_task_definition" "airflow" {
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_scheduler_container_name}",
+        "cpu": ${var.task_cpu},
+        "memory": ${var.task_memory},
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
@@ -134,6 +140,8 @@ resource "aws_ecs_task_definition" "airflow" {
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_webserver_container_name}",
+        "cpu": ${var.task_cpu},
+        "memory": ${var.task_memory},
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
@@ -183,6 +191,8 @@ resource "aws_ecs_task_definition" "airflow" {
       {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_dags_sync_container_name}",
+        "cpu": ${var.task_cpu},
+        "memory": ${var.task_memory},
         "command": [
             "/bin/bash -c \"aws s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${local.s3_bucket_name}/dags/ ${var.airflow_container_home}/dags\""
         ],

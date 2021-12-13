@@ -132,7 +132,19 @@ variable "ecs_cpu" {
 variable "ecs_memory" {
   type        = number
   description = "The allocated memory for your airflow instance"
-  default     = 4096
+  default     = 3096
+}
+
+variable "task_cpu" {
+  type        = number
+  description = "The allocated cpu for your airflow container"
+  default     = 256
+}
+
+variable "task_memory" {
+  type        = number
+  description = "The allocated memory for your airflow container"
+  default     = 512
 }
 
 // Networking variables
