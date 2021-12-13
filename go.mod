@@ -19,4 +19,5 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
+	gotest.tools/gotestsum v1.7.0 // indirect
 )

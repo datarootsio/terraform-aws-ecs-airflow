@@ -35,14 +35,12 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
-            "/bin/bash -c \"aws s3 cp s3://${local.s3_bucket_name}/${local.s3_key} ${var.airflow_container_home} --recursive && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
+            "/bin/bash -c \"chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
         ],
         "entryPoint": [
             "sh",
             "-c"
         ],
-        "cpu": "${var.ecs_cpu}",
-        "memory": "${var.ecs_memory}",
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
@@ -62,8 +60,6 @@ resource "aws_ecs_task_definition" "airflow" {
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_init_container_name}",
-        "cpu": "${var.ecs_cpu}",
-        "memory": "${var.ecs_memory}",
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
@@ -99,8 +95,6 @@ resource "aws_ecs_task_definition" "airflow" {
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_scheduler_container_name}",
-        "cpu": "${var.ecs_cpu}",
-        "memory": "${var.ecs_memory}",
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
@@ -140,8 +134,6 @@ resource "aws_ecs_task_definition" "airflow" {
       {
         "image": "${var.airflow_image_name}:${var.airflow_image_tag}",
         "name": "${local.airflow_webserver_container_name}",
-        "cpu": "${var.ecs_cpu}",
-        "memory": "${var.ecs_memory}",
         "dependsOn": [
             {
                 "containerName": "${local.airflow_sidecar_container_name}",
@@ -191,10 +183,8 @@ resource "aws_ecs_task_definition" "airflow" {
       {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_dags_sync_container_name}",
-        "cpu": "${var.ecs_cpu}",
-        "memory": "${var.ecs_memory}",
         "command": [
-            "/bin/bash -c \"aws s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${local.s3_bucket_name}/dags/ ${var.airflow_container_home}/dags\""
+            "/bin/bash -c \"aws s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${local.s3_bucket_name}/dags/ ${var.airflow_container_home}/dags/\""
         ],
         "entryPoint": [
             "sh",
