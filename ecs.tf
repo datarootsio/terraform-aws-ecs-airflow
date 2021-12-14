@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
-            "/bin/bash -c \"chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
+            "/bin/bash -c \"chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_sync_dags_entrypoint.key} && \"chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
         ],
         "entryPoint": [
             "sh",
@@ -184,7 +184,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_dags_sync_container_name}",
         "command": [
-            "/bin/bash -c \"aws s3 sync --exclude='*' --include='*.py' --size-only --delete s3://${local.s3_bucket_name}/dags/ ${var.airflow_container_home}/dags/\""
+           "/bin/bash -c \"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_sync_dags_entrypoint.key}\""
         ],
         "entryPoint": [
             "sh",
@@ -204,6 +204,16 @@ resource "aws_ecs_task_definition" "airflow" {
             "sourceVolume": "${local.airflow_volume_name}",
             "containerPath": "${var.airflow_container_home}"
           }
+        ],
+        "dependsOn": [
+            {
+                "containerName": "${local.airflow_sidecar_container_name}",
+                "condition": "SUCCESS"
+            },
+            {
+                "containerName": "${local.airflow_init_container_name}",
+                "condition": "SUCCESS"
+            }
         ]
       }
     ]
