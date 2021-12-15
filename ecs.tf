@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
-            "/bin/bash -c \"chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_sync_dags_entrypoint.key} && \"chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
+            "/bin/bash -c \"chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_bucket_object.airflow_webserver_entrypoint.key} && chmod -R 777 ${var.airflow_container_home}\""
         ],
         "entryPoint": [
             "sh",
@@ -177,42 +177,6 @@ resource "aws_ecs_task_definition" "airflow" {
             {
                 "containerPort": 8080,
                 "hostPort": 8080
-            }
-        ]
-      },
-      {
-        "image": "mikesir87/aws-cli",
-        "name": "${local.airflow_dags_sync_container_name}",
-        "command": [
-           "/bin/bash -c \"${var.airflow_container_home}/${aws_s3_bucket_object.airflow_sync_dags_entrypoint.key}\""
-        ],
-        "entryPoint": [
-            "sh",
-            "-c"
-        ],
-        "logConfiguration": {
-          "logDriver": "awslogs",
-          "options": {
-            "awslogs-group": "${aws_cloudwatch_log_group.airflow.name}",
-            "awslogs-region": "${local.airflow_log_region}",
-            "awslogs-stream-prefix": "airflow"
-          }
-        },
-        "essential": false,
-        "mountPoints": [
-          {
-            "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}"
-          }
-        ],
-        "dependsOn": [
-            {
-                "containerName": "${local.airflow_sidecar_container_name}",
-                "condition": "SUCCESS"
-            },
-            {
-                "containerName": "${local.airflow_init_container_name}",
-                "condition": "SUCCESS"
             }
         ]
       }
