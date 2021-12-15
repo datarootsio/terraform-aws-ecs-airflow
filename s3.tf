@@ -40,12 +40,6 @@ resource "aws_s3_bucket_object" "airflow_webserver_entrypoint" {
   content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", { AIRFLOW_HOME = var.airflow_container_home })
 }
 
-resource "aws_s3_bucket_object" "airflow_sync_dags_entrypoint" {
-  bucket  = local.s3_bucket_name
-  key     = "startup/entrypoint_sync_dags.sh"
-  content = templatefile("${path.module}/templates/startup/entrypoint_sync_dags.sh", { AIRFLOW_HOME = var.airflow_container_home })
-}
-
 resource "aws_s3_bucket_object" "airflow_init_entrypoint" {
   bucket = local.s3_bucket_name
   key    = "startup/entrypoint_init.sh"
