@@ -27,6 +27,10 @@ resource "aws_ecs_task_definition" "airflow" {
 
   volume {
     name = local.airflow_volume_name
+    efs_volume_configuration {
+        file_system_id = aws_efs_file_system.airflow.id
+        root_directory = "/mnt/efs"
+    }
   }
 
   container_definitions = <<TASK_DEFINITION
@@ -241,4 +245,72 @@ resource "aws_lb_target_group" "airflow" {
   }
 
   tags = local.common_tags
+}
+
+resource "aws_efs_file_system" "airflow" {
+  creation_token = "airlow-efs"
+  tags = {
+    Name    = "airflow-efs"
+  }
+}
+# Create the access point with the given user permissions
+resource "aws_efs_access_point" "airflow" {
+  file_system_id = aws_efs_file_system.airflow.id
+  posix_user {
+    gid = 1000
+    uid = 1000
+  }
+  root_directory {
+    path = "/mnt/efs"
+    creation_info {
+      owner_gid   = 1000
+      owner_uid   = 1000
+      permissions = 755
+    }
+  }
+  tags = {
+    Name    = "airflow-efs"
+  }
+}
+# Create the mount targets on your private subnets
+resource "aws_efs_mount_target" "airflow" {
+  count           = length(var.private_subnet_ids)
+  file_system_id  = aws_efs_file_system.airflow.id
+  subnet_id       = tolist(var.private_subnet_ids)[count.index]
+  security_groups = [aws_security_group.airflow.id]
+}
+
+resource "aws_datasync_location_s3" "s3_location" {
+  s3_bucket_arn = "${local.s3_bucket_name.s3_location.arn}"
+  subdirectory  = "${var.datasync_location_s3_subdirectory}"
+
+  s3_config {
+    bucket_access_role_arn = "${aws_iam_role.execution.arn}"
+  }
+
+  tags = {
+    Name = "datasync-agent-location-s3"
+  }
+}
+
+resource "aws_datasync_location_efs" "efs_destination" {
+  count = length(aws_efs_mount_target.airflow)
+ 
+  efs_file_system_arn = aws_efs_mount_target.airflow[count.index].file_system_arn
+
+  ec2_config {
+    security_group_arns = [aws_security_group.airflow.arn]
+    subnet_arn          = var.private_subnet_ids[0]
+  }
+}
+
+resource "aws_datasync_task" "dags_sync" {
+  count = length(aws_datasync_location_efs.efs_destination)
+  destination_location_arn = aws_datasync_location_s3.s3_location.arn
+  name                     = "dags_sync"
+  source_location_arn      = aws_datasync_location_efs.efs_destination[count.index].arn
+
+  schedule {
+    schedule_expression = "cron(0 10 * * *)"
+  }
 }

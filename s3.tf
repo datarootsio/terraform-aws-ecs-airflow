@@ -66,3 +66,28 @@ resource "aws_s3_bucket_object" "airflow_requirements" {
   key     = "startup/requirements.txt"
   content = templatefile(local.airflow_py_requirements_path, {})
 }
+
+resource "aws_s3_bucket" "lambda_trigger_bucket" {
+  count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
+  bucket = "${var.s3_bucket_name}"
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
+  bucket = "${var.s3_bucket_name}"
+
+  lambda_function {
+    lambda_function_arn = "${var.s3_bucket_source_arn != "" ? local.s3_bucket_name  : var.s3_bucket_source_arn }"
+    events              = ["s3:ObjectCreated:*"]
+  }
+}
+
+ module "lambda" {
+  source           = "moritzzimmer/lambda/aws"
+  version          = "5.2.1"
+  filename         = "lambda-datasync-dags.zip"
+  function_name    = "lambda-datasync-dags"
+  handler          = "lambda_handler"
+  runtime          = "go1.x"
+  source_code_hash = filebase64sha256("./templates/lambda/lambda-datasync-dags.zip")
+}

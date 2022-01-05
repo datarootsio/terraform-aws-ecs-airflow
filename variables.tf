@@ -288,3 +288,14 @@ variable "s3_bucket_name" {
   default     = ""
   description = "The S3 bucket name where the DAGs and startup scripts will be stored, leave this blank to let this module create a s3 bucket for you. WARNING: this module will put files into the path \"dags/\" and \"startup/\" of the bucket"
 }
+
+variable "datasync_location_s3_subdirectory" {
+  type        = string
+  default     = "/dags"
+  description = "the place in the S3 bucket where the DAGs will be stored"
+}
+
+variable "s3_bucket_source_arn" {
+  description = "The S3 bucket arn if the bucket already existing,keep blacn if you want to create new."
+  default     = ""
+}
