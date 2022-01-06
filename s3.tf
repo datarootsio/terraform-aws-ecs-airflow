@@ -89,5 +89,5 @@ module "lambda" {
   function_name    = "lambda-datasync-dags"
   handler          = "lambda_handler"
   runtime          = "go1.x"
-  source_code_hash = filebase64sha256("./templates/lambda/lambda-datasync-dags.zip")
+  source_code_hash = filebase64sha256("${path.module}/templates/lambda/lambda-datasync-dags.zip")
 }
