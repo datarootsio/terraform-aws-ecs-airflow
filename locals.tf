@@ -33,6 +33,7 @@ locals {
   airflow_sidecar_container_name   = "${var.resource_prefix}-airflow-sidecar-${var.resource_suffix}"
   airflow_init_container_name      = "${var.resource_prefix}-airflow-init-${var.resource_suffix}"
   airflow_volume_name              = "airflow"
+  efs_root_directory               = "/opt/airflow"
   // Keep the 2 env vars second, we want to override them (this module manges these vars)
   airflow_variables = merge(var.airflow_variables, {
     AIRFLOW__CORE__SQL_ALCHEMY_CONN : local.db_uri,

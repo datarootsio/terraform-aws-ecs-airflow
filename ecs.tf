@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "airflow" {
     name = local.airflow_volume_name
     efs_volume_configuration {
         file_system_id = aws_efs_file_system.airflow.id
-        root_directory = "${local.airflow_volume_name}"
+        root_directory = local.efs_root_directory
     }
   }
 
@@ -261,7 +261,7 @@ resource "aws_efs_access_point" "airflow" {
     uid = 1000
   }
   root_directory {
-    path = "${local.airflow_volume_name}"
+    path = local.efs_root_directory
     creation_info {
       owner_gid   = 1000
       owner_uid   = 1000
