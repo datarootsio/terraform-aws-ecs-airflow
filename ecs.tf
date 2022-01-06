@@ -280,6 +280,10 @@ resource "aws_efs_mount_target" "airflow" {
   security_groups = [aws_security_group.airflow.id]
 }
 
+data "aws_s3_bucket" "s3_location" {
+  bucket = "${var.s3_bucket_name}"
+}
+
 resource "aws_datasync_location_s3" "s3_location" {
   s3_bucket_arn = "${data.aws_s3_bucket.s3_location.arn}"
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
