@@ -281,7 +281,7 @@ resource "aws_efs_mount_target" "airflow" {
 }
 
 resource "aws_datasync_location_s3" "s3_location" {
-  s3_bucket_arn = "${local.s3_bucket_source_arn}"
+  s3_bucket_arn = "${data.aws_s3_bucket.s3_location.arn}"
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
   s3_config {
