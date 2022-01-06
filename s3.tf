@@ -69,12 +69,12 @@ resource "aws_s3_bucket_object" "airflow_requirements" {
 
 resource "aws_s3_bucket" "lambda_trigger_bucket" {
   count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
-  bucket = "${var.s3_bucket_name}"
+  bucket = local.s3_bucket_name
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
   count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
-  bucket = "${var.s3_bucket_name}"
+  bucket = local.s3_bucket_name
 
   lambda_function {
     lambda_function_arn = "${var.s3_bucket_source_arn != "" ? local.s3_bucket_name  : var.s3_bucket_source_arn }"
@@ -82,7 +82,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   }
 }
 
- module "lambda" {
+module "lambda" {
   source           = "moritzzimmer/lambda/aws"
   version          = "5.2.1"
   filename         = "lambda-datasync-dags.zip"

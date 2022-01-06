@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "airflow" {
     name = local.airflow_volume_name
     efs_volume_configuration {
         file_system_id = aws_efs_file_system.airflow.id
-        root_directory = "/mnt/efs"
+        root_directory = "${local.airflow_volume_name}"
     }
   }
 
@@ -261,7 +261,7 @@ resource "aws_efs_access_point" "airflow" {
     uid = 1000
   }
   root_directory {
-    path = "/mnt/efs"
+    path = "${local.airflow_volume_name}"
     creation_info {
       owner_gid   = 1000
       owner_uid   = 1000
@@ -309,8 +309,4 @@ resource "aws_datasync_task" "dags_sync" {
   destination_location_arn = aws_datasync_location_s3.s3_location.arn
   name                     = "dags_sync"
   source_location_arn      = aws_datasync_location_efs.efs_destination[count.index].arn
-
-  schedule {
-    schedule_expression = "cron(0 10 * * *)"
-  }
 }
