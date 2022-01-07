@@ -280,12 +280,17 @@ resource "aws_efs_mount_target" "this" {
   security_groups = [aws_security_group.airflow.id]
 }
 
+resource "aws_iam_role" "datasync-s3-access-role" {
+  name               = "datasync-s3-access-role"
+  assume_role_policy = "${data.aws_iam_policy_document.datasync_assume_role.json}"
+}
+
 resource "aws_datasync_location_s3" "this" {
   s3_bucket_arn = aws_s3_bucket.airflow[0].arn
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
   s3_config {
-    bucket_access_role_arn = "${aws_iam_role.execution.arn}"
+    bucket_access_role_arn = "${aws_iam_role.datasync-s3-access-role.arn}"
   }
 
   tags = {
