@@ -273,16 +273,15 @@ resource "aws_efs_access_point" "airflow" {
   }
 }
 # Create the mount targets on your private subnets
-resource "aws_efs_mount_target" "airflow" {
+resource "aws_efs_mount_target" "this" {
   count           = length(var.private_subnet_ids)
   file_system_id  = aws_efs_file_system.airflow.id
   subnet_id       = tolist(var.private_subnet_ids)[count.index]
   security_groups = [aws_security_group.airflow.id]
 }
 
-resource "aws_datasync_location_s3" "s3_location" {
-  count = length(aws_s3_bucket.airflow)
-  s3_bucket_arn = "${aws_s3_bucket.airflow[count.index].arn}"
+resource "aws_datasync_location_s3" "this" {
+  s3_bucket_arn = "${data.aws_s3_bucket.this.arn}"
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
   s3_config {
@@ -294,10 +293,9 @@ resource "aws_datasync_location_s3" "s3_location" {
   }
 }
 
-resource "aws_datasync_location_efs" "efs_destination" {
-  count = length(aws_efs_mount_target.airflow)
- 
-  efs_file_system_arn = aws_efs_mount_target.airflow[count.index].file_system_arn
+resource "aws_datasync_location_efs" "this" {
+  count = length(aws_efs_mount_target.this)
+  efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
 
   ec2_config {
     security_group_arns = [aws_security_group.airflow.arn]
@@ -306,9 +304,8 @@ resource "aws_datasync_location_efs" "efs_destination" {
 }
 
 resource "aws_datasync_task" "dags_sync" {
-  # count = length(aws_datasync_location_efs.efs_destination)
-  count = length(aws_datasync_location_s3.s3_location)
-  destination_location_arn = aws_datasync_location_s3.s3_location[count.index].arn
+  count = aws_datasync_location_efs.this
+  destination_location_arn = aws_datasync_location_s3.this.arn
   name                     = "dags_sync"
-  source_location_arn      = aws_datasync_location_efs.efs_destination[count.index].arn
+  source_location_arn      = aws_datasync_location_efs.this[count.index].arn
 }
