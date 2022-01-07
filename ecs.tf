@@ -248,7 +248,7 @@ resource "aws_lb_target_group" "airflow" {
 }
 
 resource "aws_efs_file_system" "airflow" {
-  creation_token = "airlow"
+  creation_token = "airlow-efs"
   tags = {
     Name    = "airflow-efs"
   }
