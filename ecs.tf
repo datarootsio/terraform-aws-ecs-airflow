@@ -281,7 +281,7 @@ resource "aws_efs_mount_target" "this" {
 }
 
 resource "aws_datasync_location_s3" "this" {
-  s3_bucket_arn = "${data.aws_s3_bucket.this.arn}"
+  s3_bucket_arn = "${local.s3_bucket_name.arn}"
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
   s3_config {
