@@ -26,7 +26,7 @@ resource "aws_ecs_task_definition" "airflow" {
   execution_role_arn       = aws_iam_role.execution.arn
 
   volume {
-    name = aws_efs_file_system.airflow.creation_token
+    name = "airflow"
     efs_volume_configuration {
         file_system_id = aws_efs_file_system.airflow.id
         root_directory = local.efs_root_directory
