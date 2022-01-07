@@ -280,12 +280,9 @@ resource "aws_efs_mount_target" "airflow" {
   security_groups = [aws_security_group.airflow.id]
 }
 
-data "aws_s3_bucket" "s3_location" {
-  bucket = "${var.s3_bucket_name}"
-}
-
 resource "aws_datasync_location_s3" "s3_location" {
-  s3_bucket_arn = "${data.aws_s3_bucket.s3_location.arn}"
+  count = length(aws_s3_bucket.airflow)
+  s3_bucket_arn = "${aws_s3_bucket.airflow[count.index].arn}"
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
   s3_config {
@@ -309,8 +306,9 @@ resource "aws_datasync_location_efs" "efs_destination" {
 }
 
 resource "aws_datasync_task" "dags_sync" {
-  count = length(aws_datasync_location_efs.efs_destination)
-  destination_location_arn = aws_datasync_location_s3.s3_location.arn
+  # count = length(aws_datasync_location_efs.efs_destination)
+  count = length(aws_datasync_location_s3.s3_location)
+  destination_location_arn = aws_datasync_location_s3.s3_location[count.index].arn
   name                     = "dags_sync"
   source_location_arn      = aws_datasync_location_efs.efs_destination[count.index].arn
 }
