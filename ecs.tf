@@ -26,7 +26,7 @@ resource "aws_ecs_task_definition" "airflow" {
   execution_role_arn       = aws_iam_role.execution.arn
 
   volume {
-    name = local.airflow_volume_name
+    name = aws_efs_file_system.airflow.creation_token
     efs_volume_configuration {
         file_system_id = aws_efs_file_system.airflow.id
         root_directory = local.efs_root_directory
@@ -248,7 +248,7 @@ resource "aws_lb_target_group" "airflow" {
 }
 
 resource "aws_efs_file_system" "airflow" {
-  creation_token = "airlow-efs"
+  creation_token = "airlow"
   tags = {
     Name    = "airflow-efs"
   }
