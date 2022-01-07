@@ -67,6 +67,11 @@ resource "aws_s3_bucket_object" "airflow_requirements" {
   content = templatefile(local.airflow_py_requirements_path, {})
 }
 
+resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
+  bucket = aws_s3_bucket.airflow[0].id
+  policy = data.aws_iam_policy_document.allow_access_from_another_account.json
+}
+
 # resource "aws_s3_bucket" "lambda_trigger_bucket" {
 #   count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
 #   bucket = local.s3_bucket_name
