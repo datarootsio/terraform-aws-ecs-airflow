@@ -280,37 +280,37 @@ resource "aws_efs_mount_target" "this" {
   security_groups = [aws_security_group.airflow.id]
 }
 
-resource "aws_iam_role" "datasync-s3-access-role" {
-  name               = "datasync-s3-access-role"
-  assume_role_policy = "${data.aws_iam_policy_document.datasync_assume_role.json}"
-}
+# resource "aws_iam_role" "datasync-s3-access-role" {
+#   name               = "datasync-s3-access-role"
+#   assume_role_policy = "${data.aws_iam_policy_document.datasync_assume_role.json}"
+# }
 
-resource "aws_datasync_location_s3" "this" {
-  s3_bucket_arn = aws_s3_bucket.airflow[0].arn
-  subdirectory  = "${var.datasync_location_s3_subdirectory}"
+# resource "aws_datasync_location_s3" "this" {
+#   s3_bucket_arn = aws_s3_bucket.airflow[0].arn
+#   subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
-  s3_config {
-    bucket_access_role_arn = "${aws_iam_role.datasync-s3-access-role.arn}"
-  }
+#   s3_config {
+#     bucket_access_role_arn = "${aws_iam_role.datasync-s3-access-role.arn}"
+#   }
 
-  tags = {
-    Name = "datasync-agent-location-s3"
-  }
-}
+#   tags = {
+#     Name = "datasync-agent-location-s3"
+#   }
+# }
 
-resource "aws_datasync_location_efs" "this" {
-  count = length(aws_efs_mount_target.this)
-  efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
+# resource "aws_datasync_location_efs" "this" {
+#   count = length(aws_efs_mount_target.this)
+#   efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
 
-  ec2_config {
-    security_group_arns = [aws_security_group.airflow.arn]
-    subnet_arn          = var.private_subnet_ids[0]
-  }
-}
+#   ec2_config {
+#     security_group_arns = [aws_security_group.airflow.arn]
+#     subnet_arn          = var.private_subnet_ids[0]
+#   }
+# }
 
-resource "aws_datasync_task" "dags_sync" {
-  count = length(aws_datasync_location_efs.this)
-  destination_location_arn = aws_datasync_location_s3.this.arn
-  name                     = "dags_sync"
-  source_location_arn      = aws_datasync_location_efs.this[count.index].arn
-}
+# resource "aws_datasync_task" "dags_sync" {
+#   count = length(aws_datasync_location_efs.this)
+#   destination_location_arn = aws_datasync_location_s3.this.arn
+#   name                     = "dags_sync"
+#   source_location_arn      = aws_datasync_location_efs.this[count.index].arn
+# }
