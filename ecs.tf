@@ -304,7 +304,7 @@ resource "aws_datasync_location_efs" "this" {
 }
 
 resource "aws_datasync_task" "dags_sync" {
-  count = aws_datasync_location_efs.this
+  count = length(aws_datasync_location_efs.this)
   destination_location_arn = aws_datasync_location_s3.this.arn
   name                     = "dags_sync"
   source_location_arn      = aws_datasync_location_efs.this[count.index].arn
