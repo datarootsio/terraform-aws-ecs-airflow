@@ -285,7 +285,7 @@ resource "aws_efs_mount_target" "this" {
 
 resource "aws_security_group" "datasync-task" {
   name        = "${var.resource_prefix}-datasync-${var.resource_suffix}"
-  description = "${var.resource_prefix}-Datasync Security Group-${var.resource_suffix}"
+  description = "${var.resource_prefix}-datasync-security-group-${var.resource_suffix}"
   vpc_id      = "${var.vpc_id}"
 
   egress {
