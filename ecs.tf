@@ -27,10 +27,10 @@ resource "aws_ecs_task_definition" "airflow" {
 
   volume {
     name = "${local.airflow_volume_name}"
-    # efs_volume_configuration {
-    #     file_system_id = aws_efs_file_system.airflow.id
-    #     root_directory = local.efs_root_directory
-    # }
+    efs_volume_configuration {
+        file_system_id = aws_efs_file_system.airflow.id
+        root_directory = local.efs_root_directory
+    }
   }
 
   container_definitions = <<TASK_DEFINITION

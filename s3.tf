@@ -117,7 +117,7 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
-resource "aws_lambda_function" "test_lambda" {
+resource "aws_lambda_function" "dags-sync-lambda" {
   filename      = "datasync-dags.zip"
   function_name = "datasync-dags"
   role          = aws_iam_role.iam_for_lambda.arn
