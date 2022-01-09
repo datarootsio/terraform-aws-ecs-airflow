@@ -125,11 +125,11 @@ data "archive_file" "zipit" {
 
 resource "aws_lambda_function" "dags-sync-lambda" {
   filename      = "${path.module}/datasync-dags-lambda.zip"
-  function_name = "datasync-dags-lambda"
+  function_name = "${var.resource_prefix}-datasync-dags-lambda-${var.resource_suffix}"
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "datasync-dags-lambda.lambda_handler"
 
   source_code_hash = "${data.archive_file.zipit.output_base64sha256}"
 
-  runtime = "python3.9"
+  runtime = "python3.8"
 }
