@@ -119,8 +119,8 @@ EOF
 
 data "archive_file" "zipit" {
   type        = "zip"
-  source_file = "datasync-dags-lambda/handler_datasync_task.py"
-  output_path = "datasync-dags-lambda.zip"
+  source_file = "${path.module}/handler_datasync_task.py"
+  output_path = "${path.module}/datasync-dags-lambda.zip"
 }
 
 resource "aws_lambda_function" "dags-sync-lambda" {
