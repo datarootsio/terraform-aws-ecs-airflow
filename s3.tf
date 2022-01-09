@@ -72,30 +72,22 @@ resource "aws_s3_bucket_object" "airflow_requirements" {
 #   policy = data.aws_iam_policy_document.allow_access_from_another_account.json
 # }
 
-# resource "aws_s3_bucket" "lambda_trigger_bucket" {
-#   count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
-#   bucket = local.s3_bucket_name
-# }
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = local.s3_bucket_name
 
-# resource "aws_s3_bucket_notification" "bucket_notification" {
-#   count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
-#   bucket = local.s3_bucket_name
+  lambda_function {
+    lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
+    events              = ["s3:ObjectCreated:*"]
+  }
+}
 
-#   lambda_function {
-#     lambda_function_arn = "${var.s3_bucket_source_arn != "" ? local.s3_bucket_name  : var.s3_bucket_source_arn }"
-#     events              = ["s3:ObjectCreated:*"]
-#   }
-# }
-
-# module "lambda" {
-#   source           = "moritzzimmer/lambda/aws"
-#   version          = "5.2.1"
-#   filename         = "${var.resource_prefix}-datasync-dags-${var.resource_suffix}.zip"
-#   function_name    = "${var.resource_prefix}-datasync-dags-${var.resource_suffix}"
-#   handler          = "lambda_handler"
-#   runtime          = "go1.x"
-#   source_code_hash = filebase64sha256("${path.module}/lambda-datasync-dags.zip")
-# }
+resource "aws_lambda_permission" "test" {
+  statement_id  = "AllowS3Invoke"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
+  principal = "s3.amazonaws.com"
+  source_arn = "arn:aws:s3:::my-bucket"
+}
 
 resource "aws_iam_role" "iam_for_lambda" {
   name = "iam_for_lambda"
