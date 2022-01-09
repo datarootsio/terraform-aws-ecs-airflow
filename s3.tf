@@ -82,7 +82,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 }
 
 resource "aws_lambda_permission" "test" {
-  statement_id  = "AllowS3Invoke"
+  statement_id  = "AllowToBeInvoked"
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
   principal = "s3.amazonaws.com"
