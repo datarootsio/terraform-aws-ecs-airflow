@@ -119,7 +119,7 @@ EOF
 
 data "archive_file" "zipit" {
   type        = "zip"
-  source_file = "datasync-dags-lambda/handler_datasync_task.py"
+  source_file = "templates/datasync-dags-lambda/handler_datasync_task.py"
   output_path = "datasync-dags-lambda.zip"
 }
 
