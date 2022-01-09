@@ -281,8 +281,8 @@ resource "aws_efs_mount_target" "this" {
 }
 
 resource "aws_security_group" "datasync-task" {
-  name        = "datasync-${var.region}"
-  description = "Datasync Security Group-${var.region}"
+  name        = "${var.resource_prefix}-datasync-${var.resource_suffix}"
+  description = "${var.resource_prefix}-Datasync Security Group-${var.resource_suffix}"
   vpc_id      = "${var.vpc_id}"
 
   egress {
@@ -294,7 +294,7 @@ resource "aws_security_group" "datasync-task" {
   }
 
   tags = {
-    Name = "datasync-task-${var.region}"
+    Name = "${var.resource_prefix}-datasync-task-${var.resource_suffix}"
   }
 }
 
@@ -304,7 +304,7 @@ resource "aws_iam_role" "datasync-s3-access-role" {
 }
 
 resource "aws_iam_role_policy" "datasync-s3-access-policy" {
-  name   = "datasync-s3-access-policy}-${var.region}"
+  name   = "${var.resource_prefix}-datasync-s3-access-policy-${var.resource_suffix}"
   role   = "${aws_iam_role.datasync-s3-access-role.name}"
   policy = "${data.aws_iam_policy_document.bucket_access.json}"
 }

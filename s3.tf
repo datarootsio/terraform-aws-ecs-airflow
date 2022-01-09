@@ -90,8 +90,8 @@ resource "aws_s3_bucket_object" "airflow_requirements" {
 # module "lambda" {
 #   source           = "moritzzimmer/lambda/aws"
 #   version          = "5.2.1"
-#   filename         = "am-datasync-dags.zip"
-#   function_name    = "am-datasync-dags"
+#   filename         = "${var.resource_prefix}-datasync-dags-${var.resource_suffix}.zip"
+#   function_name    = "${var.resource_prefix}-datasync-dags-${var.resource_suffix}"
 #   handler          = "lambda_handler"
 #   runtime          = "go1.x"
 #   source_code_hash = filebase64sha256("${path.module}/lambda-datasync-dags.zip")
