@@ -86,7 +86,7 @@ resource "aws_lambda_permission" "test" {
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
   principal = "s3.amazonaws.com"
-  source_arn = "arn:aws:s3:::${local.s3_bucket_name}"
+  source_arn = "arn:aws:s3:::${var.resource_prefix}-${local.s3_bucket_name}-${var.resource_suffix}"
 }
 
 resource "aws_iam_role" "iam_for_lambda" {
