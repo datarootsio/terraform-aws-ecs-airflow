@@ -248,9 +248,12 @@ resource "aws_lb_target_group" "airflow" {
 }
 
 resource "aws_efs_file_system" "airflow" {
-  creation_token = "airlow-efs"
+  creation_token = "${var.resource_prefix}-airlow-efs-${var.resource_suffix}"
+  encrypted      = true
+  performance_mode = "generalPurpose"
+  throughput_mode  = "bursting"
   tags = {
-    Name    = "airflow-efs"
+    Name    = "${var.resource_prefix}-airflow-efs-${var.resource_suffix}"
   }
 }
 # Create the access point with the given user permissions
@@ -269,7 +272,7 @@ resource "aws_efs_access_point" "airflow" {
     }
   }
   tags = {
-    Name    = "airflow-efs"
+    Name    = "${var.resource_prefix}-airflow-efs-${var.resource_suffix}"
   }
 }
 # Create the mount targets on your private subnets
@@ -336,6 +339,6 @@ resource "aws_datasync_location_efs" "this" {
 resource "aws_datasync_task" "dags_sync" {
   count = length(aws_datasync_location_efs.this)
   destination_location_arn = aws_datasync_location_s3.this.arn
-  name                     = "dags_sync"
+  name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
   source_location_arn      = aws_datasync_location_efs.this[count.index].arn
 }
