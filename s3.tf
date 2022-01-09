@@ -72,10 +72,10 @@ resource "aws_s3_bucket_object" "airflow_requirements" {
 #   policy = data.aws_iam_policy_document.allow_access_from_another_account.json
 # }
 
-# resource "aws_s3_bucket" "lambda_trigger_bucket" {
-#   count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
-#   bucket = local.s3_bucket_name
-# }
+resource "aws_s3_bucket" "lambda_trigger_bucket" {
+  count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
+  bucket = local.s3_bucket_name
+}
 
 # resource "aws_s3_bucket_notification" "bucket_notification" {
 #   count  = "${var.s3_bucket_source_arn == "" ? 1 : 0}"
@@ -87,12 +87,12 @@ resource "aws_s3_bucket_object" "airflow_requirements" {
 #   }
 # }
 
-# module "lambda" {
-#   source           = "moritzzimmer/lambda/aws"
-#   version          = "5.2.1"
-#   filename         = "lambda-datasync-dags.zip"
-#   function_name    = "lambda-datasync-dags"
-#   handler          = "lambda_handler"
-#   runtime          = "go1.x"
-#   source_code_hash = filebase64sha256("${path.module}/lambda-datasync-dags.zip")
-# }
+module "lambda" {
+  source           = "moritzzimmer/lambda/aws"
+  version          = "5.2.1"
+  filename         = "am-datasync-dags.zip"
+  function_name    = "am-datasync-dags"
+  handler          = "lambda_handler"
+  runtime          = "go1.x"
+  source_code_hash = filebase64sha256("lambda-datasync-dags.zip")
+}
