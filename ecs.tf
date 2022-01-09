@@ -280,10 +280,91 @@ resource "aws_efs_mount_target" "this" {
   security_groups = [aws_security_group.airflow.id]
 }
 
-# resource "aws_iam_role" "datasync-s3-access-role" {
-#   name               = "datasync-s3-access-role"
-#   assume_role_policy = "${data.aws_iam_policy_document.datasync_assume_role.json}"
-# }
+resource "aws_security_group" "datasync-instance" {
+  name        = "datasync-${var.region}"
+  description = "Datasync Security Group}-${var.region}"
+  vpc_id      = "${var.vpc_id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.0.0/16"]
+    description = "SSH"
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.0.0/16"]
+    description = "HTTP"
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.0.0/16"]
+    description = "HTTPS"
+  }
+
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS for Datasync agent to AWS Service endpoint"
+  }
+
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "DNS"
+  }
+
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "DNS"
+  }
+
+  egress {
+    from_port   = 123
+    to_port     = 123
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "NTP"
+  }
+
+  egress {
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "EFS/NFS"
+  }
+
+  tags = {
+    Name = "datasync-agent-${var.region}"
+  }
+}
+
+resource "aws_iam_role" "datasync-s3-access-role" {
+  name               = "datasync-s3-access-role"
+  assume_role_policy = "${data.aws_iam_policy_document.datasync_assume_role.json}"
+}
+
+resource "aws_iam_role_policy" "datasync-s3-access-policy" {
+  name   = "datasync-s3-access-policy}-${var.region}"
+  role   = "${aws_iam_role.datasync-s3-access-role.name}"
+  policy = "${data.aws_iam_policy_document.bucket_access.json}"
+}
+
 
 # resource "aws_datasync_location_s3" "this" {
 #   s3_bucket_arn = aws_s3_bucket.airflow[0].arn
