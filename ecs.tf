@@ -280,66 +280,10 @@ resource "aws_efs_mount_target" "this" {
   security_groups = [aws_security_group.airflow.id]
 }
 
-resource "aws_security_group" "datasync-instance" {
+resource "aws_security_group" "datasync-task" {
   name        = "datasync-${var.region}"
-  description = "Datasync Security Group}-${var.region}"
+  description = "Datasync Security Group-${var.region}"
   vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"]
-    description = "SSH"
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"]
-    description = "HTTP"
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"]
-    description = "HTTPS"
-  }
-
-  egress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTPS for Datasync agent to AWS Service endpoint"
-  }
-
-  egress {
-    from_port   = 53
-    to_port     = 53
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "DNS"
-  }
-
-  egress {
-    from_port   = 53
-    to_port     = 53
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "DNS"
-  }
-
-  egress {
-    from_port   = 123
-    to_port     = 123
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "NTP"
-  }
 
   egress {
     from_port   = 2049
@@ -350,7 +294,7 @@ resource "aws_security_group" "datasync-instance" {
   }
 
   tags = {
-    Name = "datasync-agent-${var.region}"
+    Name = "datasync-task-${var.region}"
   }
 }
 
@@ -366,32 +310,32 @@ resource "aws_iam_role_policy" "datasync-s3-access-policy" {
 }
 
 
-# resource "aws_datasync_location_s3" "this" {
-#   s3_bucket_arn = aws_s3_bucket.airflow[0].arn
-#   subdirectory  = "${var.datasync_location_s3_subdirectory}"
+resource "aws_datasync_location_s3" "this" {
+  s3_bucket_arn = aws_s3_bucket.airflow[0].arn
+  subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
-#   s3_config {
-#     bucket_access_role_arn = "${aws_iam_role.datasync-s3-access-role.arn}"
-#   }
+  s3_config {
+    bucket_access_role_arn = "${aws_iam_role.datasync-s3-access-role.arn}"
+  }
 
-#   tags = {
-#     Name = "datasync-agent-location-s3"
-#   }
-# }
+  tags = {
+    Name = "datasync-location-s3"
+  }
+}
 
-# resource "aws_datasync_location_efs" "this" {
-#   count = length(aws_efs_mount_target.this)
-#   efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
+resource "aws_datasync_location_efs" "this" {
+  count = length(aws_efs_mount_target.this)
+  efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
 
-#   ec2_config {
-#     security_group_arns = [aws_security_group.airflow.arn]
-#     subnet_arn          = var.private_subnet_ids[0]
-#   }
-# }
+  ec2_config {
+    security_group_arns = [aws_security_group.airflow.arn]
+    subnet_arn          = var.private_subnet_ids[0]
+  }
+}
 
-# resource "aws_datasync_task" "dags_sync" {
-#   count = length(aws_datasync_location_efs.this)
-#   destination_location_arn = aws_datasync_location_s3.this.arn
-#   name                     = "dags_sync"
-#   source_location_arn      = aws_datasync_location_efs.this[count.index].arn
-# }
+resource "aws_datasync_task" "dags_sync" {
+  count = length(aws_datasync_location_efs.this)
+  destination_location_arn = aws_datasync_location_s3.this.arn
+  name                     = "dags_sync"
+  source_location_arn      = aws_datasync_location_efs.this[count.index].arn
+}
