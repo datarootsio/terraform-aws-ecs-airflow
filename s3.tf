@@ -117,16 +117,19 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
+data "archive_file" "zipit" {
+  type        = "zip"
+  source_file = "datasync-dags-lambda/handler_datasync_task.py"
+  output_path = "datasync-dags-lambda.zip"
+}
+
 resource "aws_lambda_function" "dags-sync-lambda" {
   filename      = "datasync-dags.zip"
-  function_name = "datasync-dags"
+  function_name = "datasync-dags-lambda"
   role          = aws_iam_role.iam_for_lambda.arn
-  handler       = "lambda_handler"
+  handler       = "datasync-dags-lambda.lambda_handler"
 
-  # The filebase64sha256() function is available in Terraform 0.11.12 and later
-  # For Terraform 0.11.11 and earlier, use the base64sha256() function and the file() function:
-  # source_code_hash = "${base64sha256(file("lambda_function_payload.zip"))}"
-  source_code_hash = filebase64sha256("${path.module}/datasync-dags.zip")
+  source_code_hash = "${data.archive_file.zipit.output_base64sha256}"
 
   runtime = "python3.9"
 }
