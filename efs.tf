@@ -71,16 +71,16 @@ resource "aws_security_group_rule" "ecs_loopback_rule" {
 resource "aws_efs_access_point" "airflow" {
   file_system_id = aws_efs_file_system.airflow-efs.id
   posix_user {
-    gid            = 1001
-    uid            = 5000
-    secondary_gids = 1002
+    gid = 1001
+    uid = 5000
+    secondary_gids = [1002,1003]
   }
   root_directory {
     path = "/opt/airflow"
     creation_info {
-        gid         = 1001
-        uid         = 5000
-        permissions = 0755
+      owner_gid   = 1001
+      owner_uid   = 5000
+      permissions = 0755
     }
   }
   tags = {
