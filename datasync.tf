@@ -46,8 +46,8 @@ resource "aws_datasync_location_efs" "this" {
   efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
 
   ec2_config {
-    security_group_arns = [aws_security_group.airflow.arn]
-    subnet_arn          = var.private_subnet_ids[0]
+    security_group_arns = [aws_security_group.efs.arn]
+    subnet_arn          = aws_subnet.subnet.arn
   }
 }
 
