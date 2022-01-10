@@ -47,7 +47,7 @@ resource "aws_datasync_location_efs" "this" {
 
   ec2_config {
     security_group_arns = [aws_security_group.efs.arn]
-    subnet_arn          = aws_subnet.subnet.arn
+    subnet_arn          = aws_subnet.subnet[0].arn
   }
 }
 
