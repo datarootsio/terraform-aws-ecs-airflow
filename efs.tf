@@ -28,16 +28,15 @@ resource "aws_efs_access_point" "airflow" {
 }
 # Create the mount targets on your private subnets
 resource "aws_efs_mount_target" "this" {
-  count           = length(data.aws_availability_zones.available.names)
-  file_system_id  = aws_efs_file_system.airflow.id
-  subnet_id       = aws_subnet.subnet[count.index].id
-  security_groups = [aws_security_group.efs.id]
+    count           = length(var.private_subnet_ids)
+    file_system_id  = aws_efs_file_system.airflow.id
+    subnet_id       = var.private_subnet_ids[count.index]
 }
 
 resource "aws_security_group" "efs" {
    name = "efs-sg"
    description= "Allos inbound efs traffic from ecs"
-   vpc_id = aws_vpc.vpc.id
+   vpc_id = var.vpc_id
 
    ingress {
      security_groups = [aws_security_group.ecs.id]

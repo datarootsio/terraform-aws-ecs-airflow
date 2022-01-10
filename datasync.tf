@@ -41,19 +41,19 @@ resource "aws_datasync_location_s3" "this" {
   }
 }
 
-resource "aws_datasync_location_efs" "this" {
-  count = length(aws_efs_mount_target.this)
-  efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
+# resource "aws_datasync_location_efs" "this" {
+#   count = length(aws_efs_mount_target.this)
+#   efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
 
-  ec2_config {
-    security_group_arns = [aws_security_group.efs.arn]
-    subnet_arn          = aws_subnet.subnet[0].arn
-  }
-}
+#   ec2_config {
+#     security_group_arns = [aws_security_group.efs.arn]
+#     subnet_arn          = aws_subnet.subnet[0].arn
+#   }
+# }
 
-resource "aws_datasync_task" "dags_sync" {
-  count = length(aws_datasync_location_efs.this)
-  destination_location_arn = aws_datasync_location_s3.this.arn
-  name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
-  source_location_arn      = aws_datasync_location_efs.this[count.index].arn
-}
+# resource "aws_datasync_task" "dags_sync" {
+#   count = length(aws_datasync_location_efs.this)
+#   destination_location_arn = aws_datasync_location_s3.this.arn
+#   name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
+#   source_location_arn      = aws_datasync_location_efs.this[count.index].arn
+# }
