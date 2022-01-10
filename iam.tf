@@ -57,6 +57,18 @@ data "aws_iam_policy_document" "task_execution_permissions" {
   }
 }
 
+data "aws_iam_policy_document" "datasync_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["datasync.amazonaws.com"]
+    }
+  }
+}
+
 # role for ecs to create the instance
 resource "aws_iam_role" "execution" {
   name               = "${var.resource_prefix}-airflow-task-execution-role-${var.resource_suffix}"
