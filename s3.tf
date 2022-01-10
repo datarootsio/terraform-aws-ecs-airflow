@@ -72,22 +72,22 @@ resource "aws_s3_bucket_object" "airflow_requirements" {
 #   policy = data.aws_iam_policy_document.allow_access_from_another_account.json
 # }
 
-resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = local.s3_bucket_name
+# resource "aws_s3_bucket_notification" "bucket_notification" {
+#   bucket = local.s3_bucket_name
 
-  lambda_function {
-    lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
-    events              = ["s3:ObjectCreated:*"]
-  }
-}
+#   lambda_function {
+#     lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
+#     events              = ["s3:ObjectCreated:*"]
+#   }
+# }
 
-resource "aws_lambda_permission" "test" {
-  statement_id  = "AllowToBeInvoked"
-  action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
-  principal = "s3.amazonaws.com"
-  source_arn = "arn:aws:s3:::${var.resource_prefix}-${local.s3_bucket_name}-${var.resource_suffix}"
-}
+# resource "aws_lambda_permission" "test" {
+#   statement_id  = "AllowToBeInvoked"
+#   action        = "lambda:InvokeFunction"
+#   function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
+#   principal = "s3.amazonaws.com"
+#   source_arn = "arn:aws:s3:::${var.resource_prefix}-${local.s3_bucket_name}-${var.resource_suffix}"
+# }
 
 resource "aws_iam_role" "iam_for_lambda" {
   name = "iam_for_lambda"
