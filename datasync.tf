@@ -51,9 +51,9 @@ resource "aws_datasync_location_efs" "this" {
   }
 }
 
-# resource "aws_datasync_task" "dags_sync" {
-#   count = length(aws_datasync_location_efs.this)
-#   destination_location_arn = aws_datasync_location_s3.this.arn
-#   name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
-#   source_location_arn      = aws_datasync_location_efs.this[count.index].arn
-# }
+resource "aws_datasync_task" "dags_sync" {
+  count = length(aws_datasync_location_efs.this)
+  destination_location_arn = aws_datasync_location_s3.this.arn
+  name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
+  source_location_arn      = aws_datasync_location_efs.this[count.index].arn
+}
