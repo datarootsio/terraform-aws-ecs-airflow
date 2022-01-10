@@ -247,98 +247,69 @@ resource "aws_lb_target_group" "airflow" {
   tags = local.common_tags
 }
 
-resource "aws_efs_file_system" "airflow" {
-  creation_token = "${var.resource_prefix}-airlow-efs-${var.resource_suffix}"
-  encrypted      = true
-  performance_mode = "generalPurpose"
-  throughput_mode  = "bursting"
-  tags = {
-    Name    = "${var.resource_prefix}-airflow-efs-${var.resource_suffix}"
-  }
-}
-# Create the access point with the given user permissions
-resource "aws_efs_access_point" "airflow" {
-  file_system_id = aws_efs_file_system.airflow.id
-  posix_user {
-    gid = 1000
-    uid = 1000
-  }
-  root_directory {
-    path = local.efs_root_directory
-    creation_info {
-      owner_gid   = 1000
-      owner_uid   = 1000
-      permissions = 755
-    }
-  }
-  tags = {
-    Name    = "${var.resource_prefix}-airflow-efs-${var.resource_suffix}"
-  }
-}
-# Create the mount targets on your private subnets
-resource "aws_efs_mount_target" "this" {
-  count           = length(var.private_subnet_ids)
-  file_system_id  = aws_efs_file_system.airflow.id
-  subnet_id       = tolist(var.private_subnet_ids)[count.index]
-  security_groups = [aws_security_group.airflow.id]
-}
 
-resource "aws_security_group" "datasync-task" {
-  name        = "${var.resource_prefix}-datasync-${var.resource_suffix}"
-  description = "${var.resource_prefix}-datasync-security-group-${var.resource_suffix}"
-  vpc_id      = "${var.vpc_id}"
-
+resource "aws_security_group" "ecs" {
+  name        = "allow_efs"
+  description = "Allow efs outbound traffic"
+  vpc_id      = aws_vpc.vpc.id
+  ingress {
+     cidr_blocks = ["0.0.0.0/0"]
+     from_port = 22
+     to_port = 22
+     protocol = "tcp"
+   }
   egress {
-    from_port   = 2049
-    to_port     = 2049
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "EFS/NFS"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "allow_efs"
+  }
+}
+
+data "aws_availability_zones" "available" {}
+
+resource "aws_vpc" "vpc" {
+   cidr_block = "10.0.0.0/16"
+   enable_dns_hostnames = true
+   enable_dns_support = true
+   tags= {
+     Name = "${var.resource_prefix}-efs-vpc-${var.resource_suffix}"
+   }
+ }
+
+resource "aws_internet_gateway" "internet_gateway" {
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name = "Internet_Gateway"
+  }
+}
+ 
+ resource "aws_subnet" "subnet" {
+   count=length(data.aws_availability_zones.available.names)
+   cidr_block = cidrsubnet(aws_vpc.vpc.cidr_block, 8, count.index)
+   vpc_id = aws_vpc.vpc.id
+   availability_zone = data.aws_availability_zones.available.names[count.index]
+ }
+
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.internet_gateway.id
   }
 
   tags = {
-    Name = "${var.resource_prefix}-datasync-task-${var.resource_suffix}"
+    Name = "Public Route Table"
   }
+  depends_on = [aws_internet_gateway.internet_gateway]
 }
 
-resource "aws_iam_role" "datasync-s3-access-role" {
-  name               = "datasync-s3-access-role"
-  assume_role_policy = "${data.aws_iam_policy_document.datasync_assume_role.json}"
-}
-
-resource "aws_iam_role_policy" "datasync-s3-access-policy" {
-  name   = "${var.resource_prefix}-datasync-s3-access-policy-${var.resource_suffix}"
-  role   = "${aws_iam_role.datasync-s3-access-role.name}"
-  policy = "${data.aws_iam_policy_document.bucket_access.json}"
-}
-
-
-resource "aws_datasync_location_s3" "this" {
-  s3_bucket_arn = aws_s3_bucket.airflow[0].arn
-  subdirectory  = "${var.datasync_location_s3_subdirectory}"
-
-  s3_config {
-    bucket_access_role_arn = "${aws_iam_role.datasync-s3-access-role.arn}"
-  }
-
-  tags = {
-    Name = "datasync-location-s3"
-  }
-}
-
-resource "aws_datasync_location_efs" "this" {
-  count = length(aws_efs_mount_target.this)
-  efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
-
-  ec2_config {
-    security_group_arns = [aws_security_group.airflow.arn]
-    subnet_arn          = var.private_subnet_ids[0]
-  }
-}
-
-resource "aws_datasync_task" "dags_sync" {
-  count = length(aws_datasync_location_efs.this)
-  destination_location_arn = aws_datasync_location_s3.this.arn
-  name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
-  source_location_arn      = aws_datasync_location_efs.this[count.index].arn
+resource "aws_route_table_association" "vpc_public_assoc" {
+  count          = length(data.aws_availability_zones.available.names)
+  subnet_id      = aws_subnet.subnet.*.id[count.index]
+  route_table_id = aws_route_table.public.id
 }
