@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "airflow" {
     name = "${local.airflow_volume_name}"
     efs_volume_configuration {
         file_system_id = aws_efs_file_system.airflow-efs.id
-        root_directory = "/"
+        root_directory = local.efs_root_directory
     }
   }
 
@@ -57,7 +57,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "/",
+            "containerPath": "${var.airflow_container_home}",
             "readOnly": false
           }
         ]
@@ -133,7 +133,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "/",
+            "containerPath": "${var.airflow_container_home}",
             "readOnly": false
           }
         ]
@@ -177,7 +177,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "/",
+            "containerPath": "${var.airflow_container_home}",
             "readOnly": false
           }
         ],

@@ -75,7 +75,7 @@ resource "aws_efs_access_point" "airflow" {
     uid = 1000
   }
   root_directory {
-    path = "/"
+    path = "/opt/airflow"
     creation_info {
       owner_gid   = 1000
       owner_uid   = 1000
