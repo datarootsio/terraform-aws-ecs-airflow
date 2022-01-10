@@ -57,7 +57,8 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}"
+            "containerPath": "${var.airflow_container_home}",
+            "readOnly": false
           }
         ]
       },
@@ -92,7 +93,8 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}"
+            "containerPath": "${var.airflow_container_home}",
+            "readOnly": false
           }
         ]
       },
@@ -131,7 +133,8 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}"
+            "containerPath": "${var.airflow_container_home}",
+            "readOnly": false
           }
         ]
       },
@@ -174,7 +177,8 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}"
+            "containerPath": "${var.airflow_container_home}",
+            "readOnly": false
           }
         ],
         "portMappings": [
