@@ -299,3 +299,7 @@ variable "s3_bucket_source_arn" {
   description = "The S3 bucket arn if the bucket already existing,keep blacn if you want to create new."
   default     = ""
 }
+
+variable "cidr" {
+  default = ""
+}
