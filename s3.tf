@@ -18,15 +18,15 @@ resource "aws_s3_bucket" "airflow" {
   tags = local.common_tags
 }
 
-resource "aws_s3_bucket_public_access_block" "airflow" {
-  count  = var.s3_bucket_name == "" ? 1 : 0
-  bucket = aws_s3_bucket.airflow[0].id
+# resource "aws_s3_bucket_public_access_block" "airflow" {
+#   count  = var.s3_bucket_name == "" ? 1 : 0
+#   bucket = aws_s3_bucket.airflow[0].id
 
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
+#   block_public_acls       = true
+#   block_public_policy     = true
+#   ignore_public_acls      = true
+#   restrict_public_buckets = true
+# }
 
 resource "aws_s3_bucket_object" "airflow_seed_dag" {
   bucket = local.s3_bucket_name

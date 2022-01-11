@@ -32,7 +32,8 @@ data "aws_iam_policy_document" "bucket_access" {
   statement {
     actions = ["*"]
     resources = [
-      "arn:aws:s3:::${local.s3_bucket_name}:dags/*"
+      "arn:aws:s3:::${var.s3_bucket_name}",
+      "arn:aws:s3:::${var.s3_bucket_name}/*",
     ]
   }
 }
