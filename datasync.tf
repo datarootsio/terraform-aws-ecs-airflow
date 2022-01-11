@@ -46,7 +46,7 @@ resource "aws_datasync_location_efs" "location_efs" {
 
   ec2_config {
     security_group_arns = [aws_security_group.ecs_container_security_group.arn]
-    subnet_arn          = var.private_subnet_arns[0]
+    subnet_arn          = "arn:aws:ec2:${var.region}:681718253798:subnet/${var.private_subnets[0]}"
   }
 }
 

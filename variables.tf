@@ -303,8 +303,3 @@ variable "s3_bucket_source_arn" {
 variable "cidr" {
   default = ""
 }
-
-variable "private_subnet_arns" {
-  type = list(string)
-  default = []
-}
