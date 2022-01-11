@@ -24,6 +24,7 @@ data "aws_iam_policy_document" "datasync_assume_role" {
       identifiers = ["datasync.amazonaws.com"]
       type        = "Service"
     }
+    
   }
 }
 
