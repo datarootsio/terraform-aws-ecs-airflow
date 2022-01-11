@@ -30,10 +30,11 @@ data "aws_iam_policy_document" "datasync_assume_role" {
 
 data "aws_iam_policy_document" "bucket_access" {
   statement {
-    actions = ["*"]
+    actions = ["s3:ListBucket", "s3:GetObject", "s3:PutObject", "s3:PutObjectAcl", "s3:GetObjectAcl"]
     resources = [
-      "arn:aws:s3:::${var.s3_bucket_name}",
-      "arn:aws:s3:::${var.s3_bucket_name}/*",
+      "arn:aws:s3:::${local.s3_bucket_name}",
+      "arn:aws:s3:::${local.s3_bucket_name}:/*",
+      "arn:aws:s3:::${local.s3_bucket_name}:dags/*"
     ]
   }
 }
@@ -41,11 +42,12 @@ data "aws_iam_policy_document" "bucket_access" {
 resource "aws_iam_role" "datasync-s3-access-role" {
   name               = "${var.resource_prefix}-datasync-s3-access-role-${var.resource_suffix}"
   assume_role_policy = "${data.aws_iam_policy_document.datasync_assume_role.json}"
+}
 
-  inline_policy {
-    name = "DataSyncS3BucketAccess"
-    policy = data.aws_iam_policy_document.bucket_access.json
-  }
+resource "aws_iam_role_policy" "datasync-s3-access-policy" {
+  name   = "${var.resource_prefix}-datasync-s3-access-policy-${var.resource_suffix}"
+  role   = "${aws_iam_role.datasync-s3-access-role.name}"
+  policy = "${data.aws_iam_policy_document.bucket_access.json}"
 }
 
 resource "aws_datasync_location_s3" "location_s3" {
@@ -63,6 +65,7 @@ resource "aws_datasync_location_s3" "location_s3" {
 
 resource "aws_datasync_location_efs" "location_efs" {
   efs_file_system_arn = aws_efs_mount_target.ecs_temp_space_az0.file_system_arn
+  subdirectory = "/"
 
   ec2_config {
     security_group_arns = [aws_security_group.ecs_container_security_group.arn]
@@ -74,8 +77,4 @@ resource "aws_datasync_task" "dags_sync" {
   destination_location_arn = aws_datasync_location_s3.location_s3.arn
   name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
   source_location_arn      = aws_datasync_location_efs.location_efs.arn
-  cloudwatch_log_group_arn = aws_cloudwatch_log_group.airflow.arn
-  tags                     = {
-      name="${var.resource_prefix}-dags_sync-${var.resource_suffix}"
-  }
 }
