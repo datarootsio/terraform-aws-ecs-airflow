@@ -1,7 +1,7 @@
 resource "aws_s3_bucket" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
   bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-  acl    = "private"
+  acl    = "public-read"
 
   versioning {
     enabled = true
@@ -13,11 +13,6 @@ resource "aws_s3_bucket" "airflow" {
         sse_algorithm = "aws:kms"
       }
     }
-  }
-
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["PUT", "POST", "GET"]
   }
 
   tags = local.common_tags
