@@ -1,7 +1,34 @@
 resource "aws_s3_bucket" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
   bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-  acl    = "public-read"
+  acl    = "private"
+  policy = <<EOF
+    {
+    "Version": "2012-10-17",
+    "Id": "S3AccessPolicy",
+    "Statement": [
+        {
+            "Sid": "S3AccessPolicy01",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::681718253798:user/milena"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:GetBucketLocation",
+                "s3:ListBucket",
+                "s3:PutObject", 
+                "s3:PutObjectAcl", 
+                "s3:GetObjectAcl"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${var.s3_bucket_name}/*",
+                "arn:aws:s3:::${var.s3_bucket_name}"
+            ]
+        }
+    ]
+}
+EOF
 
   versioning {
     enabled = true

@@ -31,13 +31,13 @@ data "aws_iam_policy_document" "task_permissions" {
       "arn:aws:s3:::*"
     ]
 
-    actions = ["s3:ListBucket", "s3:ListAllMyBuckets", "s3:PutObject", "s3:PutObjectAcl", "s3:GetObjectAcl"]
+    actions = ["s3:ListBucket", "s3:ListAllMyBuckets"]
   }
 
   statement {
     effect    = "Allow"
     resources = ["arn:aws:s3:::${local.s3_bucket_name}", "arn:aws:s3:::${local.s3_bucket_name}/*"]
-    actions   = ["s3:ListBucket", "s3:GetObject", "s3:PutObject", "s3:PutObjectAcl", "s3:GetObjectAcl"]
+    actions   = ["s3:ListBucket", "s3:GetObject"]
   }
 
 }
@@ -54,18 +54,6 @@ data "aws_iam_policy_document" "task_execution_permissions" {
       "logs:CreateLogStream",
       "logs:PutLogEvents",
     ]
-  }
-}
-
-data "aws_iam_policy_document" "datasync_assume" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["datasync.amazonaws.com"]
-    }
   }
 }
 
