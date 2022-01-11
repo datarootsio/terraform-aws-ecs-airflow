@@ -73,7 +73,11 @@ resource "aws_datasync_location_efs" "location_efs" {
 }
 
 resource "aws_datasync_task" "dags_sync" {
-  destination_location_arn = aws_datasync_location_s3.location_s3.arn
+  destination_location_arn = aws_datasync_location_efs.location_efs.arn
   name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
-  source_location_arn      = aws_datasync_location_efs.location_efs.arn
+  source_location_arn      = aws_datasync_location_s3.location_s3.arn
+  cloudwatch_log_group_arn = aws_cloudwatch_log_group.airflow.arn
+  tags                     = {
+      name="${var.resource_prefix}-dags_sync-${var.resource_suffix}"
+  }
 }
