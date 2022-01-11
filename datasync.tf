@@ -16,6 +16,39 @@ resource "aws_security_group" "datasync-task" {
   }
 }
 
+
+data "aws_iam_policy_document" "datasync_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole",]
+    principals {
+      identifiers = ["datasync.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+data "aws_iam_policy_document" "bucket_access" {
+  statement {
+    actions = ["s3:*",]
+    resources = [
+      "arn:aws:s3:::${local.s3_bucket_name}",
+      "arn:aws:s3:::${local.s3_bucket_name}:/*",
+      "arn:aws:s3:::${local.s3_bucket_name}:dags/*"
+    ]
+  }
+}
+
+resource "aws_iam_role" "datasync-s3-access-role" {
+  name               = "${var.resource_prefix}-datasync-s3-access-role-${var.resource_suffix}"
+  assume_role_policy = "${data.aws_iam_policy_document.datasync_assume_role.json}"
+}
+
+resource "aws_iam_role_policy" "datasync-s3-access-policy" {
+  name   = "${var.resource_prefix}-datasync-s3-access-policy-${var.resource_suffix}"
+  role   = "${aws_iam_role.datasync-s3-access-role.name}"
+  policy = "${data.aws_iam_policy_document.bucket_access.json}"
+}
+
 resource "aws_datasync_location_s3" "location_s3" {
   s3_bucket_arn = aws_s3_bucket.airflow[0].arn
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
