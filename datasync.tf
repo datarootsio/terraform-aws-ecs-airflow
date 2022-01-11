@@ -16,24 +16,12 @@ resource "aws_security_group" "datasync-task" {
   }
 }
 
-resource "aws_iam_role" "datasync-s3-access-role" {
-  name               = "datasync-s3-access-role"
-  assume_role_policy = "${data.aws_iam_policy_document.datasync_assume_role.json}"
-}
-
-resource "aws_iam_role_policy" "datasync-s3-access-policy" {
-  name   = "${var.resource_prefix}-datasync-s3-access-policy-${var.resource_suffix}"
-  role   = "${aws_iam_role.datasync-s3-access-role.name}"
-  policy = "${data.aws_iam_policy_document.bucket_access.json}"
-}
-
-
 resource "aws_datasync_location_s3" "location_s3" {
   s3_bucket_arn = aws_s3_bucket.airflow[0].arn
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
   s3_config {
-    bucket_access_role_arn = "${aws_iam_role.datasync-s3-access-role.arn}"
+    bucket_access_role_arn = "${aws_iam_role.task.arn}"
   }
 
   tags = {
@@ -43,6 +31,7 @@ resource "aws_datasync_location_s3" "location_s3" {
 
 resource "aws_datasync_location_efs" "location_efs" {
   efs_file_system_arn = aws_efs_mount_target.ecs_temp_space_az0.file_system_arn
+  subdirectory = "/opt/airflow"
 
   ec2_config {
     security_group_arns = [aws_security_group.ecs_container_security_group.arn]
