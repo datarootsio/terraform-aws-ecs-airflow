@@ -28,7 +28,7 @@ resource "aws_iam_role_policy" "datasync-s3-access-policy" {
 }
 
 
-resource "aws_datasync_location_s3" "this" {
+resource "aws_datasync_location_s3" "location_s3" {
   s3_bucket_arn = aws_s3_bucket.airflow[0].arn
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
@@ -41,19 +41,17 @@ resource "aws_datasync_location_s3" "this" {
   }
 }
 
-# resource "aws_datasync_location_efs" "this" {
-#   count = length(aws_efs_mount_target.this)
-#   efs_file_system_arn = aws_efs_mount_target.this[count.index].file_system_arn
+resource "aws_datasync_location_efs" "location_efs" {
+  efs_file_system_arn = aws_efs_mount_target.ecs_temp_space_az0.file_system_arn
 
-#   ec2_config {
-#     security_group_arns = [aws_security_group.efs.arn]
-#     subnet_arn          = aws_subnet.subnet[0].arn
-#   }
-# }
+  ec2_config {
+    security_group_arns = [aws_security_group.ecs_container_security_group.arn]
+    subnet_arn          = var.private_subnet_ids[0]
+  }
+}
 
-# resource "aws_datasync_task" "dags_sync" {
-#   count = length(aws_datasync_location_efs.this)
-#   destination_location_arn = aws_datasync_location_s3.this.arn
-#   name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
-#   source_location_arn      = aws_datasync_location_efs.this[count.index].arn
-# }
+resource "aws_datasync_task" "dags_sync" {
+  destination_location_arn = aws_datasync_location_s3.location_s3.arn
+  name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
+  source_location_arn      = aws_datasync_location_efs.location_efs.arn
+}
