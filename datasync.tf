@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "datasync_assume_role" {
 
 data "aws_iam_policy_document" "bucket_access" {
   statement {
-    actions = ["s3:*",]
+    actions = ["s3:ListBucket", "s3:GetObject", "s3:PutObject", "s3:PutObjectAcl", "s3:GetObjectAcl"]
     resources = [
       "arn:aws:s3:::${local.s3_bucket_name}",
       "arn:aws:s3:::${local.s3_bucket_name}:/*",

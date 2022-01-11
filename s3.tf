@@ -15,6 +15,11 @@ resource "aws_s3_bucket" "airflow" {
     }
   }
 
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT", "POST", "GET"]
+  }
+
   tags = local.common_tags
 }
 
