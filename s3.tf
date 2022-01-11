@@ -87,10 +87,49 @@ resource "aws_s3_bucket_object" "airflow_requirements" {
   content = templatefile(local.airflow_py_requirements_path, {})
 }
 
-# resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
-#   bucket = aws_s3_bucket.airflow[0].id
-#   policy = data.aws_iam_policy_document.allow_access_from_another_account.json
-# }
+resource "aws_s3_bucket_policy" "s3_bucket_policy" {
+  bucket = aws_s3_bucket.airflow[0].bucket
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "SSMBucketPermissionsCheck",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ssm.amazonaws.com"
+            },
+            "Action": "s3:GetBucketAcl",
+            "Resource": "arn:aws:s3:::${aws_s3_bucket.airflow[0].bucket}"
+        },
+        {
+            "Sid": " SSMBucketDelivery",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ssm.amazonaws.com"
+            },
+            "Action": "s3:PutObject",
+            "Resource": ["arn:aws:s3:::${aws_s3_bucket.airflow[0].bucket}/*"],
+            "Condition": {
+                "StringEquals": {
+                    "s3:x-amz-acl": "bucket-owner-full-control"
+                }
+            }
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_ssm_resource_data_sync" "ssm_resource_data_sync" {
+  name = "ssm_resource_data_sync"
+
+  s3_destination {
+    bucket_name = aws_s3_bucket.airflow[0].bucket
+    region      = aws_s3_bucket.airflow[0].region
+  }
+}
 
 # resource "aws_s3_bucket_notification" "bucket_notification" {
 #   bucket = local.s3_bucket_name
