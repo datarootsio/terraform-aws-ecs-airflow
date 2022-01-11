@@ -78,9 +78,9 @@ resource "aws_efs_access_point" "airflow" {
   root_directory {
     path = "/opt/airflow"
     creation_info {
-      owner_gid   = 1001
-      owner_uid   = 5000
-      permissions = 0755
+      owner_gid   = 0
+      owner_uid   = 0
+      permissions = "755"
     }
   }
   tags = {
