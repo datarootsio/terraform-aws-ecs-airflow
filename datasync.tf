@@ -73,8 +73,8 @@ resource "aws_datasync_location_efs" "location_efs" {
   }
 }
 
-resource "aws_datasync_task" "dags_sync" {
-  destination_location_arn = aws_datasync_location_s3.location_s3.arn
-  name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
-  source_location_arn      = aws_datasync_location_efs.location_efs.arn
-}
+# resource "aws_datasync_task" "dags_sync" {
+#   destination_location_arn = aws_datasync_location_s3.location_s3.arn
+#   name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
+#   source_location_arn      = aws_datasync_location_efs.location_efs.arn
+# }

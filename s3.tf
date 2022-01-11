@@ -2,7 +2,6 @@ resource "aws_s3_bucket" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
   bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   acl    = "private"
-  policy = data.aws_iam_policy_document.custom_bucket_policy.json
 
   versioning {
     enabled = true
@@ -17,32 +16,6 @@ resource "aws_s3_bucket" "airflow" {
   }
 
   tags = local.common_tags
-}
-
-data "aws_iam_policy_document" "custom_bucket_policy" {
-  statement {
-    sid    = "allow-datasync-puts"
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["datasync.amazonaws.com"]
-    }
-
-    actions = [
-      "s3:PutObject",
-    ]
-
-    resources = [
-      "arn:aws:s3:::${var.s3_bucket_name}/*",
-    ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:Referer"
-      values   = ["681718253798"]
-    }
-  }
 }
 
 resource "aws_s3_bucket_public_access_block" "airflow" {
