@@ -54,7 +54,7 @@ resource "aws_datasync_location_s3" "location_s3" {
   subdirectory  = "${var.datasync_location_s3_subdirectory}"
 
   s3_config {
-    bucket_access_role_arn = "${aws_iam_role.task.arn}"
+    bucket_access_role_arn = "${aws_iam_role.datasync-s3-access-role.arn}"
   }
 
   tags = {
