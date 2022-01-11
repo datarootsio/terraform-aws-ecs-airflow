@@ -28,7 +28,7 @@ resource "aws_ecs_task_definition" "airflow" {
   volume {
     name = "${local.airflow_volume_name}"
     efs_volume_configuration {
-        file_system_id = module.efs.efs_id
+        file_system_id = module.efs.id
         root_directory = local.efs_root_directory
     }
   }
