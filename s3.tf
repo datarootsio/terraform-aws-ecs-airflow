@@ -3,17 +3,17 @@ resource "aws_s3_bucket" "airflow" {
   bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   acl    = "private"
 
-  versioning {
-    enabled = true
-  }
+  # versioning {
+  #   enabled = true
+  # }
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "aws:kms"
-      }
-    }
-  }
+  # server_side_encryption_configuration {
+  #   rule {
+  #     apply_server_side_encryption_by_default {
+  #       sse_algorithm = "aws:kms"
+  #     }
+  #   }
+  # }
 
   tags = local.common_tags
 }
