@@ -41,15 +41,15 @@ EOF
 
 data "archive_file" "zipit" {
   type        = "zip"
-  source_file = "${path.module}/datasync-dags-lambda/handler_datasync_task.py"
-  output_path = "${path.module}/datasync-dags-lambda.zip"
+  source_file = "${path.module}/datasync-dags/datasync-dags-lambda.py"
+  output_path = "${path.module}/datasync-dags.zip"
 }
 
 resource "aws_lambda_function" "dags-sync-lambda" {
-  filename      = "${path.module}/datasync-dags-lambda.zip"
-  function_name = "datasync-dags-lambda"
+  filename      = "${path.module}/datasync-dags.zip"
+  function_name = "datasync-dags"
   role          = aws_iam_role.iam_for_lambda.arn
-  handler       = "datasync-dags-lambda.lambda_handler"
+  handler       = "datasync-dags.handler"
 
   source_code_hash = "${data.archive_file.zipit.output_base64sha256}"
 
