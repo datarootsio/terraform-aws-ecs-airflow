@@ -47,7 +47,7 @@ data "archive_file" "zipit" {
 
 resource "aws_lambda_function" "dags-sync-lambda" {
   filename      = "${path.module}/datasync-dags-lambda.zip"
-  function_name = "${var.resource_prefix}-datasync-dags-lambda-${var.resource_suffix}"
+  function_name = "datasync-dags-lambda"
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "datasync-dags-lambda.lambda_handler"
 
