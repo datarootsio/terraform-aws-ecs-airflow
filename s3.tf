@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 resource "aws_s3_bucket" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
   bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"

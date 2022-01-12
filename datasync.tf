@@ -61,7 +61,6 @@ resource "aws_datasync_location_s3" "location_s3" {
     Name = "datasync-location-s3"
   }
 }
-data "aws_caller_identity" "current" {}
 
 resource "aws_datasync_location_efs" "location_efs" {
   efs_file_system_arn = aws_efs_mount_target.ecs_temp_space_az0.file_system_arn
