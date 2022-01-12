@@ -41,7 +41,7 @@ EOF
 
 data "archive_file" "zipit" {
   type        = "zip"
-  source_file = "${path.module}/datasync-dags/datasync-dags-lambda.py"
+  source_file = "${path.module}/datasync-dags/datasync-dags.py"
   output_path = "${path.module}/datasync-dags.zip"
 }
 
