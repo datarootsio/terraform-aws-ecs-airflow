@@ -61,13 +61,14 @@ resource "aws_datasync_location_s3" "location_s3" {
     Name = "datasync-location-s3"
   }
 }
+data "aws_caller_identity" "current" {}
 
 resource "aws_datasync_location_efs" "location_efs" {
   efs_file_system_arn = aws_efs_mount_target.ecs_temp_space_az0.file_system_arn
 
   ec2_config {
     security_group_arns = [aws_security_group.ecs_container_security_group.arn]
-    subnet_arn          = "arn:aws:ec2:${var.region}:681718253798:subnet/${var.private_subnet_ids[0]}"
+    subnet_arn          = "arn:aws:ec2:${var.region}:${data.aws_caller_identity.current.account_id}:subnet/${var.private_subnet_ids[0]}"
   }
 }
 
@@ -76,7 +77,7 @@ resource "aws_datasync_task" "dags_sync" {
   name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
   source_location_arn      = aws_datasync_location_s3.location_s3.arn
   cloudwatch_log_group_arn = aws_cloudwatch_log_group.airflow.arn
-  
+
   tags                     = {
       name="${var.resource_prefix}-dags_sync-${var.resource_suffix}"
   }

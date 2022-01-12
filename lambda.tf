@@ -35,26 +35,21 @@ resource "aws_lambda_function" "dags-sync-lambda" {
   runtime = "python3.8"
 }
 
-resource "null_resource" "wait_for_lambda_trigger" {
-  depends_on   = [aws_lambda_permission.s3_trigger]
-  provisioner "local-exec" {
-    command = "sleep 60 >./stdout.log 2>./stderr.log & echo \"sleeping in PID\" $!"
-  }
-}
-
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
-  bucket = local.s3_bucket_name
-  depends_on = [null_resource.wait_for_lambda_trigger]
+  bucket = aws_s3_bucket.airflow[0].id
 
   lambda_function {
     lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
     events              = ["s3:ObjectCreated:*"]
   }
-  
+  depends_on = [
+    aws_lambda_permission.s3_trigger,
+    aws_lambda_function.dags-sync-lambda.arn
+  ]
 }
 
 resource "aws_lambda_permission" "s3_trigger" {
-  statement_id  = "AllowExecutionFromS3Bucket"
+  statement_id  = "AllowS3Invoke"
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
   principal = "s3.amazonaws.com"

@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_s3_bucket" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
   bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"
@@ -14,6 +16,22 @@ resource "aws_s3_bucket" "airflow" {
   #     }
   #   }
   # }
+
+  policy = <<EOF
+{
+      "Version": "2012-10-17",
+      "Statement": [
+         {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+            },
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::${var.s3_bucket_name}/*"
+        }
+      ]
+    }
+EOF
 
   tags = local.common_tags
 }
