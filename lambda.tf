@@ -35,6 +35,13 @@ resource "aws_lambda_function" "dags-sync-lambda" {
   runtime = "python3.8"
 }
 
+resource "null_resource" "wait_for_lambda_trigger" {
+  depends_on   = [aws_lambda_permission.s3_trigger]
+  provisioner "local-exec" {
+    command = "sleep 3m"
+  }
+}
+
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
   bucket = local.s3_bucket_name
 
@@ -45,7 +52,7 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
   depends_on = [aws_lambda_permission.test]
 }
 
-resource "aws_lambda_permission" "test" {
+resource "aws_lambda_permission" "s3_trigger" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
