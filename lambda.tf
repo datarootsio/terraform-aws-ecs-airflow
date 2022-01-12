@@ -49,7 +49,7 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
     lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
     events              = ["s3:ObjectCreated:*"]
   }
-  depends_on = [aws_lambda_permission.test]
+  depends_on = [aws_lambda_permission.s3_trigger]
 }
 
 resource "aws_lambda_permission" "s3_trigger" {
