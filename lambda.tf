@@ -44,7 +44,7 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
   }
   depends_on = [
     aws_lambda_permission.s3_trigger,
-    aws_lambda_function.dags-sync-lambda.arn
+    aws_lambda_function.dags-sync-lambda
   ]
 }
 
