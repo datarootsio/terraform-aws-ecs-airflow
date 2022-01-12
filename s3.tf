@@ -130,12 +130,3 @@ resource "aws_ssm_resource_data_sync" "ssm_resource_data_sync" {
     region      = aws_s3_bucket.airflow[0].region
   }
 }
-
-resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
-  bucket = local.s3_bucket_name
-
-  lambda_function {
-    lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
-    events              = ["s3:ObjectCreated:*"]
-  }
-}

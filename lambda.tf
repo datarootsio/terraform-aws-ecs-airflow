@@ -35,8 +35,18 @@ resource "aws_lambda_function" "dags-sync-lambda" {
   runtime = "python3.8"
 }
 
+resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
+  bucket = local.s3_bucket_name
+
+  lambda_function {
+    lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
+    events              = ["s3:ObjectCreated:*"]
+  }
+  depends_on = [aws_lambda_permission.test]
+}
+
 resource "aws_lambda_permission" "test" {
-  statement_id  = "AllowS3Invoke"
+  statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
   principal = "s3.amazonaws.com"
