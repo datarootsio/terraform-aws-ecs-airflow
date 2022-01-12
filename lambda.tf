@@ -71,7 +71,7 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.dags-sync-lambda.arn
-    events              = ["s3:ObjectCreated:*"]
+    events              = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
   }
   
 }
