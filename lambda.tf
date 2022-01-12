@@ -38,7 +38,7 @@ resource "aws_lambda_function" "dags-sync-lambda" {
 resource "null_resource" "wait_for_lambda_trigger" {
   depends_on   = [aws_lambda_permission.s3_trigger]
   provisioner "local-exec" {
-    command = "sleep 3m"
+    command = "sleep 60 >./stdout.log 2>./stderr.log & echo \"sleeping in PID\" $!"
   }
 }
 
