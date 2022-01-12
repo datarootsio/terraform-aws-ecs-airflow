@@ -76,7 +76,13 @@ resource "aws_datasync_task" "dags_sync" {
   name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
   source_location_arn      = aws_datasync_location_s3.location_s3.arn
   cloudwatch_log_group_arn = aws_cloudwatch_log_group.airflow.arn
+  
   tags                     = {
       name="${var.resource_prefix}-dags_sync-${var.resource_suffix}"
+  }
+
+  options {
+    log_level="TRANSFER"
+    task_queueing = "ENABLED"
   }
 }
