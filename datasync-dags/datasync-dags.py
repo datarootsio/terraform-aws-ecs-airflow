@@ -1,6 +1,7 @@
-import boto3
+import boto3, os
 
-client = boto3.client('datasync', region_name='eu-west-1')
+client = boto3.client('datasync', region_name=os.environ['REGION'])
 
 def handler(event,context):
-    response = client.start_task_execution(TaskArn='arn:aws:datasync:eu-west-1:681718253798:task/task-0201baabab0b6efa7')
+    task_arn = 'arn:aws:datasync:{region}:{account_id}:task/{task_id}'.format(region=os.environ['REGION'], account_id=os.environ['ACCOUNT_ID'], task_id=os.environ['TASK_ID'])
+    response = client.start_task_execution(TaskArn='task_arn')

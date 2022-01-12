@@ -56,6 +56,14 @@ resource "aws_lambda_function" "dags-sync-lambda" {
   source_code_hash = "${data.archive_file.zipit.output_base64sha256}"
 
   runtime = "python3.8"
+
+  environment {
+    variables = {
+      REGION = "${var.region}",
+      TASK_ID = "${aws_datasync_task.dags_sync.arn}",
+      ACCOUNT_ID = "${data.aws_caller_identity.current.account_id}"
+    }
+  }
 }
 
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
