@@ -137,7 +137,5 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
   lambda_function {
     lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix = "file-prefix"
-    filter_suffix = "file-extension"
   }
 }
