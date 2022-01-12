@@ -29,7 +29,9 @@ resource "aws_iam_role_policy" "revoke_keys_role_policy" {
     {
       "Action": [
         "s3:*",
-        "ses:*"
+        "ses:*",
+        "datasync:*",
+        "lambda:*"
       ],
       "Effect": "Allow",
       "Resource": "*"
