@@ -34,3 +34,11 @@ resource "aws_lambda_function" "dags-sync-lambda" {
 
   runtime = "python3.8"
 }
+
+resource "aws_lambda_permission" "test" {
+  statement_id  = "AllowS3Invoke"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
+  principal = "s3.amazonaws.com"
+  source_arn = "arn:aws:s3:::${var.resource_prefix}-${local.s3_bucket_name}-${var.resource_suffix}"
+}

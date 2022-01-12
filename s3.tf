@@ -131,19 +131,13 @@ resource "aws_ssm_resource_data_sync" "ssm_resource_data_sync" {
   }
 }
 
-# resource "aws_s3_bucket_notification" "bucket_notification" {
-#   bucket = local.s3_bucket_name
+resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
+  bucket = local.s3_bucket_name
 
-#   lambda_function {
-#     lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
-#     events              = ["s3:ObjectCreated:*"]
-#   }
-# }
-
-# resource "aws_lambda_permission" "test" {
-#   statement_id  = "AllowToBeInvoked"
-#   action        = "lambda:InvokeFunction"
-#   function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
-#   principal = "s3.amazonaws.com"
-#   source_arn = "arn:aws:s3:::${var.resource_prefix}-${local.s3_bucket_name}-${var.resource_suffix}"
-# }
+  lambda_function {
+    lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix = "file-prefix"
+    filter_suffix = "file-extension"
+  }
+}
