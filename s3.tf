@@ -25,7 +25,7 @@ resource "aws_s3_bucket" "airflow" {
                 "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
             },
             "Action": "s3:*",
-            "Resource": "arn:aws:s3:::${var.s3_bucket_name}/*"
+            "Resource": "arn:aws:s3:::${var.resource_prefix}-airflow-${var.resource_suffix}/*"
         }
       ]
     }
