@@ -18,6 +18,27 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
+resource "aws_iam_role_policy" "revoke_keys_role_policy" {
+  name = "lambda_iam_policy"
+  role = aws_iam_role.iam_for_lambda.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:*",
+        "ses:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 data "archive_file" "zipit" {
   type        = "zip"
   source_file = "${path.module}/datasync-dags-lambda/handler_datasync_task.py"
@@ -39,13 +60,10 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
   bucket = aws_s3_bucket.airflow[0].id
 
   lambda_function {
-    lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
+    lambda_function_arn = aws_lambda_function.dags-sync-lambda.arn
     events              = ["s3:ObjectCreated:*"]
   }
-  depends_on = [
-    aws_lambda_permission.s3_trigger,
-    aws_lambda_function.dags-sync-lambda
-  ]
+  
 }
 
 resource "aws_lambda_permission" "s3_trigger" {
@@ -53,5 +71,5 @@ resource "aws_lambda_permission" "s3_trigger" {
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
   principal = "s3.amazonaws.com"
-  source_arn = "arn:aws:s3:::${var.resource_prefix}-${local.s3_bucket_name}-${var.resource_suffix}"
+  source_arn = "arn:aws:s3:::${aws_s3_bucket.airflow[0].id}"
 }
