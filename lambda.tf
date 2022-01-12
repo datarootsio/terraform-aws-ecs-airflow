@@ -44,12 +44,13 @@ resource "null_resource" "wait_for_lambda_trigger" {
 
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
   bucket = local.s3_bucket_name
+  depends_on = [null_resource.wait_for_lambda_trigger]
 
   lambda_function {
     lambda_function_arn = "${aws_lambda_function.dags-sync-lambda.arn}"
     events              = ["s3:ObjectCreated:*"]
   }
-  depends_on = [aws_lambda_permission.s3_trigger]
+  
 }
 
 resource "aws_lambda_permission" "s3_trigger" {
