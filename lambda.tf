@@ -60,10 +60,14 @@ resource "aws_lambda_function" "dags-sync-lambda" {
   environment {
     variables = {
       REGION = "${var.region}",
-      TASK_ID = "${aws_datasync_task.dags_sync.arn}",
-      ACCOUNT_ID = "${data.aws_caller_identity.current.account_id}"
+      TASK_ID = "${aws_datasync_task.dags_sync.arn}"
     }
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_logs,
+    aws_cloudwatch_log_group.lambda_logs,
+  ]
 }
 
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
@@ -82,4 +86,39 @@ resource "aws_lambda_permission" "s3_trigger" {
   function_name = "${aws_lambda_function.dags-sync-lambda.arn}"
   principal = "s3.amazonaws.com"
   source_arn = "arn:aws:s3:::${aws_s3_bucket.airflow[0].id}"
+}
+
+# This is to optionally manage the CloudWatch Log Group for the Lambda Function.
+# If skipping this resource configuration, also add "logs:CreateLogGroup" to the IAM policy below.
+resource "aws_cloudwatch_log_group" "lambda_logs" {
+  name              = "/aws/lambda/datasync-dags"
+  retention_in_days = 14
+}
+
+resource "aws_iam_policy" "lambda_logging" {
+  name        = "lambda_logging"
+  path        = "/"
+  description = "IAM policy for logging from a lambda"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*",
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.lambda_logging.arn
 }

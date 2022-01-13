@@ -130,3 +130,4 @@ resource "aws_ssm_resource_data_sync" "ssm_resource_data_sync" {
     region      = aws_s3_bucket.airflow[0].region
   }
 }
+
