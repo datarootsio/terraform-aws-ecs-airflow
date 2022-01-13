@@ -300,6 +300,12 @@ variable "s3_bucket_source_arn" {
   default     = ""
 }
 
+variable "datasync_destination_efs_subdirectory" {
+  type        = string
+  default     = "/dags"
+  description = "subdirectory for dags in the EFS"
+}
+
 variable "cidr" {
   default = ""
 }

@@ -64,6 +64,7 @@ resource "aws_datasync_location_s3" "location_s3" {
 
 resource "aws_datasync_location_efs" "location_efs" {
   efs_file_system_arn = aws_efs_mount_target.ecs_temp_space_az0.file_system_arn
+  subdirectory  = "${var.datasync_destination_efs_subdirectory}"
 
   ec2_config {
     security_group_arns = [aws_security_group.ecs_container_security_group.arn]
