@@ -72,23 +72,3 @@ resource "aws_security_group_rule" "ecs_loopback_rule" {
   description               = "Loopback"
   security_group_id         = "${aws_security_group.ecs_container_security_group.id}"
 }
-
-# resource "aws_efs_access_point" "airflow" {
-#   file_system_id = aws_efs_file_system.airflow-efs.id
-#   posix_user {
-#     gid = 1001
-#     uid = 5000
-#     secondary_gids = [1002,1003]
-#   }
-#   root_directory {
-#     path = "/"
-#     creation_info {
-#       owner_gid   = 0
-#       owner_uid   = 0
-#       permissions = "755"
-#     }
-#   }
-#   tags = {
-#     Name    = "${var.resource_prefix}-airflow-efs-${var.resource_suffix}"
-#   }
-# }

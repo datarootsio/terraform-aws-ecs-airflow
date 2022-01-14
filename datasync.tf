@@ -58,7 +58,7 @@ resource "aws_datasync_location_s3" "location_s3" {
   }
 
   tags = {
-    Name = "datasync-location-s3"
+    name = "${var.resource_prefix}-datasync-location-s3-${var.resource_suffix}"
   }
 }
 
@@ -74,16 +74,17 @@ resource "aws_datasync_location_efs" "location_efs" {
 
 resource "aws_datasync_task" "dags_sync" {
   destination_location_arn = aws_datasync_location_efs.location_efs.arn
-  name                     = "${var.resource_prefix}-dags_sync-${var.resource_suffix}"
+  name                     = "${var.resource_prefix}-dags-sync-${var.resource_suffix}"
   source_location_arn      = aws_datasync_location_s3.location_s3.arn
   cloudwatch_log_group_arn = aws_cloudwatch_log_group.airflow.arn
 
   tags                     = {
-      name="${var.resource_prefix}-dags_sync-${var.resource_suffix}"
+      name="${var.resource_prefix}-dags-sync-${var.resource_suffix}"
   }
 
   options {
     log_level="TRANSFER"
     task_queueing = "ENABLED"
+    preserve_deleted_files = "REMOVE"
   }
 }

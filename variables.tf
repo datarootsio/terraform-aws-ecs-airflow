@@ -303,9 +303,11 @@ variable "s3_bucket_source_arn" {
 variable "datasync_destination_efs_subdirectory" {
   type        = string
   default     = "/dags"
-  description = "subdirectory for dags in the EFS"
+  description = "The subdirectory for dags in the EFS (Elastic File System)"
 }
 
 variable "cidr" {
+  type        = string
   default = ""
+  description = "Classless Inter-Domain Routing (CIDR) block for the current VPC"
 }

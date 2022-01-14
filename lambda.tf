@@ -1,5 +1,5 @@
 resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_lambda"
+  name = "${var.resource_prefix}-iam-for-lambda-${var.resource_suffix}"
 
   assume_role_policy = <<EOF
 {
@@ -19,7 +19,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "revoke_keys_role_policy" {
-  name = "lambda_iam_policy"
+  name = "${var.resource_prefix}-lambda-iam-policy-${var.resource_suffix}"
   role = aws_iam_role.iam_for_lambda.id
 
   policy = <<EOF
@@ -91,12 +91,12 @@ resource "aws_lambda_permission" "s3_trigger" {
 # This is to optionally manage the CloudWatch Log Group for the Lambda Function.
 # If skipping this resource configuration, also add "logs:CreateLogGroup" to the IAM policy below.
 resource "aws_cloudwatch_log_group" "lambda_logs" {
-  name              = "/aws/lambda/datasync-dags"
+  name              = "/aws/lambda/${var.resource_prefix}-datasync-dags-${var.resource_suffix}" 
   retention_in_days = 14
 }
 
 resource "aws_iam_policy" "lambda_logging" {
-  name        = "lambda_logging"
+  name        = "${var.resource_prefix}-lambda-logging-${var.resource_suffix}"
   path        = "/"
   description = "IAM policy for logging from a lambda"
 
