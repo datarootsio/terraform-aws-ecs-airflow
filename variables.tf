@@ -165,7 +165,7 @@ variable "public_subnet_ids" {
 variable "private_subnet_ids" {
   type        = list(string)
   description = "A list of subnet ids of where the ECS and RDS reside, this will only work if you have a NAT Gateway in your VPC"
-  default     = []
+  default     = ["172.31.0.0/20", "172.31.16.0/20"]
 
   validation {
     condition     = length(var.private_subnet_ids) >= 2 || length(var.private_subnet_ids) == 0
