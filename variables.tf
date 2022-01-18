@@ -308,6 +308,6 @@ variable "datasync_destination_efs_subdirectory" {
 
 variable "cidr" {
   type        = string
-  default = ""
+  default = "172.31.0.0/16"
   description = "Classless Inter-Domain Routing (CIDR) block for the current VPC"
 }
