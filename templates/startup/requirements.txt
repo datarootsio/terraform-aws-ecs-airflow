@@ -1,0 +1,6 @@
+boto3
+psycopg2-binary
+fsspec
+s3fs
+moto
+typing_extensions
