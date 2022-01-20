@@ -27,13 +27,13 @@ resource "aws_ecs_task_definition" "airflow" {
 
   volume {
     name = "${local.airflow_volume_name}"
-    efs_volume_configuration {
-        file_system_id = aws_efs_file_system.airflow-efs.id
-        root_directory = "/"
-      # HACK: fix for bug in aws_ecs_task_definition provider
-        transit_encryption = "ENABLED"
-        transit_encryption_port = 7777
-    }
+    # efs_volume_configuration {
+    #     file_system_id = aws_efs_file_system.airflow-efs.id
+    #     root_directory = "/"
+    #   # HACK: fix for bug in aws_ecs_task_definition provider
+    #     transit_encryption = "ENABLED"
+    #     transit_encryption_port = 7777
+    # }
   }
 
   # HACK: fix for bug in aws_ecs_task_definition provider
@@ -65,8 +65,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}",
-            "readOnly": false
+            "containerPath": "${var.airflow_container_home}"
           }
         ]
       },
@@ -101,8 +100,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}",
-            "readOnly": false
+            "containerPath": "${var.airflow_container_home}"
           }
         ]
       },
@@ -141,8 +139,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}",
-            "readOnly": false
+            "containerPath": "${var.airflow_container_home}"
           }
         ]
       },
@@ -185,8 +182,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}",
-            "readOnly": false
+            "containerPath": "${var.airflow_container_home}"
           }
         ],
         "portMappings": [
