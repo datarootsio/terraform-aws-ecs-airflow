@@ -30,22 +30,7 @@ resource "aws_security_group" "ecs_container_security_group" {
   description = "Outbound Traffic Only"
   vpc_id      = "${var.vpc_id}"
 
-  ingress = [
-    {
-      description      = "NFS"
-      from_port        = 2049
-      to_port          = 2049
-      protocol         = "tcp"
-      cidr_blocks      = ["${var.cidr}"]  
-      ipv6_cidr_blocks = []
-      prefix_list_ids = []
-      security_groups = []
-      self = false      
-    }
-  ]
-
-  egress = [
-    {
+    egress {
       description      = "for all outgoing traffics"
       from_port        = 0
       to_port          = 0
@@ -56,19 +41,30 @@ resource "aws_security_group" "ecs_container_security_group" {
       security_groups = []
       self = false
     }
-  ]
 
-}
+  ingress {
+      description      = "NFS"
+      from_port        = 2049
+      to_port          = 2049
+      protocol         = "tcp"
+      cidr_blocks      = ["${var.cidr}"]  
+      ipv6_cidr_blocks = []
+      prefix_list_ids = []
+      security_groups = []
+      self = false
+  }
 
-#----------------------------------------
-# ECS security-group loop back rule to connect to EFS Volume
-#----------------------------------------
-resource "aws_security_group_rule" "ecs_loopback_rule" {
-  type                      = "ingress"
-  from_port                 = 0
-  to_port                   = 0
-  protocol                  = "-1"
-  self                      = true
-  description               = "Loopback"
-  security_group_id         = "${aws_security_group.ecs_container_security_group.id}"
+  ingress {
+    description      = "Loopback"
+    from_port        = 0
+    ipv6_cidr_blocks = []
+    prefix_list_ids  = []
+    protocol         = "-1"
+    cidr_blocks      = []
+    security_groups  = []
+    self             = true
+    to_port          = 0
+  }
+
+  tags = local.common_tags
 }

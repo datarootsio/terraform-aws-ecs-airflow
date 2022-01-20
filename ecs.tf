@@ -30,7 +30,15 @@ resource "aws_ecs_task_definition" "airflow" {
     efs_volume_configuration {
         file_system_id = aws_efs_file_system.airflow-efs.id
         root_directory = "/"
+      # HACK: fix for bug in aws_ecs_task_definition provider
+        transit_encryption = "ENABLED"
+        transit_encryption_port = 7777
     }
+  }
+
+  # HACK: fix for bug in aws_ecs_task_definition provider
+  lifecycle {
+    ignore_changes = [ container_definitions ]
   }
 
   container_definitions = <<TASK_DEFINITION
