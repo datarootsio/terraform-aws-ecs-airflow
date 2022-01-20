@@ -15,13 +15,13 @@ resource "aws_efs_file_system" "airflow-efs" {
 
 resource "aws_efs_mount_target" "ecs_temp_space_az0" {
   file_system_id = "${aws_efs_file_system.airflow-efs.id}"
-  subnet_id      = var.private_subnet_ids[0]
+  subnet_id      = var.public_subnet_ids[0]
   security_groups = ["${aws_security_group.ecs_container_security_group.id}"]
 }
 
 resource "aws_efs_mount_target" "ecs_temp_space_az1" {
   file_system_id = "${aws_efs_file_system.airflow-efs.id}"
-  subnet_id      = var.private_subnet_ids[1]
+  subnet_id      = var.public_subnet_ids[1]
   security_groups = ["${aws_security_group.ecs_container_security_group.id}"]
 }
 
