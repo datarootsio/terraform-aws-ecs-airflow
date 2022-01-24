@@ -1,4 +1,4 @@
-import base64, logging, urllib3, json
+import base64, logging, urllib3, json, os
 
 def handler(context, event):
     http = urllib3.PoolManager()
@@ -11,9 +11,8 @@ def handler(context, event):
         'Authorization': "Basic %s" % encoded_u
     }
 
-    logging.info('Triggering Airflow DAG {dag_id}'.format(dag_id='0_sync_dags_in_s3_to_local_airflow_dags_folder'))
-    airflow_url = "airflow-base-airflow-shared-351165443.us-west-2.elb.amazonaws.com"
-    url = 'http://{airflow_url}/api/v1/dags/{dag_id}/dagRuns'.format(airflow_url=airflow_url, dag_id='0_sync_dags_in_s3_to_local_airflow_dags_folder')
+    logging.info('Triggering Airflow DAG {dag_id}'.format(dag_id=os.environ['DAG_ID']))
+    url = 'http://{airflow_url}/api/v1/dags/{dag_id}/dagRuns'.format(airflow_url=os.environ['AIRFLOW_URL'], dag_id=os.environ['DAG_ID'])
     
     response = http.request('POST',
         url=url,
