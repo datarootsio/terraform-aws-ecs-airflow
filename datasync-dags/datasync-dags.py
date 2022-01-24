@@ -21,8 +21,6 @@ def handler(context, event):
         headers=headers,
         retries = False
     )
-    print(response.status)
-    print(json.dumps(json.loads(response.data)))
     return {
             'statusCode': response.status,
             'body': json.dumps(json.loads(response.data))
