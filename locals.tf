@@ -41,7 +41,7 @@ locals {
     AIRFLOW__WEBSERVER__RBAC : var.airflow_authentication == "" ? false : true,
     AIRFLOW__WEBSERVER__AUTH_BACKEND : lookup(local.auth_map, var.airflow_authentication, "")
     AIRFLOW__WEBSERVER__BASE_URL : var.use_https ? "https://${local.dns_record}" : "http://localhost:8080" # localhost is default value
-    AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.base_auth"
+    AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.basic_auth"
   })
 
   airflow_sync_dag_id = "0_sync_dags_in_s3_to_local_airflow_dags_folder"

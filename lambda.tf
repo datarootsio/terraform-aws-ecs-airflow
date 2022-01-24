@@ -59,7 +59,7 @@ resource "aws_lambda_function" "dags-sync-lambda" {
 
   environment {
     variables = {
-      DAG_ID = "${local.airflow_dag_sync_name}",
+      DAG_ID = "${local.airflow_sync_dag_id}",
       AIRFLOW_URL = "${aws_lb.airflow.dns_name}"
     }
   }
