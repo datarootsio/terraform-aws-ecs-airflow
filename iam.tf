@@ -70,6 +70,25 @@ data "aws_iam_policy_document" "task_execution_permissions" {
   }
 }
 
+data "aws_iam_policy_document" "ecs_exec" {
+  count = var.enable_ecs_execute_command ? 1 : 0
+
+  # This policy is required to allow use of the ecs-exec command, to execute
+  # commands on running fargate tasks - similar to `docker exec` functionality
+  # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-exec.html
+  statement {
+    sid    = "AllowExecWithSSM"
+    effect = "Allow"
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"
+    ]
+    resources = ["*"]
+  }
+}
+
 # role for ecs to create the instance
 resource "aws_iam_role" "execution" {
   name               = "${var.resource_prefix}-airflow-task-execution-role-${var.resource_suffix}"
@@ -96,4 +115,10 @@ resource "aws_iam_role_policy" "log_agent" {
   name   = "${var.resource_prefix}-airflow-log-permissions-${var.resource_suffix}"
   role   = aws_iam_role.task.id
   policy = data.aws_iam_policy_document.task_permissions.json
+}
+
+resource "aws_iam_role_policy" "ecs_exec" {
+  name   = "ecs-exec"
+  policy = data.aws_iam_policy_document.ecs_exec.json
+  role   = aws_iam_role.task.name
 }
