@@ -39,6 +39,13 @@ resource "aws_s3_bucket_object" "airflow_seed_dag" {
     MONTH        = local.month
     DAY          = local.day
   })
+
+  #HACK : fix for constant recreations
+  lifecycle {
+    ignore_changes = [content, version_id]
+  }
+  etag = filemd5("${path.module}/templates/dags/airflow_seed_dag.py")
+
 }
 
 resource "aws_s3_bucket_object" "airflow_example_dag" {

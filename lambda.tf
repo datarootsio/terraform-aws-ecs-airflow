@@ -59,8 +59,8 @@ resource "aws_lambda_function" "dags-sync-lambda" {
 
   environment {
     variables = {
-      REGION = "${var.region}",
-      TASK_ID = "${aws_datasync_task.dags_sync.arn}"
+      DAG_ID = "${local.airflow_sync_dag_id}",
+      AIRFLOW_URL = "${aws_lb.airflow.dns_name}"
     }
   }
 
