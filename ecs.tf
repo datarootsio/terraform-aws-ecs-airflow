@@ -175,7 +175,7 @@ resource "aws_ecs_task_definition" "airflow" {
           }
         },
         "healthCheck": {
-          "command": [ "CMD-SHELL", "curl -f http://localhost:8080/health || exit 1" ],
+          "command": [ "CMD-SHELL", "curl -f http://0.0.0.0:8080/health || exit 1" ],
           "startPeriod": 120
         },
         "essential": true,
