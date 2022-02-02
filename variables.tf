@@ -1,7 +1,7 @@
 variable "region" {
   type        = string
   description = "The region to deploy your solution to"
-  default     = "eu-west-1"
+  default     = "eu-west-2"
 }
 
 variable "resource_prefix" {
@@ -310,4 +310,34 @@ variable "cidr" {
   type        = string
   default = "172.31.0.0/16"
   description = "Classless Inter-Domain Routing (CIDR) block for the current VPC"
+}
+
+variable "airflow_core_dag_concurrency" {
+  type        = string
+  description = "The number of task instances allowed to run concurrently by the scheduler."
+  default     = "32"
+}
+
+variable "airflow_core_worker_concurrency" {
+  type        = string
+  description = "The concurrency that will be used when starting workers with the airflow celery worker command. This defines the number of task instances that a worker will take, so size up your workers based on the resources on your worker box and the nature of your tasks."
+  default     = "32"
+}
+
+variable "airflow_core_load_default_connections" {
+  type        = string
+  description = "Whether to load the default connections that ship with Airflow. It’s good to get started, but you probably want to set this to False in a production environment."
+  default     = "False"
+}
+
+variable "airflow_scheduler_dag_dir_list_interval" {
+  type        = string
+  description = "How often (in seconds) to scan the DAGs directory for new files."
+  default     = "180"
+}
+
+variable "airflow_webserver_dag_orientation" {
+  type        = string
+  description = "Default DAG orientation. Valid values are: LR (Left->Right), TB (Top->Bottom), RL (Right->Left), BT (Bottom->Top)."
+  default     = "TB"
 }
