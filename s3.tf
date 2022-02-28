@@ -7,15 +7,27 @@ resource "aws_s3_bucket" "airflow" {
     enabled = true
   }
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "aws:kms"
-      }
+  tags = local.common_tags
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "airflow" {
+  bucket = aws_s3_bucket.airflow.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "aws:kms"
     }
   }
+}
 
-  tags = local.common_tags
+resource "aws_s3_bucket_versioning" "airflow" {
+  bucket = aws_s3_bucket.airflow.bucket
+  enabled = true
+}
+
+resource "aws_s3_bucket_acl" "airflow" {
+  bucket = aws_s3_bucket.airflow.id
+  acl    = "private"
 }
 
 resource "aws_s3_bucket_public_access_block" "airflow" {
