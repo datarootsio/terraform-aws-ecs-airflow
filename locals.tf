@@ -45,7 +45,8 @@ locals {
     AIRFLOW__WEBSERVER__DAG_ORIENTATION: var.airflow_webserver_dag_orientation,
     AIRFLOW__CORE__DAG_CONCURRENCY: var.airflow_core_dag_concurrency,
     AIRFLOW__CORE__WORKER_CONCURRENCY: var.airflow_core_worker_concurrency,
-    AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS: var.airflow_core_load_default_connections
+    AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS: var.airflow_core_load_default_connections,
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: true
   })
 
   airflow_sync_dag_id = "0_sync_dags_in_s3_to_local_airflow_dags_folder"
@@ -58,4 +59,6 @@ locals {
   certificate_arn = var.use_https ? (var.certificate_arn != "" ? var.certificate_arn : aws_acm_certificate.cert[0].arn) : ""
 
   inbound_ports = toset(var.use_https ? ["80", "443"] : ["80"])
+
+  airflow_api_key = base64encode("admin:admin")
 }

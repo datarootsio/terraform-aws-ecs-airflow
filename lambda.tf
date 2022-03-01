@@ -49,7 +49,7 @@ data "archive_file" "zipit" {
 
 resource "aws_lambda_function" "dags-sync-lambda" {
   filename      = "${path.module}/datasync-dags.zip"
-  function_name = "datasync-dags"
+  function_name = "${var.resource_prefix}-datasync-dags-${var.resource_suffix}"
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "datasync-dags.handler"
 
@@ -60,7 +60,8 @@ resource "aws_lambda_function" "dags-sync-lambda" {
   environment {
     variables = {
       DAG_ID = "${local.airflow_sync_dag_id}",
-      AIRFLOW_URL = "${aws_lb.airflow.dns_name}"
+      AIRFLOW_URL = "${aws_lb.airflow.dns_name}",
+      API_KEY = "${local.airflow_api_key}"
     }
   }
 
