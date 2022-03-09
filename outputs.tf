@@ -21,3 +21,7 @@ output "airflow_connection_sg" {
 output "postgres_uri" {
   value = local.postgres_uri
 }
+
+output "airflow_api_key" {
+  value = local.airflow_api_key
+}
