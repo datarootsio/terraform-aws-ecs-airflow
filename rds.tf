@@ -1,6 +1,6 @@
 resource "aws_db_instance" "airflow" {
   count                      = var.rds_endpoint != "" || var.airflow_executor == "Sequential" ? 0 : 1
-  db_name                    = local.database_name
+  name                    = local.database_name
   allocated_storage          = var.rds_allocated_storage
   storage_type               = var.rds_storage_type
   engine                     = var.rds_engine
