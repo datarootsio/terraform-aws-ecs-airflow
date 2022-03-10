@@ -46,7 +46,10 @@ locals {
     AIRFLOW__CORE__DAG_CONCURRENCY: var.airflow_core_dag_concurrency,
     AIRFLOW__CORE__WORKER_CONCURRENCY: var.airflow_core_worker_concurrency,
     AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS: var.airflow_core_load_default_connections,
-    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: true
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: true,
+    AIRFLOW__API__ACCESS_CONTROL_ALLOW_HEADERS: "origin, content-type, accept",
+    AIRFLOW__API__ACCESS_CONTROL_ALLOW_METHODS: "POST, GET, OPTIONS, DELETE",
+    AIRFLOW__API__ACCESS_CONTROL_ALLOW_ORIGINS: "https://am-api.dev.adsuite.tv",
   })
 
   airflow_sync_dag_id = "0_sync_dags_in_s3_to_local_airflow_dags_folder"
