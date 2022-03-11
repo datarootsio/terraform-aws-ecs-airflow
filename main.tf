@@ -1,9 +1,10 @@
 terraform {
-  required_version = ">= 0.12.26"
-
+  required_version = "> 0.15"
   required_providers {
-    aws      = "~> 3.74"
-    template = ">= 2.0"
+    aws = {
+      source  = "hashicorp/aws"
+      version = "> 3.12.0"
+    }
   }
 }
 

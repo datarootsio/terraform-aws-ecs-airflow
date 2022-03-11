@@ -1,12 +1,14 @@
-import logging, urllib3, json, os
+import base64, logging, urllib3, json, os
 
 def handler(context, event):
     http = urllib3.PoolManager()
-
+    # TODO: temporary solution for the username and pass
+    userpass = 'admin' + ':' + 'admin'
+    encoded_u = base64.b64encode(userpass.encode()).decode()
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': "Basic %s" % os.environ['API_KEY']
+        'Authorization': "Basic %s" % encoded_u
     }
 
     logging.info('Triggering Airflow DAG {dag_id}'.format(dag_id=os.environ['DAG_ID']))

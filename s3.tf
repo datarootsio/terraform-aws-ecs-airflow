@@ -1,14 +1,12 @@
 resource "aws_s3_bucket" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
   bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-
-  tags = local.common_tags
   acl    = "private"
 
   versioning {
     enabled = true
   }
-  
+
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
@@ -16,6 +14,8 @@ resource "aws_s3_bucket" "airflow" {
       }
     }
   }
+
+  tags = local.common_tags
 }
 
 resource "aws_s3_bucket_public_access_block" "airflow" {
@@ -130,7 +130,7 @@ EOF
 }
 
 resource "aws_ssm_resource_data_sync" "ssm_resource_data_sync" {
-  name = "${var.resource_prefix}-ssm_resource_data_sync-${var.resource_suffix}" 
+  name = "ssm_resource_data_sync"
 
   s3_destination {
     bucket_name = aws_s3_bucket.airflow[0].bucket
