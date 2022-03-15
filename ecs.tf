@@ -36,9 +36,9 @@ resource "aws_ecs_task_definition" "airflow" {
   }
 
   # HACK: fix for bug in aws_ecs_task_definition provider
-  lifecycle {
-    ignore_changes = [ container_definitions ]
-  }
+  # lifecycle {
+  #   ignore_changes = [ container_definitions ]
+  # }
 
   container_definitions = <<TASK_DEFINITION
     [

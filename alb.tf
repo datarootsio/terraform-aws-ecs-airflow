@@ -66,14 +66,14 @@ resource "aws_security_group" "airflow" {
 
 }
 
-resource "aws_security_group_rule" "airflow_connection" {
-  security_group_id        = aws_security_group.airflow.id
-  type                     = "ingress"
-  protocol                 = "-1"
-  from_port                = 0
-  to_port                  = 0
-  source_security_group_id = aws_security_group.airflow.id
-}
+# resource "aws_security_group_rule" "airflow_connection" {
+#   security_group_id        = aws_security_group.airflow.id
+#   type                     = "ingress"
+#   protocol                 = "-1"
+#   from_port                = 0
+#   to_port                  = 0
+#   source_security_group_id = aws_security_group.airflow.id
+# }
 
 // ALB
 resource "aws_lb" "airflow" {
