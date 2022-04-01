@@ -49,7 +49,9 @@ locals {
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: true,
     AIRFLOW__API__ACCESS_CONTROL_ALLOW_HEADERS: "origin, content-type, accept",
     AIRFLOW__API__ACCESS_CONTROL_ALLOW_METHODS: "POST, GET, OPTIONS, DELETE",
-    AIRFLOW__API__ACCESS_CONTROL_ALLOW_ORIGINS: "https://am-api.dev.adsuite.tv",
+    AIRFLOW__API__ACCESS_CONTROL_ALLOW_ORIGINS: "https://${var.resource_prefix}-api.${var.resource_suffix}.adsuite.tv",
+    AIRFLOW__SECRETS__BACKEND: "airflow.contrib.secrets.aws_systems_manager.SystemsManagerParameterStoreBackend",
+    AIRFLOW__SECRETS__BACKEND_KWARGS: "{'connections_prefix': '/airflow/connections', 'variables_prefix': '/airflow/variables', 'profile_name': 'default'}"
   })
 
   airflow_sync_dag_id = "0_sync_dags_in_s3_to_local_airflow_dags_folder"

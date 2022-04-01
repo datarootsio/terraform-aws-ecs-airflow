@@ -25,3 +25,11 @@ output "postgres_uri" {
 output "airflow_api_key" {
   value = local.airflow_api_key
 }
+
+output "airflow_s3_bucket_arn" {
+  value = aws_s3_bucket.airflow[0].arn
+}
+
+output "airflow_s3_bucket_name" {
+  value = aws_s3_bucket.airflow[0].id
+}

@@ -15,6 +15,8 @@ resource "aws_s3_bucket" "airflow" {
     }
   }
 
+  force_destroy = true
+
   tags = local.common_tags
 }
 
@@ -46,13 +48,6 @@ resource "aws_s3_bucket_object" "airflow_seed_dag" {
   }
   etag = filemd5("${path.module}/templates/dags/airflow_seed_dag.py")
 
-}
-
-resource "aws_s3_bucket_object" "airflow_example_dag" {
-  count   = var.airflow_example_dag ? 1 : 0
-  bucket  = local.s3_bucket_name
-  key     = "dags/example_dag.py"
-  content = templatefile("${path.module}/templates/dags/example_dag.py", {})
 }
 
 resource "aws_s3_bucket_object" "airflow_scheduler_entrypoint" {
@@ -129,12 +124,12 @@ resource "aws_s3_bucket_policy" "s3_bucket_policy" {
 EOF
 }
 
-resource "aws_ssm_resource_data_sync" "ssm_resource_data_sync" {
-  name = "ssm_resource_data_sync"
+# resource "aws_ssm_resource_data_sync" "ssm_resource_data_sync" {
+#   name = "ssm_resource_data_sync"
 
-  s3_destination {
-    bucket_name = aws_s3_bucket.airflow[0].bucket
-    region      = aws_s3_bucket.airflow[0].region
-  }
-}
+#   s3_destination {
+#     bucket_name = aws_s3_bucket.airflow[0].bucket
+#     region      = aws_s3_bucket.airflow[0].region
+#   }
+# }
 
