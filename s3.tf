@@ -59,7 +59,13 @@ resource "aws_s3_bucket_object" "airflow_scheduler_entrypoint" {
 resource "aws_s3_bucket_object" "airflow_webserver_entrypoint" {
   bucket  = local.s3_bucket_name
   key     = "startup/entrypoint_webserver.sh"
-  content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", { AIRFLOW_HOME = var.airflow_container_home })
+  content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", { 
+    AIRFLOW_HOME = var.airflow_container_home,
+    REGION = var.region,
+    AWS_ACCESS_KEY_ID = var.airflow_variables["AWS_ACCESS_KEY_ID"]
+    AWS_SECRET_ACCESS_KEY = var.airflow_variables["AWS_SECRET_ACCESS_KEY"]
+    }
+  )
 }
 
 resource "aws_s3_bucket_object" "airflow_init_entrypoint" {

@@ -8,6 +8,10 @@ ls /opt/airflow/dags
 echo "[INFO] Installing awscli"
 python -m pip install awscli --user
 
+aws configure set region ${REGION} --profile default
+aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} --profile default
+aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} --profile default
+
 # Install python packages through req.txt and pip (if exists)
 if [[ -f "${AIRFLOW_HOME}/startup/requirements.txt" ]]; then
     echo "[INFO] requirements.txt provided. Installing requirements.txt dependencies with pip."
