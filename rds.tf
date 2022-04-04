@@ -18,6 +18,7 @@ resource "aws_db_instance" "airflow" {
   identifier                 = local.rds_name
   vpc_security_group_ids     = [aws_security_group.airflow.id]
   db_subnet_group_name       = aws_db_subnet_group.airflow[0].name
+  storage_encrypted 	     = true
 
   tags = local.common_tags
 }
