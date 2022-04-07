@@ -194,8 +194,8 @@ resource "aws_ecs_task_definition" "airflow" {
         file_system_id = "${aws_efs_file_system.airflow-efs.id}"
         root_directory = "/"
       # HACK: fix for bug in aws_ecs_task_definition provider
-        # transit_encryption = "ENABLED"
-        # transit_encryption_port = 7777
+        transit_encryption = "ENABLED"
+        transit_encryption_port = 7777
     }
   }
 

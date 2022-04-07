@@ -1,7 +1,7 @@
 # TODO: temporary commented (efs works only with the DNS hostnames enabled) 
 resource "aws_efs_file_system" "airflow-efs" {
   creation_token = "${var.resource_prefix}-airlow-efs-${var.resource_suffix}"
-  encrypted      = false
+  encrypted      = true
   performance_mode = "generalPurpose"
   throughput_mode  = "bursting"
 
