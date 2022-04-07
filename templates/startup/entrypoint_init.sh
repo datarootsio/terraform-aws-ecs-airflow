@@ -1,4 +1,5 @@
 #!/bin/bash
+
 echo "[INFO] Starting up airflow init"
 
 # commands change between version so get the major version here

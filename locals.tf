@@ -40,7 +40,7 @@ locals {
     AIRFLOW__CORE__EXECUTOR : "${var.airflow_executor}Executor",
     AIRFLOW__WEBSERVER__RBAC : var.airflow_authentication == "" ? false : true,
     AIRFLOW__WEBSERVER__AUTH_BACKEND : lookup(local.auth_map, var.airflow_authentication, ""),
-    AIRFLOW__WEBSERVER__BASE_URL : var.use_https ? "https://${local.dns_record}" : "http://0.0.0.0:8080", # localhost is default value
+    AIRFLOW__WEBSERVER__BASE_URL : var.use_https ? "http://${local.dns_record}" : "http://${split("/", var.ip_allow_list[0])[0]}:8080", # localhost is default value
     AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.basic_auth",
     AIRFLOW__WEBSERVER__DAG_ORIENTATION: var.airflow_webserver_dag_orientation,
     AIRFLOW__CORE__DAG_CONCURRENCY: var.airflow_core_dag_concurrency,

@@ -6,13 +6,13 @@ data "aws_route53_zone" "zone" {
 resource "aws_route53_record" "airflow" {
   count   = var.route53_zone_name != "" ? 1 : 0
   zone_id = data.aws_route53_zone.zone[0].id
-  name    = local.dns_record
+  name    = "${aws_lb.airflow.dns_name}"
   type    = "A"
 
   alias {
     name                   = aws_lb.airflow.dns_name
     zone_id                = aws_lb.airflow.zone_id
-    evaluate_target_health = "false"
+    evaluate_target_health = "true"
   }
 }
 

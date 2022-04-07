@@ -62,7 +62,7 @@ resource "aws_s3_bucket_object" "airflow_webserver_entrypoint" {
   content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", { 
     AIRFLOW_HOME = var.airflow_container_home,
     REGION = var.region,
-    AWS_ACCESS_KEY_ID = var.airflow_variables["AWS_ACCESS_KEY_ID"]
+    AWS_ACCESS_KEY_ID = var.airflow_variables["AWS_ACCESS_KEY_ID"],
     AWS_SECRET_ACCESS_KEY = var.airflow_variables["AWS_SECRET_ACCESS_KEY"]
     }
   )
@@ -78,7 +78,13 @@ resource "aws_s3_bucket_object" "airflow_init_entrypoint" {
     RBAC_FIRSTNAME  = var.rbac_admin_firstname,
     RBAC_LASTNAME   = var.rbac_admin_lastname,
     RBAC_PASSWORD   = var.rbac_admin_password,
-    AIRFLOW_VERSION = var.airflow_image_tag
+    AIRFLOW_VERSION = var.airflow_image_tag,
+    REGION = var.region,
+    AWS_ACCESS_KEY_ID = var.airflow_variables["AWS_ACCESS_KEY_ID"],
+    AWS_SECRET_ACCESS_KEY = var.airflow_variables["AWS_SECRET_ACCESS_KEY"],
+    # IP = "${aws_efs_mount_target.ecs_temp_space_az0.network_interface_id}"
+    # IP1 = "${aws_efs_mount_target.ecs_temp_space_az1.network_interface_id}"
+    # DNS_NAME = "${aws_efs_mount_target.ecs_temp_space_az0.dns_name}"
   })
 }
 

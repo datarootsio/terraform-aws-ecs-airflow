@@ -10,7 +10,7 @@ resource "aws_ecs_cluster" "airflow" {
   capacity_providers = ["FARGATE_SPOT", "FARGATE"]
 
   default_capacity_provider_strategy {
-    capacity_provider = "FARGATE_SPOT"
+    capacity_provider = "FARGATE"
   }
 
   tags = local.common_tags
@@ -24,16 +24,6 @@ resource "aws_ecs_task_definition" "airflow" {
   network_mode             = "awsvpc"
   task_role_arn            = aws_iam_role.task.arn
   execution_role_arn       = aws_iam_role.execution.arn
-
-  volume {
-    name = "${local.airflow_volume_name}"
-    # efs_volume_configuration {
-    #     file_system_id = module.efs.id
-    #   # HACK: fix for bug in aws_ecs_task_definition provider
-    #     transit_encryption = "ENABLED"
-    #     transit_encryption_port = 7777
-    # }
-  }
 
   # HACK: fix for bug in aws_ecs_task_definition provider
   # lifecycle {
@@ -64,7 +54,8 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}"
+            "containerPath": "${local.efs_root_directory}",
+            "readOnly": false
           }
         ]
       },
@@ -99,7 +90,8 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}"
+            "containerPath": "${local.efs_root_directory}",
+            "readOnly": false
           }
         ]
       },
@@ -138,7 +130,8 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}"
+            "containerPath": "${local.efs_root_directory}",
+            "readOnly": false
           }
         ]
       },
@@ -181,7 +174,8 @@ resource "aws_ecs_task_definition" "airflow" {
         "mountPoints": [
           {
             "sourceVolume": "${local.airflow_volume_name}",
-            "containerPath": "${var.airflow_container_home}"
+            "containerPath": "${local.efs_root_directory}",
+            "readOnly": false
           }
         ],
         "portMappings": [
@@ -194,9 +188,19 @@ resource "aws_ecs_task_definition" "airflow" {
     ]
   TASK_DEFINITION
 
+  volume {
+    name = "${local.airflow_volume_name}"
+    efs_volume_configuration {
+        file_system_id = "${aws_efs_file_system.airflow-efs.id}"
+        root_directory = "/"
+      # HACK: fix for bug in aws_ecs_task_definition provider
+        # transit_encryption = "ENABLED"
+        # transit_encryption_port = 7777
+    }
+  }
+
   tags = local.common_tags
 }
-
 
 
 // Without depends_on I get this error:
@@ -221,7 +225,7 @@ resource "aws_ecs_service" "airflow" {
   }
 
   capacity_provider_strategy {
-    capacity_provider = "FARGATE_SPOT"
+    capacity_provider = "FARGATE"
     weight            = 100
   }
 
