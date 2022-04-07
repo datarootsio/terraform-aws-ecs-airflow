@@ -341,3 +341,15 @@ variable "airflow_webserver_dag_orientation" {
   description = "Default DAG orientation. Valid values are: LR (Left->Right), TB (Top->Bottom), RL (Right->Left), BT (Bottom->Top)."
   default     = "TB"
 }
+
+variable "username_api" {
+  type = string
+  description = "A username for Airflow API basic auth."
+  default = "admin"
+}
+
+variable "password_api" {
+  type = string
+  description = "A password for Airflow API basic auth"
+  default = "admin"
+}
