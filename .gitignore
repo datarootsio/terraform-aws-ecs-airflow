@@ -36,3 +36,4 @@ override.tf.json
 .terraform.lock.hcl
 templates/.DS_Store
 templates/dags/.DS_Store
+.history
