@@ -31,7 +31,8 @@ resource "aws_iam_role_policy" "revoke_keys_role_policy" {
         "s3:*",
         "ses:*",
         "datasync:*",
-        "lambda:*"
+        "lambda:*",
+        "ec2:DescribeNetworkInterfaces"
       ],
       "Effect": "Allow",
       "Resource": "*"

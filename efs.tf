@@ -20,12 +20,6 @@ resource "aws_efs_mount_target" "ecs_temp_space_az" {
   security_groups = ["${aws_security_group.ecs_container_security_group.id}", "${aws_security_group.ecs_container_security_group1.id}"]
 }
 
-resource "aws_efs_mount_target" "ecs_temp_space_az1" {
-  file_system_id = "${aws_efs_file_system.airflow-efs.id}"
-  subnet_id      = var.private_subnet_ids[1]
-  security_groups = ["${aws_security_group.ecs_container_security_group.id}", "${aws_security_group.ecs_container_security_group1.id}"]
-}
-
 resource "aws_security_group" "ecs_container_security_group" {
   name        = "${var.resource_prefix}-ecs-sg-${var.resource_suffix}"
   description = "Outbound Traffic Only"
