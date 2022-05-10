@@ -81,10 +81,4 @@ resource "aws_datasync_task" "dags_sync" {
   tags                     = {
       name="${var.resource_prefix}-dags-sync-${var.resource_suffix}"
   }
-
-  options {
-    log_level="TRANSFER"
-    task_queueing = "ENABLED"
-    preserve_deleted_files = "REMOVE"
-  }
 }

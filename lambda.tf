@@ -24,20 +24,20 @@ resource "aws_iam_role_policy" "revoke_keys_role_policy" {
 
   policy = <<EOF
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "s3:*",
-        "ses:*",
-        "datasync:*",
-        "lambda:*",
-        "ec2:DescribeNetworkInterfaces"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
-  ]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:*",
+                "ses:*",
+                "datasync:*",
+                "lambda:*",
+                "ec2:DescribeNetworkInterfaces"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        }
+    ]
 }
 EOF
 }
