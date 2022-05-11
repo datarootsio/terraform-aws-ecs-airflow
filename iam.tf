@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "task_permissions" {
 
     actions = [
       "logs:CreateLogStream",
-      "logs:PutLogEvents",
+      "logs:PutLogEvents"
     ]
   }
 
@@ -42,6 +42,19 @@ data "aws_iam_policy_document" "task_permissions" {
 
 }
 
+data "aws_iam_policy_document" "ecs_task_execution_permissions" {
+  statement {
+    effect  = "Allow"
+    actions = ["ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel"]
+
+    resources = ["*"]
+  }
+
+}
+
 data "aws_iam_policy_document" "task_execution_permissions" {
   statement {
     effect = "Allow"
@@ -52,7 +65,7 @@ data "aws_iam_policy_document" "task_execution_permissions" {
 
     actions = [
       "logs:CreateLogStream",
-      "logs:PutLogEvents",
+      "logs:PutLogEvents"
     ]
   }
 }
@@ -77,6 +90,12 @@ resource "aws_iam_role_policy" "task_execution" {
   name   = "${var.resource_prefix}-airflow-task-execution-${var.resource_suffix}"
   role   = aws_iam_role.execution.id
   policy = data.aws_iam_policy_document.task_execution_permissions.json
+}
+
+resource "aws_iam_role_policy" "task_ecs_execution" {
+  name   = "${var.resource_prefix}-ecs-task-execution-${var.resource_suffix}"
+  role   = aws_iam_role.task.id
+  policy = data.aws_iam_policy_document.ecs_task_execution_permissions.json
 }
 
 resource "aws_iam_role_policy" "log_agent" {

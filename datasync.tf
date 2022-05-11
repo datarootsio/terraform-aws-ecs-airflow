@@ -72,13 +72,26 @@ resource "aws_datasync_location_efs" "location_efs" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "datasync" {
+  name              = "${var.resource_prefix}-datasync-${var.resource_suffix}"
+  retention_in_days = var.airflow_log_retention
+
+  tags = local.common_tags
+}
+
 resource "aws_datasync_task" "dags_sync" {
   destination_location_arn = aws_datasync_location_efs.location_efs.arn
   name                     = "${var.resource_prefix}-dags-sync-${var.resource_suffix}"
   source_location_arn      = aws_datasync_location_s3.location_s3.arn
-  cloudwatch_log_group_arn = aws_cloudwatch_log_group.airflow.arn
+  cloudwatch_log_group_arn = aws_cloudwatch_log_group.datasync.arn
 
   tags                     = {
       name="${var.resource_prefix}-dags-sync-${var.resource_suffix}"
   }
+   options {
+    verify_mode = "NONE"
+    log_level = "TRANSFER"
+    preserve_deleted_files = "REMOVE"
+  }
+  
 }
