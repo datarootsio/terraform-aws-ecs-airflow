@@ -95,3 +95,66 @@ resource "aws_datasync_task" "dags_sync" {
   }
   
 }
+
+resource "aws_iam_policy" "datasync_logging" {
+  name        = "${var.resource_prefix}-datasync-logging-${var.resource_suffix}"
+  path        = "/"
+  description = "IAM policy for logging from a datasync"
+
+  policy = <<EOF
+{
+  {
+    "Statement": [
+        {
+            "Sid": "DataSyncLogsToCloudWatchLogs",
+            "Effect": "Allow",
+            "Action": [
+                "logs:PutLogEvents",
+                "logs:CreateLogStream"
+            ],
+            "Principal": {
+                "Service": "datasync.amazonaws.com"
+            },
+            "Condition": {
+                "ArnLike": {
+                    "aws:SourceArn": [
+                        "arn:aws:datasync:${var.region}:${data.aws_caller_identity.current.account_id}:task/*"
+                    ]
+                },
+                "StringEquals": {
+                    "aws:SourceAccount": "${data.aws_caller_identity.current.account_id}"
+                }
+            },
+            "Resource": "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:*:*"
+        }
+    ],
+    "Version": "2012-10-17"
+}
+}
+EOF
+}
+
+resource "aws_iam_role" "iam_for_datasync" {
+  name = "${var.resource_prefix}-iam-for-datasync-${var.resource_suffix}"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "datasync.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "datasync_logs" {
+  role       = aws_iam_role.iam_for_datasync.name
+  policy_arn = aws_iam_policy.datasync_logging.arn
+}
