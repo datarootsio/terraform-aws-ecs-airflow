@@ -4,3 +4,4 @@ fsspec
 s3fs
 moto
 typing_extensions
+fastparquet
