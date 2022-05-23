@@ -59,7 +59,7 @@ resource "aws_s3_bucket_object" "airflow_scheduler_entrypoint" {
 resource "aws_s3_bucket_object" "airflow_requirements" {
   bucket  = local.s3_bucket_name
   key     = "startup/requirements.txt"
-  content = templatefile("${path.module}/templates/startup/requirements.txt")
+  content = templatefile("${path.module}/templates/startup/requirements.txt", {})
 }
 
 resource "aws_s3_bucket_object" "airflow_webserver_entrypoint" {
@@ -97,12 +97,12 @@ resource "aws_s3_bucket_object" "airflow_init_db_script" {
   source = "${path.module}/templates/startup/init.py"
 }
 
-resource "aws_s3_bucket_object" "airflow_requirements" {
-  count   = var.airflow_py_requirements_path == "" ? 0 : 1
-  bucket  = local.s3_bucket_name
-  key     = "startup/requirements.txt"
-  content = templatefile(local.airflow_py_requirements_path, {})
-}
+# resource "aws_s3_bucket_object" "airflow_requirements" {
+#   count   = var.airflow_py_requirements_path == "" ? 0 : 1
+#   bucket  = local.s3_bucket_name
+#   key     = "startup/requirements.txt"
+#   content = templatefile(local.airflow_py_requirements_path, {})
+# }
 
 resource "aws_s3_bucket_policy" "s3_bucket_policy" {
   bucket = aws_s3_bucket.airflow[0].bucket
