@@ -277,7 +277,7 @@ variable "s3_bucket_name" {
   description = "The S3 bucket name where the DAGs and startup scripts will be stored, leave this blank to let this module create a s3 bucket for you. WARNING: this module will put files into the path \"dags/\" and \"startup/\" of the bucket"
 }
 
-variable "ecs_cluster_id" {
+variable "ecs_cluster" {
   type = string
   default = ""
   description = "the ECS Cluster ID to run the ECS service in"

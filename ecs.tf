@@ -186,7 +186,7 @@ resource "aws_ecs_service" "airflow" {
   depends_on = [aws_lb.airflow, aws_db_instance.airflow]
 
   name            = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-  cluster         = var.ecs_cluster_id
+  cluster         = var.ecs_cluster
   task_definition = aws_ecs_task_definition.airflow.id
   desired_count   = 1
 
