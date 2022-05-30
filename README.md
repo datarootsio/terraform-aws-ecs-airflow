@@ -13,7 +13,7 @@ This is a module for Terraform that deploys Airflow in AWS.
 
 ## Setup
 
-- An ECS Cluster with:
+- An ECS Service with:
     - Sidecar injection container
     - Airflow init container
     - Airflow webserver container
