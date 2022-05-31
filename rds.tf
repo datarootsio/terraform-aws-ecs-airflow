@@ -19,6 +19,19 @@ resource "aws_db_instance" "airflow" {
   vpc_security_group_ids     = [aws_security_group.airflow.id]
   db_subnet_group_name       = aws_db_subnet_group.airflow[0].name
   storage_encrypted          = true
+  backup_retention_period    = 7
+  backup_window              = "10:28-10:58"
+  ca_cert_identifier         = "rds-ca-2019"
+  delete_automated_backups   = false
+  enabled_cloudwatch_logs_exports = [
+    "postgresql",
+    "upgrade"
+  ]
+  kms_key_id                   = "arn:aws:kms:us-east-1:796958440801:key/b1082d93-c665-4a2b-a79c-08da2a9c8ab1"
+  maintenance_window           = "sat:03:23-sat:03:53"
+  monitoring_interval          = 1
+  monitoring_role_arn          = "arn:aws:iam::796958440801:role/rds-monitoring-role"
+  performance_insights_enabled = true
 
   tags = local.common_tags
 }
