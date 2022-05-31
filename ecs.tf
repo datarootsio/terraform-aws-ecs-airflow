@@ -5,17 +5,6 @@ resource "aws_cloudwatch_log_group" "airflow" {
   tags = local.common_tags
 }
 
-resource "aws_ecs_cluster" "airflow" {
-  name               = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-  capacity_providers = ["FARGATE_SPOT", "FARGATE"]
-
-  default_capacity_provider_strategy {
-    capacity_provider = "FARGATE_SPOT"
-  }
-
-  tags = local.common_tags
-}
-
 resource "aws_ecs_task_definition" "airflow" {
   family                   = "${var.resource_prefix}-airflow-${var.resource_suffix}"
   requires_compatibilities = ["FARGATE"]
@@ -197,7 +186,7 @@ resource "aws_ecs_service" "airflow" {
   depends_on = [aws_lb.airflow, aws_db_instance.airflow]
 
   name            = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-  cluster         = aws_ecs_cluster.airflow.id
+  cluster         = var.ecs_cluster
   task_definition = aws_ecs_task_definition.airflow.id
   desired_count   = 1
 
