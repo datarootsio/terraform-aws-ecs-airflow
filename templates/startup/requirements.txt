@@ -5,3 +5,7 @@ s3fs
 moto
 typing_extensions
 fastparquet
+apache-airflow==2.2.4
+pandas
+numpy
+apache-airflow-providers-amazon
