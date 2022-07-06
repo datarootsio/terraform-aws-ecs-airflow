@@ -33,3 +33,15 @@ output "airflow_s3_bucket_arn" {
 output "airflow_s3_bucket_name" {
   value = aws_s3_bucket.airflow[0].id
 }
+
+output "airflow_efs_dns" {
+  value = aws_efs_file_system.airflow-efs.dns_name
+}
+
+output "efs_mount_point" {
+  value = local.efs_root_directory
+}
+
+output "efs_identifier" {
+  value = local.airflow_volume_name
+}
