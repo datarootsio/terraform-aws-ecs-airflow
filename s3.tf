@@ -39,25 +39,25 @@ resource "aws_s3_bucket_public_access_block" "airflow" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_object" "airflow_seed_dag" {
-  bucket = local.s3_bucket_name
-  key    = "dags/airflow_seed_dag.py"
-  content = templatefile("${path.module}/templates/dags/airflow_seed_dag.py", {
-    BUCKET_NAME  = local.s3_bucket_name,
-    KEY          = local.s3_key,
-    AIRFLOW_HOME = var.airflow_container_home
-    YEAR         = local.year
-    MONTH        = local.month
-    DAY          = local.day
-  })
+# resource "aws_s3_object" "airflow_seed_dag" {
+#   bucket = local.s3_bucket_name
+#   key    = "dags/airflow_seed_dag.py"
+#   content = templatefile("${path.module}/templates/dags/airflow_seed_dag.py", {
+#     BUCKET_NAME  = local.s3_bucket_name,
+#     KEY          = local.s3_key,
+#     AIRFLOW_HOME = var.airflow_container_home
+#     YEAR         = local.year
+#     MONTH        = local.month
+#     DAY          = local.day
+#   })
 
-  #HACK : fix for constant recreations
-  lifecycle {
-    ignore_changes = [content, version_id]
-  }
-  etag = filemd5("${path.module}/templates/dags/airflow_seed_dag.py")
+#   #HACK : fix for constant recreations
+#   lifecycle {
+#     ignore_changes = [content, version_id]
+#   }
+#   etag = filemd5("${path.module}/templates/dags/airflow_seed_dag.py")
 
-}
+# }
 
 resource "aws_s3_object" "airflow_scheduler_entrypoint" {
   bucket  = local.s3_bucket_name
@@ -147,13 +147,3 @@ resource "aws_s3_bucket_policy" "s3_bucket_policy" {
 }
 EOF
 }
-
-# resource "aws_ssm_resource_data_sync" "ssm_resource_data_sync" {
-#   name = "ssm_resource_data_sync"
-
-#   s3_destination {
-#     bucket_name = aws_s3_bucket.airflow[0].bucket
-#     region      = aws_s3_bucket.airflow[0].region
-#   }
-# }
-
