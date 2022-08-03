@@ -16,7 +16,7 @@ resource "aws_ecs_cluster_capacity_providers" "airflow" {
   capacity_providers = ["FARGATE_SPOT", "FARGATE"]
 
   default_capacity_provider_strategy {
-    capacity_provider = "FARGATE"
+    capacity_provider = "FARGATE_SPOT"
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_ecs_task_definition" "airflow" {
         "image": "mikesir87/aws-cli",
         "name": "${local.airflow_sidecar_container_name}",
         "command": [
-            "/bin/bash -c \"aws s3 cp s3://${local.s3_bucket_name}/${local.s3_key} ${var.airflow_container_home} --recursive && chmod +x ${var.airflow_container_home}/${aws_s3_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_object.airflow_webserver_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_object.airflow_requirements.key} && chmod -R 777 ${var.airflow_container_home}\""
+            "/bin/bash -c \"aws s3 cp s3://${local.s3_bucket_name}/${local.s3_key} ${var.airflow_container_home} --recursive && chmod +x ${var.airflow_container_home}/${aws_s3_object.airflow_scheduler_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_object.airflow_webserver_entrypoint.key} && chmod +x ${var.airflow_container_home}/${aws_s3_object.airflow_init_entrypoint.key}\""
         ],
         "entryPoint": [
             "sh",
