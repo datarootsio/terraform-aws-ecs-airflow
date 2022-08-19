@@ -5,6 +5,12 @@ echo "[INFO] Starting up airflow init"
 # commands change between version so get the major version here
 airflow_major_version=$(echo ${AIRFLOW_VERSION} | awk -F. '{ print $1 }')
 
+# Install python packages through req.txt and pip (if exists)
+if [[ -f "${AIRFLOW_HOME}/startup/requirements.txt" ]]; then
+    echo "[INFO] requirements.txt provided. Installing requirements.txt dependencies with pip."
+    python -m pip install -r ${AIRFLOW_HOME}/startup/requirements.txt --user
+fi
+
 # prepare database if needed
 echo "[INFO] Check and prepare database"
 if ! python ./startup/init.py ; then

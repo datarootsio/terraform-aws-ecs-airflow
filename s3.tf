@@ -96,7 +96,8 @@ resource "aws_s3_object" "airflow_init_entrypoint" {
     AIRFLOW_VERSION = var.airflow_image_tag,
     REGION = var.region,
     AWS_ACCESS_KEY_ID = var.airflow_variables["AWS_ACCESS_KEY_ID"],
-    AWS_SECRET_ACCESS_KEY = var.airflow_variables["AWS_SECRET_ACCESS_KEY"]
+    AWS_SECRET_ACCESS_KEY = var.airflow_variables["AWS_SECRET_ACCESS_KEY"],
+    AIRFLOW_HOME = var.airflow_container_home
   })
 }
 
