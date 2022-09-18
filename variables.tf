@@ -243,7 +243,7 @@ variable "rds_password" {
 variable "rds_instance_class" {
   type        = string
   description = "The class of instance you want to give to your rds db"
-  default     = "db.t2.micro"
+  default     = "db.t2.small"
 }
 
 variable "rds_availability_zone" {
