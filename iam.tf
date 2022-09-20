@@ -57,6 +57,31 @@ data "aws_iam_policy_document" "task_execution_permissions" {
   }
 }
 
+data "aws_iam_policy_document" "task_exec_policy" {
+  statement [
+    {
+      effect = "Allow"
+
+      action = [
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel"
+      ]
+      resources = ["*"]
+    }
+    {
+      actions = [
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+      ]
+
+      resources = ["arn:aws:logs:us-east-1:796958440801:log-group:execLog"]
+    }
+  ]
+}
+
 # role for ecs to create the instance
 resource "aws_iam_role" "execution" {
   name               = "${var.resource_prefix}-airflow-task-execution-role-${var.resource_suffix}"
@@ -69,6 +94,11 @@ resource "aws_iam_role" "execution" {
 resource "aws_iam_role" "task" {
   name               = "${var.resource_prefix}-airflow-task-role-${var.resource_suffix}"
   assume_role_policy = data.aws_iam_policy_document.task_assume.json
+
+  inline_policy {
+    name = "airflow-exec-policy"
+    policy = data.aws_iam_policy_docunent.task_exec_policy.json
+  }
 
   tags = local.common_tags
 }
