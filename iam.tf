@@ -59,28 +59,25 @@ data "aws_iam_policy_document" "task_execution_permissions" {
 
 data "aws_iam_policy_document" "task_exec_policy" {
   statement {
-    {
-      effect = "Allow"
+    effect = "Allow"
 
-      action = [
-        "ssmmessages:CreateControlChannel",
-        "ssmmessages:CreateDataChannel",
-        "ssmmessages:OpenControlChannel",
-        "ssmmessages:OpenDataChannel"
-      ]
-      resources = ["*"]
-    }
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"
+    ]
+    resources = ["*"]
   }
   statement {
-    {
-      actions = [
-        "logs:CreateLogStream",
-        "logs:DescribeLogStreams",
-        "logs:PutLogEvents"
-      ]
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:DescribeLogStreams",
+      "logs:PutLogEvents"
+    ]
 
-      resources = ["arn:aws:logs:us-east-1:796958440801:log-group:execLog"]
-    }
+    resources = ["arn:aws:logs:us-east-1:796958440801:log-group:execLog"]
   }
 }
 
