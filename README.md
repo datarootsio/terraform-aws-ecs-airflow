@@ -72,7 +72,7 @@ For now the only authentication option is 'RBAC'. When enabling this, this modul
 - [ ] Support for [Google OAUTH](https://airflow.readthedocs.io/en/latest/security.html#google-authentication)
 
 <!--- BEGIN_TF_DOCS --->
-Error: Argument or block definition required: An argument or block definition is required here. To set an argument, use the equals sign "=" to introduce the argument value.
+Error: Argument or block definition required: An argument or block definition is required here.
 
 <!--- END_TF_DOCS --->
 

@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "task_execution_permissions" {
 }
 
 data "aws_iam_policy_document" "task_exec_policy" {
-  statement [
+  statement {
     {
       effect = "Allow"
 
@@ -70,6 +70,8 @@ data "aws_iam_policy_document" "task_exec_policy" {
       ]
       resources = ["*"]
     }
+  }
+  statement {
     {
       actions = [
         "logs:CreateLogStream",
@@ -79,7 +81,7 @@ data "aws_iam_policy_document" "task_exec_policy" {
 
       resources = ["arn:aws:logs:us-east-1:796958440801:log-group:execLog"]
     }
-  ]
+  }
 }
 
 # role for ecs to create the instance
