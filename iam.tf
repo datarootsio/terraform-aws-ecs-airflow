@@ -96,7 +96,7 @@ resource "aws_iam_role" "task" {
 
   inline_policy {
     name = "airflow-exec-policy"
-    policy = data.aws_iam_policy_docunent.task_exec_policy.json
+    policy = data.aws_iam_policy_document.task_exec_policy.json
   }
 
   tags = local.common_tags
