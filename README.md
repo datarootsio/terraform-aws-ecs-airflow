@@ -7,6 +7,8 @@
 
 ![](https://scontent.fbru1-1.fna.fbcdn.net/v/t1.0-9/94305647_112517570431823_3318660558911176704_o.png?_nc_cat=111&_nc_sid=e3f864&_nc_ohc=-spbrtnzSpQAX_qi7iI&_nc_ht=scontent.fbru1-1.fna&oh=483d147a29972c72dfb588b91d57ac3c&oe=5F99368A "Logo")
 
+### DEPRECATED: We are no longer actively maintaining this module, instead we recommend that you look into [AWS MWAA](https://aws.amazon.com/managed-workflows-for-apache-airflow/) as a replacement.
+
 # Terraform module Airflow on AWS ECS
 
 This is a module for Terraform that deploys Airflow in AWS.
