@@ -71,6 +71,12 @@ resource "aws_s3_object" "airflow_requirements" {
   content = templatefile("${path.module}/templates/startup/requirements.txt", {})
 }
 
+resource "aws_s3_object" "dags-am" {
+    bucket = "${aws_s3_bucket.airflow[0].id}"
+    key    = "dags/am/"
+    source = "/dev/null"
+}
+
 resource "aws_s3_object" "airflow_webserver_entrypoint" {
   bucket  = local.s3_bucket_name
   key     = "startup/entrypoint_webserver.sh"
