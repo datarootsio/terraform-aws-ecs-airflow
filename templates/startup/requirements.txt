@@ -10,5 +10,3 @@ pandas
 numpy
 apache-airflow-providers-amazon
 sentry-sdk
-awswrangler
-pydantic
