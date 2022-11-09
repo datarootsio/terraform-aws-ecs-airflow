@@ -49,3 +49,7 @@ output "efs_identifier" {
 output "airflow_user_password" {
   value = local.airflow_user_password
 }
+
+output "airflow_user_name" {
+  value = local.airflow_user_name
+}
