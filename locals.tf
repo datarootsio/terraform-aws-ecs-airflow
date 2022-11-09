@@ -66,4 +66,11 @@ locals {
   inbound_ports = toset(var.use_https ? ["80", "443"] : ["80"])
 
   airflow_api_key = base64encode("${var.username_api}:${var.password_api}")
+
+  airflow_user_password = random_password.master_password.result
+}
+
+resource "random_password" "master_password" {
+  length  = 16
+  special = false
 }

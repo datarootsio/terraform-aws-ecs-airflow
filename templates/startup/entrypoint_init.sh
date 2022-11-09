@@ -5,8 +5,6 @@ echo "[INFO] Starting up airflow init"
 # commands change between version so get the major version here
 airflow_major_version=$(echo ${AIRFLOW_VERSION} | awk -F. '{ print $1 }')
 
-python -m pip install --upgrade pip
-
 # Install python packages through req.txt and pip (if exists)
 if [[ -f "${AIRFLOW_HOME}/startup/requirements.txt" ]]; then
     echo "[INFO] requirements.txt provided. Installing requirements.txt dependencies with pip."
@@ -49,5 +47,5 @@ if [[ "${RBAC_AUTH}" == "true" ]]; then
         echo "[INFO] No admin user added, users already exists!"
     fi
 else
-  airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin
+  airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password ${AIRFLOW_USER_PASSWORD}
 fi

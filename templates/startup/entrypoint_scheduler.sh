@@ -6,7 +6,6 @@ ls /opt/airflow/dags
 
 # Install boto and awscli for the seed dag
 echo "[INFO] Installing awscli"
-python -m pip install --upgrade pip
 python -m pip install awscli --user
 
 # Install python packages through req.txt and pip (if exists)
