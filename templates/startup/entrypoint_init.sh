@@ -8,6 +8,7 @@ airflow_major_version=$(echo ${AIRFLOW_VERSION} | awk -F. '{ print $1 }')
 # Install python packages through req.txt and pip (if exists)
 if [[ -f "${AIRFLOW_HOME}/startup/requirements.txt" ]]; then
     echo "[INFO] requirements.txt provided. Installing requirements.txt dependencies with pip."
+    python -m pip install --upgrade pip
     python -m pip install -r ${AIRFLOW_HOME}/startup/requirements.txt --user
 fi
 
@@ -22,6 +23,8 @@ echo "[INFO] Running airflow db init"
 if [[ "$airflow_major_version" == "1" ]]; then
     airflow initdb
 else
+   
+    airflow db upgrade
     airflow db init
 fi
 
