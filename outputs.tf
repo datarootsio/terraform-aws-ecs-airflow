@@ -45,11 +45,3 @@ output "efs_mount_point" {
 output "efs_identifier" {
   value = local.airflow_volume_name
 }
-
-output "airflow_user_password" {
-  value = local.airflow_user_password
-}
-
-output "airflow_user_name" {
-  value = local.airflow_user_name
-}

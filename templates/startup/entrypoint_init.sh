@@ -47,5 +47,6 @@ if [[ "${RBAC_AUTH}" == "true" ]]; then
         echo "[INFO] No admin user added, users already exists!"
     fi
 else
-  airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password ${AIRFLOW_USER_PASSWORD}
+    airflow users delete -u ${AIRFLOW_USER_NAME}
+    airflow users create --role Admin --username ${AIRFLOW_USER_NAME} --email admin --firstname admin --lastname admin --password ${AIRFLOW_USER_PASSWORD}
 fi

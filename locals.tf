@@ -67,12 +67,4 @@ locals {
 
   airflow_api_key = base64encode("${var.username_api}:${var.password_api}")
 
-  airflow_user_password = random_password.master_password.result
-
-  airflow_user_name = "admin"
-}
-
-resource "random_password" "master_password" {
-  length  = 16
-  special = false
 }
