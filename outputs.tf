@@ -45,3 +45,7 @@ output "efs_mount_point" {
 output "efs_identifier" {
   value = local.airflow_volume_name
 }
+
+output "airflow_alb_zone_id" {
+  value = aws_lb.airflow.zone_id
+}
