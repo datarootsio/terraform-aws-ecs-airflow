@@ -7,17 +7,70 @@ resource "aws_s3_bucket" "airflow" {
   tags = local.common_tags
 }
 
-resource "aws_s3_bucket_acl" "airflow_acl" {
+# resource "aws_s3_bucket_acl" "airflow_acl" {
+#   bucket = aws_s3_bucket.airflow[0].id
+#   acl    = "private"
+# }
+
+resource "aws_s3_bucket_ownership_controls" "airflow_bucket_ownership_controls" {
+  # for_each = aws_s3_bucket.ui_buckets
+  bucket = aws_s3_bucket.airflow[0].id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+resource "aws_s3_bucket_public_access_block" "airflow_bucket_access_block" {
+  # for_each = aws_s3_bucket.ui_buckets
+  bucket = aws_s3_bucket.airflow[0].id
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+resource "aws_s3_bucket_acl" "airflow_bucket_acl" {
+  depends_on = [
+    aws_s3_bucket_ownership_controls.airflow_bucket_ownership_controls,
+    aws_s3_bucket_public_access_block.airflow_bucket_access_block,
+  ]
   bucket = aws_s3_bucket.airflow[0].id
   acl    = "private"
 }
 
-resource "aws_s3_bucket_versioning" "versioning_airflow_bucket" {
+
+resource "aws_s3_bucket_versioning" "airflow_bucket_versioning" {
   bucket = aws_s3_bucket.airflow[0].id
+  
   versioning_configuration {
     status = "Enabled"
-  }
 }
+}
+
+resource "aws_s3_bucket_policy" "airflow_bucket_policies" {
+  bucket = aws_s3_bucket.airflow[0].id
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt87686786",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_s3_bucket.airflow[0].id}/*",
+      "Principal": "*"
+    }
+  ]
+}
+POLICY
+}
+
+# resource "aws_s3_bucket_versioning" "versioning_airflow_bucket" {
+#   bucket = aws_s3_bucket.airflow[0].id
+#   versioning_configuration {
+#     status = "Enabled"
+#   }
+# }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "airflow_side_encryption" {
   bucket = aws_s3_bucket.airflow[0].bucket
@@ -29,15 +82,15 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "airflow_side_encr
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "airflow" {
-  count  = var.s3_bucket_name == "" ? 1 : 0
-  bucket = aws_s3_bucket.airflow[0].id
+# resource "aws_s3_bucket_public_access_block" "airflow" {
+#   count  = var.s3_bucket_name == "" ? 1 : 0
+#   bucket = aws_s3_bucket.airflow[0].id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
+#   block_public_acls       = false
+#   block_public_policy     = false
+#   ignore_public_acls      = true
+#   restrict_public_buckets = true
+# }
 
 # resource "aws_s3_object" "airflow_seed_dag" {
 #   bucket = local.s3_bucket_name
