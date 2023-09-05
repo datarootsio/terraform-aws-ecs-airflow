@@ -7,13 +7,20 @@ resource "aws_cloudwatch_log_group" "airflow" {
 
 resource "aws_ecs_cluster" "airflow" {
   name               = "${var.resource_prefix}-airflow-${var.resource_suffix}"
+  
+  tags = local.common_tags
+}
+
+resource "aws_ecs_cluster_capacity_providers" "aws_ecs_cluster_capacity_providers" {
+  cluster_name = aws_ecs_cluster.airflow.name
+
   capacity_providers = ["FARGATE_SPOT", "FARGATE"]
 
   default_capacity_provider_strategy {
+    base              = 1
+    weight            = 100
     capacity_provider = "FARGATE_SPOT"
   }
-
-  tags = local.common_tags
 }
 
 resource "aws_ecs_task_definition" "airflow" {
