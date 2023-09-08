@@ -55,16 +55,6 @@ resource "aws_s3_bucket_versioning" "airflow" {
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "airflow" {
-  bucket = aws_s3_bucket.airflow[0].id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm     = "aws:kms"
-    }
-  }
-}
-
 resource "aws_s3_object" "airflow_seed_dag" {
   bucket = local.s3_bucket_name
   key    = "dags/airflow_seed_dag.py"
