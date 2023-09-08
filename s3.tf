@@ -4,6 +4,26 @@ resource "aws_s3_bucket" "airflow" {
   tags = local.common_tags
 }
 
+data "aws_iam_policy_document" "airflow" {
+  statement {
+    effect    = "Allow"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = [
+      "s3:GetObject"
+    ]
+    resources = [
+      "${aws_s3_bucket.airflow[0].arn}/startup/requirements.txt",
+    ]
+  }
+}
+resource "aws_s3_bucket_policy" "airflow" {
+  bucket = aws_s3_bucket.airflow[0].id
+  policy = data.aws_iam_policy_document.airflow.json
+}
+
 resource "aws_s3_bucket_ownership_controls" "airflow" {
   bucket = aws_s3_bucket.airflow[0].id
   rule {
@@ -39,10 +59,10 @@ resource "aws_s3_bucket_public_access_block" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
   bucket = aws_s3_bucket.airflow[0].id
 
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 
 resource "aws_s3_object" "airflow_seed_dag" {
