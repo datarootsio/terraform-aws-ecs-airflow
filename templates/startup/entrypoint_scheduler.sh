@@ -10,7 +10,9 @@ if curl --head --fail -s ${S3_URL_REQUIREMENTS_FILE} > /dev/null; then
     echo "requirements.txt provided, installing it with pip"
     # Download the requirements.txt file to the AIRFLOW_HOME directory
     curl -s -o "${AIRFLOW_HOME}/requirements.txt" ${S3_URL_REQUIREMENTS_FILE}
-
+    echo " --- requirements.txt:"
+    cat ${AIRFLOW_HOME}/requirements.txt
+    echo "end requirements.txt ---"
     # Install the requirements using pip
     pip install -r "${AIRFLOW_HOME}/requirements.txt" --user
 else
