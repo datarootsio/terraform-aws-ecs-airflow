@@ -1,7 +1,7 @@
 resource "aws_s3_bucket" "airflow" {
   count  = var.s3_bucket_name == "" ? 1 : 0
   bucket = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-  tags = local.common_tags
+  tags   = local.common_tags
 }
 
 resource "aws_s3_bucket_public_access_block" "airflow" {
@@ -16,7 +16,7 @@ resource "aws_s3_bucket_public_access_block" "airflow" {
 
 data "aws_iam_policy_document" "airflow" {
   statement {
-    effect    = "Allow"
+    effect = "Allow"
     principals {
       type        = "*"
       identifiers = ["*"]
@@ -76,15 +76,21 @@ resource "aws_s3_object" "airflow_example_dag" {
 }
 
 resource "aws_s3_object" "airflow_scheduler_entrypoint" {
-  bucket  = local.s3_bucket_name
-  key     = "startup/entrypoint_scheduler.sh"
-  content = templatefile("${path.module}/templates/startup/entrypoint_scheduler.sh", { AIRFLOW_HOME = var.airflow_container_home })
+  bucket = local.s3_bucket_name
+  key    = "startup/entrypoint_scheduler.sh"
+  content = templatefile("${path.module}/templates/startup/entrypoint_scheduler.sh", {
+    AIRFLOW_HOME             = var.airflow_container_home,
+    S3_URL_REQUIREMENTS_FILE = "https://${local.s3_bucket_name}.s3.${var.region}.amazonaws.com/startup/requirements.txt",
+  })
 }
 
 resource "aws_s3_object" "airflow_webserver_entrypoint" {
-  bucket  = local.s3_bucket_name
-  key     = "startup/entrypoint_webserver.sh"
-  content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", { AIRFLOW_HOME = var.airflow_container_home })
+  bucket = local.s3_bucket_name
+  key    = "startup/entrypoint_webserver.sh"
+  content = templatefile("${path.module}/templates/startup/entrypoint_webserver.sh", {
+    AIRFLOW_HOME             = var.airflow_container_home,
+    S3_URL_REQUIREMENTS_FILE = "https://${local.s3_bucket_name}.s3.${var.region}.amazonaws.com/startup/requirements.txt",
+  })
 }
 
 resource "aws_s3_object" "airflow_init_entrypoint" {

@@ -5,10 +5,16 @@ ls /opt/airflow/dags
 # Install boto and awscli for the seed dag
 python -m pip install awscli --user
 
-# Intall python packages through req.txt and pip (if exists)
-if [[ -f "${AIRFLOW_HOME}/startup/requirements.txt" ]]; then
+# Check if the requirements file exists and fetch it if it does
+if curl --head --fail -s ${S3_URL_REQUIREMENTS_FILE} > /dev/null; then
     echo "requirements.txt provided, installing it with pip"
-    python -m pip install -r ${AIRFLOW_HOME}/startup/requirements.txt --user
+    # Download the requirements.txt file to the AIRFLOW_HOME directory
+    curl -s -o "${AIRFLOW_HOME}/requirements.txt" ${S3_URL_REQUIREMENTS_FILE}
+
+    # Install the requirements using pip
+    pip install -r "${AIRFLOW_HOME}/requirements.txt" --user
+else
+    echo "requirements.txt provided, but not found in S3 bucket"
 fi
 
 export AIRFLOW__WEBSERVER__SECRET_KEY=$(openssl rand -hex 30)
