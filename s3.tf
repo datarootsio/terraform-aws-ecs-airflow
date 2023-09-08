@@ -14,16 +14,6 @@ resource "aws_s3_bucket_public_access_block" "airflow" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_public_access_block" "airflow" {
-  count  = var.s3_bucket_name == "" ? 1 : 0
-  bucket = aws_s3_bucket.airflow[0].id
-
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
 data "aws_iam_policy_document" "airflow" {
   statement {
     effect = "Allow"
