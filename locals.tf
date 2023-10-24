@@ -17,7 +17,7 @@ locals {
   day                 = formatdate("D", local.timestamp)
 
   rds_name     = "${var.resource_prefix}-airflow-${var.resource_suffix}"
-  postgres_uri = var.postgres_uri != "" ? "postgresql+psycopg2://${var.rds_username}:${var.rds_password}@${var.postgres_uri}" : (var.airflow_executor == "Sequential" ? "" : "postgresql+psycopg2://${var.rds_username}:${var.rds_password}@${aws_db_instance.airflow[0].address}:${aws_db_instance.airflow[0].port}/${aws_db_instance.airflow[0].name}")
+  postgres_uri = var.postgres_uri != "" ? "postgresql+psycopg2://${var.rds_username}:${var.rds_password}@${var.postgres_uri}" : (var.airflow_executor == "Sequential" ? "" : "postgresql+psycopg2://${var.rds_username}:${var.rds_password}@${aws_db_instance.airflow[0].address}:${aws_db_instance.airflow[0].port}/${aws_db_instance.airflow[0].db_name}")
   db_uri       = var.airflow_executor == "Local" ? local.postgres_uri : "sqlite:////opt/airflow/airflow.db"
 
   s3_bucket_name = var.s3_bucket_name != "" ? var.s3_bucket_name : aws_s3_bucket.airflow[0].id
